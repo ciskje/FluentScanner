@@ -28,7 +28,9 @@ Copy-back after a release build (from `macos/`):
 
 ```bash
 D=dist && pkill -f FluentScanner.app/Contents/MacOS/FluentScanner; sleep 1
-rm -rf $D/FluentScanner.app && cp -R /var/tmp/fscan-build/dist/FluentScanner.app $D/
+rm -rf $D/FluentScanner.app $D/FluentScanner.dmg
+cp -R /var/tmp/fscan-build/dist/FluentScanner.app $D/
+cp /var/tmp/fscan-build/dist/FluentScanner.dmg $D/
 ```
 
 Headless self-tests: `FS_SELFTEST=1 <binary>` runs parser/ARP-table asserts and

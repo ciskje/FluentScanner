@@ -24,6 +24,11 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
   `win:[ ]` `mac:[x]`
 - `generic` — result sorting (click a column header) and text filter
   (1.1.0). `win:[ ]` `mac:[x]`
+- `macos` — copy-back also brings `dist/FluentScanner.dmg` back from the
+  build dir (it stayed in `/var/tmp/fscan-build`, only the app came back);
+  step fixed in `macos/AGENTS.md`. `mac:[x]`
+- `macos` — 1.1.0 publish: get `FluentScanner.dmg` onto the NAS, then tag
+  `macos-v1.1.0` + `gh release create` with it. `mac:[ ]`
 
 ## Done
 
