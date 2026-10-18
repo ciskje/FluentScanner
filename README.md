@@ -33,8 +33,15 @@ Or build it yourself: see `windows/AGENTS.md` (Build/run) and
 
 ## Changelog
 
-Same version number = same features everywhere. Windows and macOS are at `1.2.1`.
+Same version number = same features everywhere. Windows is at `1.2.2`,
+macOS at `1.2.1`: 1.2.2 is a Windows-only refinement of the 1.2.1 column
+gesture (the macOS table already resizes and fits natively with the same
+gestures).
 
+- **1.2.2** — Windows: resizing a column works like Excel — the pointer on
+  the boundary between two headers turns into the resize cursor, dragging
+  the boundary resizes the column, and a double-click on the boundary (like
+  a double-click on the header title) sizes the column to its contents.
 - **1.2.1** — Double-click a column header to size it to its contents (both
   platforms); Italian Get IP button now reads `Leggi IP` (as on Windows).
 - **1.2.0** — Full parity, both platforms: click-to-sort column headers +

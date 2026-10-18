@@ -10,7 +10,7 @@
 ; ============================================================
 
 #define MyAppName "FluentScanner"
-#define MyAppVersion "1.2.1"
+#define MyAppVersion "1.2.2"
 #define MyAppExeName "FluentScanner.exe"
 #define PublishDir "..\publish"
 #define IconFile "..\source\Assets\AppIcon.ico"

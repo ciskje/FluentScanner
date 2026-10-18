@@ -94,7 +94,7 @@
             <ListView.Header>
                 <Border BorderThickness="0,0,0,2" Padding="0,0,0,4"
                         BorderBrush="{ThemeResource AccentFillColorDefaultBrush}">
-                    <Grid ColumnSpacing="12" Padding="12,2,12,4">
+                    <Grid x:Name="HeaderGrid" ColumnSpacing="12" Padding="12,2,12,4">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="{Binding W0, Source={StaticResource Cols}}" />
                             <ColumnDefinition Width="{Binding W1, Source={StaticResource Cols}}" />
@@ -108,11 +108,11 @@
                                 BorderBrush="{x:Bind GridLineBrush, Mode=OneWay}">
                             <Grid>
                                 <TextBlock x:Name="HdrIp" FontWeight="SemiBold" Style="{StaticResource CaptionTextBlockStyle}"
-                                           Tag="0" Tapped="Header_Tapped" DoubleTapped="Header_DoubleTapped"
-                                           PointerEntered="Header_Enter" PointerExited="Header_Exit" />
-                                <Rectangle Width="11" HorizontalAlignment="Right" Margin="0,0,-9,0" Opacity="0"
-                                           Fill="{ThemeResource AccentFillColorDefaultBrush}" Tag="0"
+                                           Tag="0" Tapped="Header_Tapped" DoubleTapped="Header_DoubleTapped" />
+                                <local:CursorGripper Width="12" HorizontalAlignment="Right" Margin="0,0,-15,0" Opacity="0"
+                                           Background="{ThemeResource AccentFillColorDefaultBrush}" Tag="0"
                                            PointerEntered="Gripper_Enter" PointerExited="Gripper_Exit"
+                                           DoubleTapped="Gripper_DoubleTapped"
                                            PointerPressed="Gripper_Press" PointerMoved="Gripper_Move"
                                            PointerReleased="Gripper_Release" />
                             </Grid>
@@ -121,11 +121,11 @@
                                 BorderBrush="{x:Bind GridLineBrush, Mode=OneWay}">
                             <Grid>
                                 <TextBlock x:Name="HdrHostname" FontWeight="SemiBold" Style="{StaticResource CaptionTextBlockStyle}"
-                                           Tag="1" Tapped="Header_Tapped" DoubleTapped="Header_DoubleTapped"
-                                           PointerEntered="Header_Enter" PointerExited="Header_Exit" />
-                                <Rectangle Width="11" HorizontalAlignment="Right" Margin="0,0,-9,0" Opacity="0"
-                                           Fill="{ThemeResource AccentFillColorDefaultBrush}" Tag="1"
+                                           Tag="1" Tapped="Header_Tapped" DoubleTapped="Header_DoubleTapped" />
+                                <local:CursorGripper Width="12" HorizontalAlignment="Right" Margin="0,0,-15,0" Opacity="0"
+                                           Background="{ThemeResource AccentFillColorDefaultBrush}" Tag="1"
                                            PointerEntered="Gripper_Enter" PointerExited="Gripper_Exit"
+                                           DoubleTapped="Gripper_DoubleTapped"
                                            PointerPressed="Gripper_Press" PointerMoved="Gripper_Move"
                                            PointerReleased="Gripper_Release" />
                             </Grid>
@@ -134,11 +134,11 @@
                                 BorderBrush="{x:Bind GridLineBrush, Mode=OneWay}">
                             <Grid>
                                 <TextBlock x:Name="HdrMac" FontWeight="SemiBold" Style="{StaticResource CaptionTextBlockStyle}"
-                                           Tag="2" Tapped="Header_Tapped" DoubleTapped="Header_DoubleTapped"
-                                           PointerEntered="Header_Enter" PointerExited="Header_Exit" />
-                                <Rectangle Width="11" HorizontalAlignment="Right" Margin="0,0,-9,0" Opacity="0"
-                                           Fill="{ThemeResource AccentFillColorDefaultBrush}" Tag="2"
+                                           Tag="2" Tapped="Header_Tapped" DoubleTapped="Header_DoubleTapped" />
+                                <local:CursorGripper Width="12" HorizontalAlignment="Right" Margin="0,0,-15,0" Opacity="0"
+                                           Background="{ThemeResource AccentFillColorDefaultBrush}" Tag="2"
                                            PointerEntered="Gripper_Enter" PointerExited="Gripper_Exit"
+                                           DoubleTapped="Gripper_DoubleTapped"
                                            PointerPressed="Gripper_Press" PointerMoved="Gripper_Move"
                                            PointerReleased="Gripper_Release" />
                             </Grid>
@@ -147,11 +147,11 @@
                                 BorderBrush="{x:Bind GridLineBrush, Mode=OneWay}">
                             <Grid>
                                 <TextBlock x:Name="HdrBrand" FontWeight="SemiBold" Style="{StaticResource CaptionTextBlockStyle}"
-                                           Tag="3" Tapped="Header_Tapped" DoubleTapped="Header_DoubleTapped"
-                                           PointerEntered="Header_Enter" PointerExited="Header_Exit" />
-                                <Rectangle Width="11" HorizontalAlignment="Right" Margin="0,0,-9,0" Opacity="0"
-                                           Fill="{ThemeResource AccentFillColorDefaultBrush}" Tag="3"
+                                           Tag="3" Tapped="Header_Tapped" DoubleTapped="Header_DoubleTapped" />
+                                <local:CursorGripper Width="12" HorizontalAlignment="Right" Margin="0,0,-15,0" Opacity="0"
+                                           Background="{ThemeResource AccentFillColorDefaultBrush}" Tag="3"
                                            PointerEntered="Gripper_Enter" PointerExited="Gripper_Exit"
+                                           DoubleTapped="Gripper_DoubleTapped"
                                            PointerPressed="Gripper_Press" PointerMoved="Gripper_Move"
                                            PointerReleased="Gripper_Release" />
                             </Grid>
@@ -160,11 +160,11 @@
                                 BorderBrush="{x:Bind GridLineBrush, Mode=OneWay}">
                             <Grid>
                                 <TextBlock x:Name="HdrKind" FontWeight="SemiBold" Style="{StaticResource CaptionTextBlockStyle}"
-                                           Tag="4" Tapped="Header_Tapped" DoubleTapped="Header_DoubleTapped"
-                                           PointerEntered="Header_Enter" PointerExited="Header_Exit" />
-                                <Rectangle Width="11" HorizontalAlignment="Right" Margin="0,0,-9,0" Opacity="0"
-                                           Fill="{ThemeResource AccentFillColorDefaultBrush}" Tag="4"
+                                           Tag="4" Tapped="Header_Tapped" DoubleTapped="Header_DoubleTapped" />
+                                <local:CursorGripper Width="12" HorizontalAlignment="Right" Margin="0,0,-15,0" Opacity="0"
+                                           Background="{ThemeResource AccentFillColorDefaultBrush}" Tag="4"
                                            PointerEntered="Gripper_Enter" PointerExited="Gripper_Exit"
+                                           DoubleTapped="Gripper_DoubleTapped"
                                            PointerPressed="Gripper_Press" PointerMoved="Gripper_Move"
                                            PointerReleased="Gripper_Release" />
                             </Grid>
@@ -173,18 +173,17 @@
                                 BorderBrush="{x:Bind GridLineBrush, Mode=OneWay}">
                             <Grid>
                                 <TextBlock x:Name="HdrServices" FontWeight="SemiBold" Style="{StaticResource CaptionTextBlockStyle}"
-                                           Tag="5" Tapped="Header_Tapped" DoubleTapped="Header_DoubleTapped"
-                                           PointerEntered="Header_Enter" PointerExited="Header_Exit" />
-                                <Rectangle Width="11" HorizontalAlignment="Right" Margin="0,0,-9,0" Opacity="0"
-                                           Fill="{ThemeResource AccentFillColorDefaultBrush}" Tag="5"
+                                           Tag="5" Tapped="Header_Tapped" DoubleTapped="Header_DoubleTapped" />
+                                <local:CursorGripper Width="12" HorizontalAlignment="Right" Margin="0,0,-15,0" Opacity="0"
+                                           Background="{ThemeResource AccentFillColorDefaultBrush}" Tag="5"
                                            PointerEntered="Gripper_Enter" PointerExited="Gripper_Exit"
+                                           DoubleTapped="Gripper_DoubleTapped"
                                            PointerPressed="Gripper_Press" PointerMoved="Gripper_Move"
                                            PointerReleased="Gripper_Release" />
                             </Grid>
                         </Border>
                         <TextBlock Grid.Column="6" x:Name="HdrLatency" FontWeight="SemiBold" Style="{StaticResource CaptionTextBlockStyle}"
-                                   Tag="6" Tapped="Header_Tapped" DoubleTapped="Header_DoubleTapped"
-                                   PointerEntered="Header_Enter" PointerExited="Header_Exit" />
+                                   Tag="6" Tapped="Header_Tapped" DoubleTapped="Header_DoubleTapped" />
                     </Grid>
                 </Border>
             </ListView.Header>

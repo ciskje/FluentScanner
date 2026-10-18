@@ -383,11 +383,10 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
         RefreshHeaders();
     }
 
-    private void Header_Enter(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e) =>
-        SetHandCursor(true);
-
     /// Double-click a header title: size the column to its contents (the
-    /// macOS table does the same). WinUI delivers the first tap of the pair
+    /// macOS table fits the column under the pointer anywhere on the header
+    /// band; Excel fits on the boundary — see `Gripper_DoubleTapped`, which
+    /// covers that gesture too). WinUI delivers the first tap of the pair
     /// as a regular Tapped, so undo that sort toggle here — the order must
     /// not move on a double-click.
     private void Header_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
@@ -404,9 +403,6 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
         AutoFitColumn(col);
         e.Handled = true;
     }
-
-    private void Header_Exit(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e) =>
-        SetHandCursor(false);
 
     /// Size the column to its widest cell (header title included).
     /// Measure with a throwaway TextBlock: the ListView virtualizes rows, so
@@ -471,20 +467,6 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
         };
         probe.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
         return probe.DesiredSize.Width;
-    }
-
-    /// Same CoreWindow route as the resize gripper (no per-control cursor).
-    private static void SetHandCursor(bool on)
-    {
-        try
-        {
-            var core = Window.Current?.CoreWindow;
-            if (core is null) return;
-            core.PointerCursor = new Windows.UI.Core.CoreCursor(
-                on ? Windows.UI.Core.CoreCursorType.Hand
-                   : Windows.UI.Core.CoreCursorType.Arrow, 1);
-        }
-        catch { }
     }
 
     /// Header titles + the sort arrow (called on language and sort changes).
@@ -743,45 +725,37 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
     private int _gripCol = -1;
     private double _gripLastX;
 
-    /// Standard resize cursor (WinUI 3 has no per-control Cursor property:
-    /// CoreWindow.PointerCursor is the way; guarded — without it the accent
-    /// highlight alone remains as affordance).
-    private static void SetResizeCursor(bool on)
+    /// Excel-style boundary gesture: a double-click on the resize gripper
+    /// sizes the column to its contents. The cursor (the west-east resize
+    /// arrow) comes from the `CursorGripper` element itself.
+    private void Gripper_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
     {
-        try
-        {
-            var core = Window.Current?.CoreWindow;
-            if (core is null) return;
-            core.PointerCursor = new Windows.UI.Core.CoreCursor(
-                on ? Windows.UI.Core.CoreCursorType.SizeWestEast
-                   : Windows.UI.Core.CoreCursorType.Arrow, 1);
-        }
-        catch { }
+        if (sender is not FrameworkElement el || el.Tag is not string tag ||
+            !int.TryParse(tag, out var col)) return;
+        _gripCol = -1;
+        if (sender is UIElement u) u.Opacity = 0;
+        AutoFitColumn(col);
+        e.Handled = true;
     }
 
     private void Gripper_Enter(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        if (sender is UIElement u)
-        {
-            u.Opacity = 0.7;
-            SetResizeCursor(true);
-        }
+        if (sender is UIElement u) u.Opacity = 0.7;
     }
 
     private void Gripper_Exit(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        if (sender is UIElement u && _gripCol < 0)
-        {
-            u.Opacity = 0;
-            SetResizeCursor(false);
-        }
+        if (sender is UIElement u && _gripCol < 0) u.Opacity = 0;
     }
 
     private void Gripper_Press(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
         if (sender is not FrameworkElement el || el.Tag is not string tag || !int.TryParse(tag, out var col)) return;
         _gripCol = col;
-        _gripLastX = e.GetCurrentPoint(el).Position.X;
+        // Positions come from the header grid, not from the gripper: the
+        // gripper rides the column edge, so a relative reading would move
+        // with the thing being resized (the drag would not accumulate).
+        _gripLastX = e.GetCurrentPoint(HeaderGrid).Position.X;
         el.CapturePointer(e.Pointer);
         el.Opacity = 1;
         e.Handled = true;
@@ -789,8 +763,8 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
 
     private void Gripper_Move(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        if (_gripCol < 0 || sender is not FrameworkElement el) return;
-        double x = e.GetCurrentPoint(el).Position.X;
+        if (_gripCol < 0) return;
+        double x = e.GetCurrentPoint(HeaderGrid).Position.X;
         Cols.Set(_gripCol, Cols[_gripCol].Value + (x - _gripLastX));
         _gripLastX = x;
         e.Handled = true;
@@ -800,7 +774,6 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
     {
         if (sender is FrameworkElement el) el.ReleasePointerCapture(e.Pointer);
         if (sender is UIElement u) u.Opacity = 0;
-        SetResizeCursor(false);
         _gripCol = -1;
         e.Handled = true;
     }

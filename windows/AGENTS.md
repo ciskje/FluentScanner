@@ -195,9 +195,34 @@ Standard Win11 window, no custom chrome beyond this:
   double-click as a plain `Tapped`, so `Header_DoubleTapped` (which does
   fire, but **only with the `DoubleTapped` attribute wired in XAML**)
   restores the pre-tap sort order first: a double-click must not move the
-  order. A long cell can push a column past the viewport (the ListView
-  scrolls horizontally — the header, being sticky, is what UIA reports as
-  clipped).
+  order. The same gesture works Excel-style on the column boundary
+  (`Gripper_DoubleTapped` on the gripper element, `Tag` = the column index);
+  a single click on the boundary neither sorts nor resizes.
+  A long cell can push a column past the viewport (the ListView scrolls
+  horizontally — the header, being sticky, is what UIA reports as clipped).
+- Column gripper geometry: the boundary handle is a 12px
+  `CursorGripper` centred on the column edge (`Margin="0,0,-15,0"` against
+  the caption, which sits 9px inside the column: 6px each side, the 12px
+  `ColumnSpacing` gap keeps it clear of the next caption). It is invisible
+  until hovered (opacity 0 → 0.7 → 1 while dragging).
+- **The drag must read a stable reference frame**: the gripper rides the
+  column's right edge, so `GetCurrentPoint(gripper)` moves with the very
+  thing being resized and the deltas cancel out (the column grew ~3px
+  instead of 60, verified). `Gripper_Press`/`Gripper_Move` measure against
+  `HeaderGrid` instead.
+- **Per-element cursor (`CursorGripper`)**: WinUI 3 has no public cursor
+  property — `UIElement.ProtectedCursor` is protected, so it only works
+  from a derived class, and the obvious bases are sealed
+  (`Rectangle` and `Border` both throw CS0509), hence a `Grid` subclass.
+  Set it in the ctor **and** on `Loaded` (before the element is in the
+  visual tree it can be applied too early). The old
+  `Window.Current.CoreWindow.PointerCursor` code compiled but did nothing:
+  WinUI 3 desktop apps have no CoreWindow, so the cast was always null
+  (and it silently swallowed by a `catch`).
+  Caveat: the harness cannot observe the resulting cursor shape —
+  `GetCursorInfo` returns the same handle over the app's TextBox (I-beam),
+  a HyperlinkButton (hand) and the header (arrow), i.e. it is per-window
+  here, so the shape needs an eyeball check.
 - **Never bind null to a Brush in `x:Bind`**: on virtualized (recycled)
   `ListView` containers the text stays invisible even though UIA reads the
   right value — see the blank-IP bug (only the self row, with its explicit

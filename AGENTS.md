@@ -44,8 +44,13 @@ Both builds implement the same intents; platform-native details may differ:
   discovered services
   (HTTP/HTTPS entries open the responding host in the browser), latency
   (ping round-trip, else TCP connect time of the first open port); header
-  clicks sort by column and a text filter narrows the list; double-click
-  a header sizes it to its contents; a color legend
+  clicks sort by column and a text filter narrows the list; columns resize
+  the Excel way — the pointer on the boundary between two headers turns
+  into the west-east resize cursor and dragging resizes the column, a
+  double-click on that boundary sizes the column to its contents (macOS:
+  the native table divider does the drag and the cursor; the header band
+  double-click fits the column under the pointer, which covers the
+  boundary); a color legend
   sits in the footer; the scanning host itself is always listed and
   highlighted (accent IP + computer icon) — the highlight must
   stay readable in both light and dark mode (pure yellow fails on light
@@ -87,7 +92,8 @@ implemented those intents; if the other lags, its release waits.
 
 - Z = bugfix/tweak, Y = new feature/behavior, X = upheaval.
 - Docs/refactor/build never change the version.
-- Current: Windows `1.2.1`, macOS `1.2.1`.
+- Current: Windows `1.2.2`, macOS `1.2.1` (1.2.2 is the Windows-only
+  Excel-style column resize; macOS already resizes natively).
 - Single source: `<Version>` in `windows/source/FluentScanner.csproj`
   and `CFBundleShortVersionString` in `macos/packaging/Info.plist`.
 
