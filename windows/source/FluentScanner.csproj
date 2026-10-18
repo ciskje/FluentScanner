@@ -8,7 +8,7 @@
     <!-- Exe icon (Explorer, shortcuts, Control Panel): without this
          the default .NET one remains, because AppWindow.SetIcon only applies at runtime -->
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <ApplicationManifest>app.manifest</ApplicationManifest>

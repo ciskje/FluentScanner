@@ -33,14 +33,22 @@ Or build it yourself: see `windows/AGENTS.md` (Build/run) and
 
 ## Changelog
 
-Same version number = same features everywhere. Windows and macOS are at `1.1.0`.
+Same version number = same features everywhere. Windows and macOS are at `1.2.0`
+(the macOS `1.2.0` build is produced on the Mac; the `1.1.0` dmg stays available).
 
+- **1.2.0** — Full parity, both platforms: click-to-sort column headers +
+  text filter, editable discovery/service ports and ping/discovery/port
+  timeouts in Settings, clickable HTTP/HTTPS services (the services cell
+  renders as one truncating line on macOS), vendor and type in separate
+  columns, double-click a header sizes it to its contents.
 - **1.1.0** — Editable discovery/service ports + ping/discovery/port
   timeouts in Settings; click-to-sort columns + text filter; self-host
   highlight readable in both themes (amber on light, yellow on dark);
   Windows only: Mica window + standard menu bar, tabular results (zebra
   rows, column separators, resizable columns, clickable HTTP/HTTPS
-  links), scan runs off the UI thread, Inno Setup installer.
+  links), scan runs off the UI thread, Inno Setup installer. The Windows
+  1.1.0 build shipped without sort/filter and the Settings tuning — those
+  landed in 1.2.0.
 - **1.0.0** — First stable: everything in 0.10.0, intents locked.
 - **0.10.0** — Settings (Cmd+,): language override (system/EN/IT, live),
   table font size + monospaced toggle, light/dark/system theme.

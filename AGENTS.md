@@ -86,7 +86,8 @@ implemented those intents; if the other lags, its release waits.
 
 - Z = bugfix/tweak, Y = new feature/behavior, X = upheaval.
 - Docs/refactor/build never change the version.
-- Current: Windows `1.1.0`, macOS `1.1.0`.
+- Current: Windows `1.2.0`, macOS `1.2.0` (the macOS artifact for 1.2.0 is
+  built on the Mac; intents are already in the source).
 - Single source: `<Version>` in `windows/source/FluentScanner.csproj`
   and `CFBundleShortVersionString` in `macos/packaging/Info.plist`.
 
