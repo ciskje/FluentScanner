@@ -16,15 +16,11 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
 
 ## Pending
 
-- `generic` — Excel-style column resizing: the pointer on the column
-  boundary turns into the resize cursor, dragging the boundary resizes the
-  column, double-clicking the boundary sizes it to its contents.
-  `win:[x]` (1.2.2: centred 12px boundary handle with the west-east cursor,
-  drag via the header grid reference frame, `Gripper_DoubleTapped`).
-  `mac:[ ]` — the native table divider already drags and shows the cursor;
-  confirm that a double-click exactly on the divider also fits the *left*
-  column (today the header-band double-click fits the column under the
-  pointer).
+- `generic` — size-to-fit button: a toolbar button fits every column to
+  its contents (macOS: ↔ icon + Cmd+Shift+F, the fitted set pinched so it
+  never overflows the window). `mac:[x]` (1.2.3). `win:[ ]` — add the same
+  button to the WinUI toolbar (its Excel-style boundary drag/double-click
+  stays as a bonus).
 
 ## Done
 

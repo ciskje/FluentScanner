@@ -30,7 +30,7 @@ La discovery fa ping su ogni indirizzo e sonda le porte TCP comuni in parallelo;
 
 Il pallino prima di ogni IP è il tipo di dispositivo (vedi legenda sotto la tabella); la marca ha un suo colore stabile. L'icona shuffle indica un MAC randomizzato, senza produttore. La riga gialla con l'icona del computer è questa macchina.
 
-Gli hostname arrivano da Bonjour (mDNS), NetBIOS e reverse DNS. I dispositivi silenziosi senza porte aperte né servizio nomi restano anonimi: porte aperte, MAC reale e mDNS sono ciò che identifica un dispositivo. Il doppio click sull'intestazione di una colonna la dimensiona sul contenuto (e ordina in senso crescente). Cmd+Maiusc+F adatta tutte le colonne insieme.";
+Gli hostname arrivano da Bonjour (mDNS), NetBIOS e reverse DNS. I dispositivi silenziosi senza porte aperte né servizio nomi restano anonimi: porte aperte, MAC reale e mDNS sono ciò che identifica un dispositivo. Il bottone di adattamento in toolbar (Cmd+Maiusc+F) adatta ogni colonna al suo contenuto.";
 "aboutMenu" = "Informazioni su FluentScanner";
 "aboutTitle" = "Informazioni su FluentScanner";
 "aboutDesc" = "Trova tutti i dispositivi della tua LAN: discovery ping più TCP, scansione porte, identificazione MAC e produttore, hostname.";

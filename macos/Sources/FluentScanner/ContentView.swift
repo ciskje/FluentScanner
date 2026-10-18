@@ -10,11 +10,6 @@ struct ContentView: View {
     @State private var showHelp = false
     @State private var showAbout = false
     @State private var fits: [String: CGFloat] = [:]
-    @State private var colFrames: [String: CGRect] = [:]
-    @State private var hoverPt: CGPoint = .zero
-    // Table ignores width changes on an existing view: bump the identity
-    // so it rebuilds with the new ideals (scroll jumps to top, sort stays).
-    @State private var tableID = 0
 
     var body: some View {
         VStack(spacing: 0) {
@@ -39,13 +34,13 @@ struct ContentView: View {
                                 .help(L("thisMac"))
                         }
                     }
-                    .background(cellFrame("ip"))
+                    
                 }
                 .width(min: 90, ideal: fitIdeal("ip", 150), max: fitMax("ip", 220))
                 TableColumn(L("colHostname"), value: \.sortHostname) { r in
                     Text(r.hostname ?? "")
                         .fontWeight(r.isLocal ? .bold : .regular)
-                        .background(cellFrame("hostname"))
+                        
                 }
                     .width(min: 80, ideal: fitIdeal("hostname", 160), max: fitMax("hostname", 420))
                 TableColumn(L("colMac"), value: \.sortMac) { r in
@@ -58,44 +53,31 @@ struct ContentView: View {
                                 .help(L("randomMac"))
                         }
                     }
-                    .background(cellFrame("mac"))
+                    
                 }
                     .width(min: 110, ideal: fitIdeal("mac", 150), max: fitMax("mac", 200))
                 TableColumn(L("colVendor"), value: \.sortBrand) { r in
-                    brandCell(r).background(cellFrame("vendor"))
+                    brandCell(r)
                 }
                     .width(min: 90, ideal: fitIdeal("vendor", 150), max: fitMax("vendor", 300))
                 TableColumn(L("colType"), value: \.sortKind) { r in
-                    typeCell(r).background(cellFrame("type"))
+                    typeCell(r)
                 }
                     .width(min: 70, ideal: fitIdeal("type", 110), max: fitMax("type", 200))
                 TableColumn(L("colServices"), value: \.sortServices) { r in
-                    servicesCell(r).background(cellFrame("services"))
+                    servicesCell(r)
                 }
                     .width(min: 120, ideal: fitIdeal("services", 200), max: fitMax("services", 560))
                 TableColumn(L("colLatency"), value: \.sortLatency) { r in
-                    Text(r.latencyText).monospaced()
+                    Text(r.latencyText)
+                        .monospaced()
                         .fontWeight(r.isLocal ? .bold : .regular)
-                        .background(cellFrame("latency"))
+                        
                 }
                     .width(min: 50, ideal: fitIdeal("latency", 68), max: fitMax("latency", 110))
             }
             .font(settings.bodyFont)
             .frame(minWidth: 860)
-            .id(tableID)
-            .coordinateSpace(name: "table")
-            .onContinuousHover { if case .active(let p) = $0 { hoverPt = p } }
-            .onPreferenceChange(ColFrameKey.self) { colFrames = $0 }
-            .onTapGesture(count: 2) {
-                // Double-click outside any row = header band (no magic
-                // y numbers — works in any flipped space): fit the column
-                // at or left of the pointer (dividers belong to the left
-                // column, the Finder convention).
-                guard !colFrames.values.contains(where: { $0.contains(hoverPt) }) else { return }
-                let byX = colFrames.sorted { $0.value.minX < $1.value.minX }
-                guard let col = byX.last(where: { hoverPt.x >= $0.value.minX })?.key else { return }
-                fitColumn(col)
-            }
             .onChange(of: vm.sort) { vm.resort() }
             footer
         }
@@ -195,16 +177,13 @@ struct ContentView: View {
         colorScheme == .dark ? .yellow : Color(red: 0.7, green: 0.45, blue: 0.0)
     }
 
-    /// Cell frames in table space (one entry per column — rows share the
-    /// same widths): double-clicking a header finds its column by x.
-    private func cellFrame(_ key: String) -> some View {
-        GeometryReader { geo in
-            Color.clear.preference(key: ColFrameKey.self,
-                value: [key: geo.frame(in: .named("table"))])
-        }
+    private static func findTable(_ v: NSView) -> NSTableView? {
+        if let tv = v as? NSTableView { return tv }
+        for s in v.subviews { if let f = findTable(s) { return f } }
+        return nil
     }
 
-    /// Ideal width for a column: the fitted width once double-clicked.
+    /// Ideal width for a column: the fitted width once the fit button ran.
     private func fitIdeal(_ key: String, _ dflt: CGFloat) -> CGFloat {
         fits[key] ?? dflt
     }
@@ -246,26 +225,27 @@ struct ContentView: View {
         for key in ["ip", "hostname", "mac", "vendor", "type", "services", "latency"] {
             fits[key] = fittedWidth(key)
         }
-        tableID += 1
+        pinchFits()
     }
 
-    /// Double-click a header: size that column to its contents and sort it
-    /// ascending (deterministic — also neutralizes the two sort toggles
-    /// the double-click itself fires).
-    private func fitColumn(_ key: String) {
-        fits[key] = fittedWidth(key)
-        let cmp: KeyPathComparator<HostRow>
-        switch key {
-        case "hostname": cmp = KeyPathComparator(\.sortHostname)
-        case "mac": cmp = KeyPathComparator(\.sortMac)
-        case "vendor": cmp = KeyPathComparator(\.sortBrand)
-        case "type": cmp = KeyPathComparator(\.sortKind)
-        case "services": cmp = KeyPathComparator(\.sortServices)
-        case "latency": cmp = KeyPathComparator(\.sortLatency)
-        default: cmp = KeyPathComparator(\.sortIp)
+    /// Scale fitted widths so their sum fits the visible table (Aqua min
+    /// widths respected): fitting must never push a column out of view.
+    private func pinchFits() {
+        guard
+            let tv = NSApp.windows.compactMap({ ($0.isVisible
+                && $0.contentView != nil) ? Self.findTable($0.contentView!) : nil }).first
+        else { return }
+        let visible = tv.enclosingScrollView?.contentView.bounds.width ?? tv.frame.width
+        let mins: [String: CGFloat] = ["ip": 90, "hostname": 80, "mac": 110,
+            "vendor": 90, "type": 70, "services": 120, "latency": 50]
+        let dflt: [String: CGFloat] = ["ip": 150, "hostname": 160, "mac": 150,
+            "vendor": 150, "type": 110, "services": 200, "latency": 68]
+        let sum = mins.keys.reduce(0.0) { $0 + (fits[$1] ?? dflt[$1] ?? 100) }
+        guard sum > visible, visible > 400 else { return }
+        let k = visible / sum
+        for key in mins.keys {
+            fits[key] = max(mins[key] ?? 60, floor((fits[key] ?? dflt[key] ?? 100) * k))
         }
-        vm.sort = [cmp]
-        tableID += 1
     }
 
     /// Services cell: one Text (markdown links for HTTP/HTTPS) so the
