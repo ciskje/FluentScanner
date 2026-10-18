@@ -34,7 +34,11 @@ Or build it yourself: see `windows/AGENTS.md` (Build/run) and
 ## Changelog
 
 Same version number = same features everywhere. Windows is at `1.2.2`,
-macOS at `1.2.3`.
+macOS at `1.2.4`.
+
+- **1.2.4** — macOS: the size-to-fit toolbar button works again (the 1.2.3
+  cleanup had dropped the table rebuild that makes SwiftUI apply the
+  fitted widths).
 
 - **1.2.3** — macOS: a toolbar button fits every column to its contents
   (Cmd+Shift+F); the fitted set is pinched so it never overflows the

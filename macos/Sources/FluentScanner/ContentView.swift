@@ -10,6 +10,9 @@ struct ContentView: View {
     @State private var showHelp = false
     @State private var showAbout = false
     @State private var fits: [String: CGFloat] = [:]
+    // Table ignores width changes on an existing view: bump the identity
+    // so it rebuilds with the new ideals (scroll jumps to top, sort stays).
+    @State private var tableID = 0
 
     var body: some View {
         VStack(spacing: 0) {
@@ -78,6 +81,7 @@ struct ContentView: View {
             }
             .font(settings.bodyFont)
             .frame(minWidth: 860)
+            .id(tableID)
             .onChange(of: vm.sort) { vm.resort() }
             footer
         }
@@ -226,6 +230,7 @@ struct ContentView: View {
             fits[key] = fittedWidth(key)
         }
         pinchFits()
+        tableID += 1
     }
 
     /// Scale fitted widths so their sum fits the visible table (Aqua min
