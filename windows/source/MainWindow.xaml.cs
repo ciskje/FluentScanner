@@ -40,6 +40,11 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
     private int _sortCol;
     private bool _sortAsc = true;
     private string _filter = "";
+    // Header tap bookkeeping (see Header_DoubleTapped: a double-click must
+    // size the column, not move the sort order).
+    private int _tapCol;
+    private bool _tapAsc = true;
+    private int _tapTick;
 
     // Code-behind strings: read from the .resw files shipped next to the exe
     // (Strings/<language>/). No MRT/ResourceLoader: it needs package identity,
@@ -364,6 +369,9 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
     {
         if (sender is not FrameworkElement el || el.Tag is not string tag ||
             !int.TryParse(tag, out var col)) return;
+        _tapCol = _sortCol; // so a following double-click can undo this tap
+        _tapAsc = _sortAsc;
+        _tapTick = Environment.TickCount;
         if (col == _sortCol) _sortAsc = !_sortAsc;
         else { _sortCol = col; _sortAsc = true; }
         SortRows();
@@ -375,6 +383,91 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
 
     private void Header_Exit(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e) =>
         SetHandCursor(false);
+
+    /// Double-click a header title: size that column to its contents (the
+    /// macOS table does the same). Sorting stays a single-click gesture: if
+    /// WinUI delivered the Tapped that opened the pair, this undoes it —
+    /// the gesture recognizer can also swallow that tap, in which case
+    /// there is nothing to undo.
+    private void Header_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement el || el.Tag is not string tag ||
+            !int.TryParse(tag, out var col)) return;
+        if (unchecked(Environment.TickCount - _tapTick) < 600)
+        {
+            _tapTick = 0;
+            _sortCol = _tapCol;
+            _sortAsc = _tapAsc;
+            SortRows();
+            RefreshHeaders();
+        }
+        AutoFitColumn(col);
+        e.Handled = true;
+    }
+
+    /// Measure with a throwaway TextBlock: the ListView virtualizes rows, so
+    /// only the realized containers are on screen and measuring them would
+    /// size the column to what happens to be visible. The data (all visible
+    /// rows) is measured instead, with the same font as the cells.
+    private void AutoFitColumn(int col)
+    {
+        var headers = new[] { HdrIp, HdrHostname, HdrMac, HdrBrand, HdrKind, HdrServices, HdrLatency };
+        var header = headers[col];
+        double width = Measure(header.Text + "  ", header.FontSize, header.FontFamily, header.FontWeight);
+        bool selfIcon = false;
+        foreach (var r in _rows)
+        {
+            double cell = col == ColServices
+                ? ServicesWidth(r)
+                : Measure(CellText(r, col), r.RowFontSize, r.RowFontFamily, null);
+            if (col == 0)
+            {
+                cell += 14; // device-type dot + gap
+                if (r.IsLocal) selfIcon = true;
+            }
+            width = Math.Max(width, cell);
+        }
+        if (selfIcon) width += _settings.FontSize + 6; // 🖥 self-host icon + gap
+        Cols.Set(col, Math.Min(640, width + (col == ColLatency ? 14 : 20)));
+    }
+
+    private double ServicesWidth(HostRow r)
+    {
+        double w = r.PlainServices.Length == 0
+            ? 0
+            : Measure(r.PlainServices + (r.Links.Count > 0 ? ", " : ""),
+                      r.RowFontSize, r.RowFontFamily, null);
+        // HTTP/HTTPS entries are HyperlinkButtons: fixed 12px font, 4px side
+        // padding (see the list item template).
+        foreach (var link in r.Links)
+            w += Measure(link.Label, 12, new FontFamily("Segoe UI"), null) + 12;
+        return w;
+    }
+
+    private static string CellText(HostRow r, int col) => col switch
+    {
+        ColHostname => r.Hostname,
+        ColMac => r.Mac,
+        ColBrand => r.Brand,
+        ColKind => r.Kind,
+        ColServices => r.Services,
+        ColLatency => r.Latency,
+        _ => r.Ip,
+    };
+
+    private static double Measure(string text, double size, FontFamily family,
+        Windows.UI.Text.FontWeight? weight)
+    {
+        var probe = new TextBlock
+        {
+            Text = text,
+            FontSize = size,
+            FontFamily = family,
+            FontWeight = weight ?? Microsoft.UI.Text.FontWeights.Normal,
+        };
+        probe.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
+        return probe.DesiredSize.Width;
+    }
 
     /// Same CoreWindow route as the resize gripper (no per-control cursor).
     private static void SetHandCursor(bool on)

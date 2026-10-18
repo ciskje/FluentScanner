@@ -42,7 +42,8 @@ internal sealed class ColumnWidths : INotifyPropertyChanged
             case 2: W2 = w; break;
             case 3: W3 = w; break;
             case 4: W4 = w; break;
-            default: W5 = w; break;
+            case 5: W5 = w; break;
+            case 6: W6 = w; break;
         }
     }
 

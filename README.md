@@ -33,9 +33,9 @@ Or build it yourself: see `windows/AGENTS.md` (Build/run) and
 
 ## Changelog
 
-Same version number = same features everywhere. Windows and macOS are at `1.2.0`
-(the macOS `1.2.0` build is produced on the Mac; the `1.1.0` dmg stays available).
+Same version number = same features everywhere. Windows and macOS are at `1.2.1`.
 
+- **1.2.1** — Italian Get IP button now reads `Leggi IP` (as on Windows).
 - **1.2.0** — Full parity, both platforms: click-to-sort column headers +
   text filter, editable discovery/service ports and ping/discovery/port
   timeouts in Settings, clickable HTTP/HTTPS services (the services cell

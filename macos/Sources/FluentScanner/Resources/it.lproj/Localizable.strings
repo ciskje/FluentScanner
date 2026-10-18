@@ -19,12 +19,12 @@
 "randomMac" = "MAC randomizzato (indirizzo privacy, nessun produttore)";
 "startIp" = "IP inizio";
 "endIp" = "IP fine";
-"getIp" = "Get IP";
+"getIp" = "Leggi IP";
 "getIpHelp" = "Riempie con il range della subnet di questa macchina";
 "randomMacLegend" = "MAC randomizzato";
 "thisMacLegend" = "Questo Mac (host di scansione)";
 "helpTitle" = "Aiuto di FluentScanner";
-"helpBody" = "Inserisci IP inizio e IP fine e premi Start (vale anche Invio). Get IP riempie il range della subnet di questa macchina. Un singolo IP scansiona solo quell'host. Gli indirizzi di rete (.0) e broadcast (.255) non vengono mai sondati.
+"helpBody" = "Inserisci IP inizio e IP fine e premi Avvia (vale anche Invio). Get IP riempie il range della subnet di questa macchina. Un singolo IP scansiona solo quell'host. Gli indirizzi di rete (.0) e broadcast (.255) non vengono mai sondati.
 
 La discovery fa ping su ogni indirizzo e sonda le porte TCP comuni in parallelo; gli host attivi ricevono poi la scansione completa delle porte. La barra mostra l'avanzamento; Stop ferma la scansione. Export salva la tabella in CSV.
 
