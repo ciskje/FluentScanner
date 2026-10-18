@@ -71,4 +71,12 @@ Gli hostname arrivano da Bonjour (mDNS), NetBIOS e reverse DNS. I dispositivi si
   <data name="themeSystem"><value>Sistema</value></data>
   <data name="themeLight"><value>Chiaro</value></data>
   <data name="themeDark"><value>Scuro</value></data>
+  <data name="searchLabel"><value>Filtra</value></data>
+  <data name="pingTimeoutLabel"><value>Timeout ping</value></data>
+  <data name="discTimeoutLabel"><value>Timeout discovery</value></data>
+  <data name="portTimeoutLabel"><value>Timeout porte</value></data>
+  <data name="discPortsLabel"><value>Porte discovery (separate da virgole)</value></data>
+  <data name="scanPortsLabel"><value>Porte servizi (separate da virgole)</value></data>
+  <data name="portsInvalid"><value>Lista non valida — numeri 1-65535 separati da virgole</value></data>
+  <data name="saveBtn"><value>Salva</value></data>
 </root>

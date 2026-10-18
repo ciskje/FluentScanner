@@ -40,7 +40,8 @@ Both builds implement the same intents; platform-native details may differ:
   ride in the additional section), NetBIOS node-status for Windows PCs,
   classic reverse DNS last
 - Live results list: IP (with a device-type color dot), hostname, MAC,
-  vendor (each brand in its own stable color) + type, discovered services
+  vendor (each brand in its own stable color) and type in separate columns,
+  discovered services
   (HTTP/HTTPS entries open the responding host in the browser), latency
   (ping round-trip, else TCP connect time of the first open port); header
   clicks sort by column and a text filter narrows the list; a color legend

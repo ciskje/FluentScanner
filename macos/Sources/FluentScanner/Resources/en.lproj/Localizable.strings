@@ -14,7 +14,7 @@
 "colMac" = "MAC Address";
 "colServices" = "Services";
 "colLatency" = "Latency";
-"colVendor" = "Vendor / Type";
+"colVendor" = "Vendor";
 "thisMac" = "This Mac (scanning host)";
 "randomMac" = "Randomized MAC (privacy address, no vendor)";
 "startIp" = "Start IP";
@@ -52,3 +52,4 @@ Hostnames come from Bonjour (mDNS), NetBIOS and reverse DNS. Quiet devices with 
 "scanPortsLabel" = "Service ports (comma separated)";
 "portsInvalid" = "Invalid port list — use numbers 1-65535 separated by commas";
 "searchLabel" = "Filter";
+"colType" = "Type";

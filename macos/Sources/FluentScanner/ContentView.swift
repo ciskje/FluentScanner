@@ -52,8 +52,10 @@ struct ContentView: View {
                     }
                 }
                     .width(min: 110, ideal: 150, max: 200)
-                TableColumn(L("colVendor"), value: \.sortVendor) { r in vendorCell(r) }
-                    .width(min: 110, ideal: 220, max: 420)
+                TableColumn(L("colVendor"), value: \.sortBrand) { r in brandCell(r) }
+                    .width(min: 90, ideal: 150, max: 300)
+                TableColumn(L("colType"), value: \.sortKind) { r in typeCell(r) }
+                    .width(min: 70, ideal: 110, max: 200)
                 TableColumn(L("colServices"), value: \.sortServices) { r in servicesCell(r) }
                     .width(min: 120, ideal: 200, max: 560)
                 TableColumn(L("colLatency"), value: \.sortLatency) { r in
@@ -205,20 +207,25 @@ struct ContentView: View {
         return Self.brandPalette[Int(h % UInt(Self.brandPalette.count))]
     }
 
-    private func vendorCell(_ r: HostRow) -> some View {
+    private func brandCell(_ r: HostRow) -> some View {
         let brand = r.vendor ?? r.server // HTTP software fills OUI silence
-        return HStack(spacing: 0) {            if let v = brand, !v.isEmpty {
-                Text(v).foregroundStyle(brandColor(v))
-            }
-            if let k = r.kind, !k.isEmpty {
-                Text(((brand?.isEmpty ?? true) ? "" : " — ") + k)
-                    .foregroundStyle(.secondary)
-            }
+        return HStack(spacing: 0) {
+            Text(brand ?? "")
+                .foregroundStyle(brand.map(brandColor) ?? .primary)
         }
         .lineLimit(1)
         .truncationMode(.middle)
         .help(r.vendorText)
         .fontWeight(r.isLocal ? .bold : .regular)
+    }
+
+    private func typeCell(_ r: HostRow) -> some View {
+        Text(r.kind ?? "")
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+            .truncationMode(.middle)
+            .help(r.vendorText)
+            .fontWeight(r.isLocal ? .bold : .regular)
     }
     /// One dot color per device hint (unknown stays unfilled).
     private func tint(for r: HostRow) -> Color {

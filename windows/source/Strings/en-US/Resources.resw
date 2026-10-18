@@ -71,4 +71,12 @@ Hostnames come from Bonjour (mDNS), NetBIOS and reverse DNS. Quiet devices with 
   <data name="themeSystem"><value>System</value></data>
   <data name="themeLight"><value>Light</value></data>
   <data name="themeDark"><value>Dark</value></data>
+  <data name="searchLabel"><value>Filter</value></data>
+  <data name="pingTimeoutLabel"><value>Ping timeout</value></data>
+  <data name="discTimeoutLabel"><value>Discovery timeout</value></data>
+  <data name="portTimeoutLabel"><value>Port timeout</value></data>
+  <data name="discPortsLabel"><value>Discovery ports (comma separated)</value></data>
+  <data name="scanPortsLabel"><value>Service ports (comma separated)</value></data>
+  <data name="portsInvalid"><value>Invalid port list — use numbers 1-65535 separated by commas</value></data>
+  <data name="saveBtn"><value>Save</value></data>
 </root>

@@ -32,6 +32,15 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
     private readonly Dictionary<string, HostRow> _byIp = [];
     private AppSettings _settings = AppSettings.Load();
 
+    // Sort/filter state: the column index matches the header Tags (0..6);
+    // the default (IP ascending) is the pre-sort behavior. The visible order
+    // drives the zebra RowIndex *and* the CSV export, like the macOS table.
+    private const int ColHostname = 1, ColMac = 2, ColBrand = 3, ColKind = 4,
+        ColServices = 5, ColLatency = 6;
+    private int _sortCol;
+    private bool _sortAsc = true;
+    private string _filter = "";
+
     // Code-behind strings: read from the .resw files shipped next to the exe
     // (Strings/<language>/). No MRT/ResourceLoader: it needs package identity,
     // missing in unpackaged apps (FileNotFoundException in the constructor).
@@ -151,6 +160,7 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
 
     private void ApplySettings()
     {
+        _settings.ApplyTuning(); // port lists + timeouts → scan engine
         if (Content is FrameworkElement root) root.RequestedTheme = _settings.ThemeEnum();
         HostRow.DarkMode = EffectiveDark();
         GridLineBrush = new SolidColorBrush(HostRow.DarkMode
@@ -212,13 +222,9 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
         HelpMenu.Title = Str("menuHelp");
         HelpMenuItem.Text = Str("helpItem");
         AboutMenuItem.Text = Str("aboutItem");
-        HdrIp.Text = Str("thIp");
-        HdrHostname.Text = Str("thHostname");
-        HdrMac.Text = Str("thMac");
-        HdrBrand.Text = Str("thBrand");
-        HdrKind.Text = Str("thKind");
-        HdrServices.Text = Str("thServices");
-        HdrLatency.Text = Str("thLatency");
+        SettingsMenuItem.Text = Str("settingsTitle");
+        FilterBox.PlaceholderText = Str("searchLabel");
+        RefreshHeaders();
         RandomLegendTxt.Text = Str("randomMacLegend");
         SelfLegendTxt.Text = Str("thisPcLegend");
         BuildKindLegend();
@@ -299,21 +305,103 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
         row = new HostRow(ip);
         ApplyFont(row);
         _byIp[ip] = row;
-        _rows.Add(row);
+        // A filter hides non-matching rows; SortRows() reconsiders every row
+        // once its hostname/services fill in.
+        if (_filter.Length == 0 || MatchesFilter(row)) _rows.Add(row);
         return row;
     }
 
     private void SortRows()
     {
         // Same HostRow objects are re-added: IsLocal survives rebuilds (0.8.1).
-        // RowIndex drives the zebra striping.
-        var sorted = _byIp.Keys.OrderBy(ip => ip, Comparer<string>.Create(Scanner.IpCompare)).ToList();
+        // RowIndex drives the zebra striping of the visible (filtered) list.
+        var list = _byIp.Values.Where(r => _filter.Length == 0 || MatchesFilter(r)).ToList();
+        list.Sort(CompareRows);
         _rows.Clear();
-        for (int i = 0; i < sorted.Count; i++)
+        for (int i = 0; i < list.Count; i++)
         {
-            _byIp[sorted[i]].RowIndex = i;
-            _rows.Add(_byIp[sorted[i]]);
+            list[i].RowIndex = i;
+            _rows.Add(list[i]);
         }
+    }
+
+    /// Case-insensitive substring over the same fields as the macOS
+    /// publishAll (ip, hostname, mac, vendor text, services).
+    private bool MatchesFilter(HostRow r)
+    {
+        bool Hit(string s) => s.Contains(_filter, StringComparison.OrdinalIgnoreCase);
+        return Hit(r.Ip) || Hit(r.Hostname) || Hit(r.Mac) || Hit(r.VendorText) || Hit(r.Services);
+    }
+
+    /// Active column first, IP as the tie-break so the order stays stable
+    /// while rows fill in during the scan.
+    private int CompareRows(HostRow a, HostRow b)
+    {
+        int c = _sortCol switch
+        {
+            ColHostname => string.Compare(a.Hostname, b.Hostname, StringComparison.OrdinalIgnoreCase),
+            ColMac => string.Compare(a.Mac, b.Mac, StringComparison.OrdinalIgnoreCase),
+            ColBrand => string.Compare(a.Brand, b.Brand, StringComparison.OrdinalIgnoreCase),
+            ColKind => string.Compare(a.Kind, b.Kind, StringComparison.OrdinalIgnoreCase),
+            ColServices => string.Compare(a.Services, b.Services, StringComparison.OrdinalIgnoreCase),
+            ColLatency => (a.LatencyMs ?? int.MaxValue).CompareTo(b.LatencyMs ?? int.MaxValue),
+            _ => Scanner.IpCompare(a.Ip, b.Ip),
+        };
+        if (c == 0) c = Scanner.IpCompare(a.Ip, b.Ip);
+        return _sortAsc ? c : -c;
+    }
+
+    private void Filter_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        _filter = FilterBox.Text.Trim();
+        SortRows();
+    }
+
+    // MARK: Sortable headers (click a column title to sort, arrow marks the
+    // active column — the macOS table sorts the same way on header click).
+
+    private void Header_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement el || el.Tag is not string tag ||
+            !int.TryParse(tag, out var col)) return;
+        if (col == _sortCol) _sortAsc = !_sortAsc;
+        else { _sortCol = col; _sortAsc = true; }
+        SortRows();
+        RefreshHeaders();
+    }
+
+    private void Header_Enter(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e) =>
+        SetHandCursor(true);
+
+    private void Header_Exit(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e) =>
+        SetHandCursor(false);
+
+    /// Same CoreWindow route as the resize gripper (no per-control cursor).
+    private static void SetHandCursor(bool on)
+    {
+        try
+        {
+            var core = Window.Current?.CoreWindow;
+            if (core is null) return;
+            core.PointerCursor = new Windows.UI.Core.CoreCursor(
+                on ? Windows.UI.Core.CoreCursorType.Hand
+                   : Windows.UI.Core.CoreCursorType.Arrow, 1);
+        }
+        catch { }
+    }
+
+    /// Header titles + the sort arrow (called on language and sort changes).
+    private void RefreshHeaders()
+    {
+        var heads = new (TextBlock T, string Key)[]
+        {
+            (HdrIp, "thIp"), (HdrHostname, "thHostname"), (HdrMac, "thMac"),
+            (HdrBrand, "thBrand"), (HdrKind, "thKind"), (HdrServices, "thServices"),
+            (HdrLatency, "thLatency"),
+        };
+        for (int i = 0; i < heads.Length; i++)
+            heads[i].T.Text = Str(heads[i].Key) +
+                (i == _sortCol ? (_sortAsc ? " ▲" : " ▼") : "");
     }
 
     private void ApplyMac(string ip, Dictionary<string, string> arp)
@@ -450,6 +538,96 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
         _settings.Save();
         ApplySettings();
         RefreshViewMenu();
+    }
+
+    /// Scan tuning dialog (port lists + timeouts): the same intent as the
+    /// macOS SettingsView fields, opened from the View menu like the other
+    /// former settings-dialog options.
+    private async void Settings_Click(object sender, RoutedEventArgs e)
+    {
+        var stack = new StackPanel { Spacing = 12, Width = 420 };
+
+        var ping = new Slider { Minimum = 500, Maximum = 2000, StepFrequency = 250, Value = _settings.PingTimeoutMs };
+        var disc = new Slider { Minimum = 500, Maximum = 3000, StepFrequency = 500, Value = _settings.DiscoveryTimeoutMs };
+        var port = new Slider { Minimum = 500, Maximum = 3000, StepFrequency = 500, Value = _settings.PortTimeoutMs };
+        BindSlider(ping, "pingTimeoutLabel", v => $"{(int)v} ms");
+        BindSlider(disc, "discTimeoutLabel", v => $"{v / 1000.0:0.0} s");
+        BindSlider(port, "portTimeoutLabel", v => $"{v / 1000.0:0.0} s");
+
+        var discPorts = new TextBox { Header = Str("discPortsLabel"), Text = _settings.DiscoveryPortsText };
+        var scanPorts = new TextBox { Header = Str("scanPortsLabel"), Text = _settings.ScanPortsText };
+        var err = new TextBlock
+        {
+            Text = Str("portsInvalid"),
+            TextWrapping = TextWrapping.Wrap,
+            Foreground = CriticalBrush(),
+            Visibility = Visibility.Collapsed,
+        };
+
+        stack.Children.Add(ping);
+        stack.Children.Add(disc);
+        stack.Children.Add(port);
+        stack.Children.Add(discPorts);
+        stack.Children.Add(scanPorts);
+        stack.Children.Add(err);
+
+        var dlg = new ContentDialog
+        {
+            Title = Str("settingsTitle"),
+            Content = new ScrollViewer
+            {
+                Content = stack, MaxHeight = 420,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            },
+            PrimaryButtonText = Str("saveBtn"),
+            CloseButtonText = Str("closeBtn"),
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = Content.XamlRoot,
+        };
+        // Invalid port text keeps the dialog open (like the macOS inline
+        // error) — never let a typo reach the scan engine.
+        dlg.PrimaryButtonClick += (_, args) =>
+        {
+            var dp = Scanner.ParsePorts(discPorts.Text);
+            var sp = Scanner.ParsePorts(scanPorts.Text);
+            if (dp is null || sp is null)
+            {
+                err.Visibility = Visibility.Visible;
+                args.Cancel = true;
+                return;
+            }
+            _settings.PingTimeoutMs = (int)ping.Value;
+            _settings.DiscoveryTimeoutMs = (int)disc.Value;
+            _settings.PortTimeoutMs = (int)port.Value;
+            _settings.DiscoveryPortsText = string.Join(", ", dp);
+            _settings.ScanPortsText = string.Join(", ", sp);
+            _settings.Save();
+            ApplySettings();
+        };
+        await dlg.ShowAsync();
+    }
+
+    /// Slider header doubles as label + live value (no extra text row).
+    private void BindSlider(Slider s, string key, Func<double, string> fmt)
+    {
+        void Update() => s.Header = $"{Str(key)}: {fmt(s.Value)}";
+        s.ValueChanged += (_, _) => Update();
+        Update();
+    }
+
+    /// Theme-aware error red (same resolution rule as SecondaryBrush).
+    private static Brush CriticalBrush()
+    {
+        try
+        {
+            var dicts = Application.Current.Resources.ThemeDictionaries;
+            if (dicts.TryGetValue(HostRow.DarkMode ? "Dark" : "Light", out var o) &&
+                o is ResourceDictionary d &&
+                d.TryGetValue("SystemFillColorCriticalBrush", out var v) && v is Brush b)
+                return b;
+        }
+        catch { }
+        return new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0xC4, 0x2B, 0x1C));
     }
 
     private void Range_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)

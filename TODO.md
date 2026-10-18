@@ -16,6 +16,8 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
 
 ## Pending
 
+- `generic` — Vendor and Type in separate columns (Windows already had
+  them; macOS showed `Vendor — Type` combined). `mac:[x] win:[x]`
 - `generic` — click-to-sort columns + text filter (1.1.0). `mac:[x] win:[ ]`
 - `generic` — editable discovery/scan ports + ping/discovery/port timeouts
   (1.1.0). `mac:[x] win:[ ]`

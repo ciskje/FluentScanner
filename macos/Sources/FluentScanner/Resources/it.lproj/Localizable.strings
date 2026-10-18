@@ -14,7 +14,7 @@
 "colMac" = "Indirizzo MAC";
 "colServices" = "Servizi";
 "colLatency" = "Latenza";
-"colVendor" = "Produttore / Tipo";
+"colVendor" = "Produttore";
 "thisMac" = "Questo Mac (host di scansione)";
 "randomMac" = "MAC randomizzato (indirizzo privacy, nessun produttore)";
 "startIp" = "IP inizio";
@@ -52,3 +52,4 @@ Gli hostname arrivano da Bonjour (mDNS), NetBIOS e reverse DNS. I dispositivi si
 "scanPortsLabel" = "Porte servizi (separate da virgole)";
 "portsInvalid" = "Lista non valida — numeri 1-65535 separati da virgole";
 "searchLabel" = "Filtra";
+"colType" = "Tipo";

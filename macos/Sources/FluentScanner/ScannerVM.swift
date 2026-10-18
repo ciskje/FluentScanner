@@ -28,7 +28,8 @@ struct HostRow: Identifiable {
     var sortIp: String { ip }
     var sortHostname: String { hostname ?? "" }
     var sortMac: String { mac ?? "" }
-    var sortVendor: String { vendorText }
+    var sortBrand: String { (vendor ?? server) ?? "" }
+    var sortKind: String { kind ?? "" }
     var sortServices: String { services ?? "" }
     var sortLatency: Int { latencyMs ?? Int.max }
 }
