@@ -30,7 +30,7 @@ Discovery pings every address and probes common TCP ports in parallel; live host
 
 The dot before each IP is the device type (see the legend below the table); the brand name gets its own stable color. A shuffle icon marks a randomized MAC, which carries no vendor. The yellow row with the computer icon is this machine.
 
-Hostnames come from Bonjour (mDNS), NetBIOS and reverse DNS. Quiet devices with no open port and no name service stay anonymous — open ports, a real MAC vendor and mDNS are what identify a device.";
+Hostnames come from Bonjour (mDNS), NetBIOS and reverse DNS. Quiet devices with no open port and no name service stay anonymous — open ports, a real MAC vendor and mDNS are what identify a device. Double-click a column header to size it to its contents (and sort ascending).";
 "aboutMenu" = "About FluentScanner";
 "aboutTitle" = "About FluentScanner";
 "aboutDesc" = "Finds every device on your LAN: ping plus TCP discovery, open-port sweep, MAC and vendor identification, hostnames.";

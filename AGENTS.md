@@ -44,7 +44,8 @@ Both builds implement the same intents; platform-native details may differ:
   discovered services
   (HTTP/HTTPS entries open the responding host in the browser), latency
   (ping round-trip, else TCP connect time of the first open port); header
-  clicks sort by column and a text filter narrows the list; a color legend
+  clicks sort by column and a text filter narrows the list; double-click
+  a header sizes it to its contents; a color legend
   sits in the footer; the scanning host itself is always listed and
   highlighted (accent IP + computer icon) — the highlight must
   stay readable in both light and dark mode (pure yellow fails on light

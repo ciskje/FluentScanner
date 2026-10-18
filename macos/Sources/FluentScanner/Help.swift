@@ -1,6 +1,17 @@
 import AppKit
 import SwiftUI
 
+/// Column cell frames in table space, for header double-click fitting.
+struct ColFrameKey: PreferenceKey {
+    static var defaultValue: [String: CGRect] = [:]
+    static func reduce(value: inout [String: CGRect],
+                       nextValue: () -> [String: CGRect]) {
+        for (k, r) in nextValue() {
+            value[k] = value[k]?.union(r) ?? r
+        }
+    }
+}
+
 extension Notification.Name {
     static let showAbout = Notification.Name("FluentScanner.showAbout")
 }

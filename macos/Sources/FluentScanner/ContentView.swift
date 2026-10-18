@@ -9,6 +9,9 @@ struct ContentView: View {
     @State private var end = Scanner.localSubnet()?.end ?? "192.168.1.254"
     @State private var showHelp = false
     @State private var showAbout = false
+    @State private var fits: [String: CGFloat] = [:]
+    @State private var colFrames: [String: CGRect] = [:]
+    @State private var hoverPt: CGPoint = .zero
 
     var body: some View {
         VStack(spacing: 0) {
@@ -33,13 +36,15 @@ struct ContentView: View {
                                 .help(L("thisMac"))
                         }
                     }
+                    .background(cellFrame("ip"))
                 }
-                .width(min: 90, ideal: 150, max: 220)
+                .width(min: 90, ideal: fitIdeal("ip", 150), max: fitMax("ip", 220))
                 TableColumn(L("colHostname"), value: \.sortHostname) { r in
                     Text(r.hostname ?? "")
                         .fontWeight(r.isLocal ? .bold : .regular)
+                        .background(cellFrame("hostname"))
                 }
-                    .width(min: 80, ideal: 160, max: 420)
+                    .width(min: 80, ideal: fitIdeal("hostname", 160), max: fitMax("hostname", 420))
                 TableColumn(L("colMac"), value: \.sortMac) { r in
                     HStack(spacing: 4) {
                         Text(r.mac ?? "").monospaced()
@@ -50,22 +55,44 @@ struct ContentView: View {
                                 .help(L("randomMac"))
                         }
                     }
+                    .background(cellFrame("mac"))
                 }
-                    .width(min: 110, ideal: 150, max: 200)
-                TableColumn(L("colVendor"), value: \.sortBrand) { r in brandCell(r) }
-                    .width(min: 90, ideal: 150, max: 300)
-                TableColumn(L("colType"), value: \.sortKind) { r in typeCell(r) }
-                    .width(min: 70, ideal: 110, max: 200)
-                TableColumn(L("colServices"), value: \.sortServices) { r in servicesCell(r) }
-                    .width(min: 120, ideal: 200, max: 560)
+                    .width(min: 110, ideal: fitIdeal("mac", 150), max: fitMax("mac", 200))
+                TableColumn(L("colVendor"), value: \.sortBrand) { r in
+                    brandCell(r).background(cellFrame("vendor"))
+                }
+                    .width(min: 90, ideal: fitIdeal("vendor", 150), max: fitMax("vendor", 300))
+                TableColumn(L("colType"), value: \.sortKind) { r in
+                    typeCell(r).background(cellFrame("type"))
+                }
+                    .width(min: 70, ideal: fitIdeal("type", 110), max: fitMax("type", 200))
+                TableColumn(L("colServices"), value: \.sortServices) { r in
+                    servicesCell(r).background(cellFrame("services"))
+                }
+                    .width(min: 120, ideal: fitIdeal("services", 200), max: fitMax("services", 560))
                 TableColumn(L("colLatency"), value: \.sortLatency) { r in
                     Text(r.latencyText).monospaced()
                         .fontWeight(r.isLocal ? .bold : .regular)
+                        .background(cellFrame("latency"))
                 }
-                    .width(min: 50, ideal: 68, max: 110)
+                    .width(min: 50, ideal: fitIdeal("latency", 68), max: fitMax("latency", 110))
             }
             .font(settings.bodyFont)
             .frame(minWidth: 860)
+            .coordinateSpace(name: "table")
+            .onContinuousHover { if case .active(let p) = $0 { hoverPt = p } }
+            .onPreferenceChange(ColFrameKey.self) { colFrames = $0 }
+            .onTapGesture(count: 2) {
+                // Double-click outside any row = header band (no magic
+                // y numbers — works in any flipped space): fit the column
+                // under the pointer.
+                guard !colFrames.values.contains(where: { $0.contains(hoverPt) }),
+                    let col = colFrames.first(where: {
+                        hoverPt.x >= $0.value.minX && hoverPt.x <= $0.value.maxX
+                    })?.key
+                else { return }
+                fitColumn(col)
+            }
             .onChange(of: vm.sort) { vm.resort() }
             footer
         }
@@ -158,6 +185,65 @@ struct ContentView: View {
     /// so light mode gets a darker amber instead.
     private var selfColor: Color {
         colorScheme == .dark ? .yellow : Color(red: 0.7, green: 0.45, blue: 0.0)
+    }
+
+    /// Cell frames in table space (one entry per column — rows share the
+    /// same widths): double-clicking a header finds its column by x.
+    private func cellFrame(_ key: String) -> some View {
+        GeometryReader { geo in
+            Color.clear.preference(key: ColFrameKey.self,
+                value: [key: geo.frame(in: .named("table"))])
+        }
+    }
+
+    /// Ideal width for a column: the fitted width once double-clicked.
+    private func fitIdeal(_ key: String, _ dflt: CGFloat) -> CGFloat {
+        fits[key] ?? dflt
+    }
+
+    /// Max width, always at least the fitted width.
+    private func fitMax(_ key: String, _ dflt: CGFloat) -> CGFloat {
+        max(dflt, fits[key] ?? dflt)
+    }
+
+    /// Double-click a header: size that column to its contents and sort it
+    /// ascending (deterministic — also neutralizes the two sort toggles
+    /// the double-click itself fires).
+    private func fitColumn(_ key: String) {
+        let vals: [String]
+        let mono: Bool
+        switch key {
+        case "hostname":
+            vals = [L("colHostname")] + vm.rows.map { $0.hostname ?? "" }; mono = false
+        case "mac":
+            vals = [L("colMac")] + vm.rows.map { $0.mac ?? "" }; mono = true
+        case "vendor":
+            vals = [L("colVendor")] + vm.rows.map { $0.vendor ?? $0.server ?? "" }; mono = false
+        case "type":
+            vals = [L("colType")] + vm.rows.map { $0.kind ?? "" }; mono = false
+        case "services":
+            vals = [L("colServices")] + vm.rows.map { $0.services ?? "" }; mono = false
+        case "latency":
+            vals = [L("colLatency")] + vm.rows.map(\.latencyText); mono = true
+        default:
+            vals = [L("colIp")] + vm.rows.map(\.ip); mono = true
+        }
+        let font = mono
+            ? NSFont.monospacedSystemFont(ofSize: settings.fontSize, weight: .regular)
+            : NSFont.systemFont(ofSize: settings.fontSize)
+        let w = vals.map { ($0 as NSString).size(withAttributes: [.font: font]).width }.max() ?? 0
+        fits[key] = min(600, max(70, w + 30))
+        let cmp: KeyPathComparator<HostRow>
+        switch key {
+        case "hostname": cmp = KeyPathComparator(\.sortHostname)
+        case "mac": cmp = KeyPathComparator(\.sortMac)
+        case "vendor": cmp = KeyPathComparator(\.sortBrand)
+        case "type": cmp = KeyPathComparator(\.sortKind)
+        case "services": cmp = KeyPathComparator(\.sortServices)
+        case "latency": cmp = KeyPathComparator(\.sortLatency)
+        default: cmp = KeyPathComparator(\.sortIp)
+        }
+        vm.sort = [cmp]
     }
 
     /// Services cell: one Text (markdown links for HTTP/HTTPS) so the
