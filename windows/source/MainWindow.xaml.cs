@@ -40,11 +40,12 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
     private int _sortCol;
     private bool _sortAsc = true;
     private string _filter = "";
-    // Header tap bookkeeping (see Header_DoubleTapped: a double-click must
-    // size the column, not move the sort order).
-    private int _tapCol;
-    private bool _tapAsc = true;
-    private int _tapTick;
+    // Header tap bookkeeping: the second tap of a double-click sizes the
+    // column (and undoes the sort of the first one).
+    private int _lastTapCol = -1;
+    private int _lastTapTick;
+    private int _prevSortCol;
+    private bool _prevSortAsc = true;
 
     // Code-behind strings: read from the .resw files shipped next to the exe
     // (Strings/<language>/). No MRT/ResourceLoader: it needs package identity,
@@ -363,15 +364,19 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
     }
 
     // MARK: Sortable headers (click a column title to sort, arrow marks the
-    // active column — the macOS table sorts the same way on header click).
+    // active column; double-click sizes the column to its contents — the
+    // macOS table does both the same way).
 
     private void Header_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
     {
         if (sender is not FrameworkElement el || el.Tag is not string tag ||
             !int.TryParse(tag, out var col)) return;
-        _tapCol = _sortCol; // so a following double-click can undo this tap
-        _tapAsc = _sortAsc;
-        _tapTick = Environment.TickCount;
+        // Remember what sorting looked like: the DoubleTapped that follows in
+        // a double-click puts it back (a double-click only sizes the column).
+        _prevSortCol = _sortCol;
+        _prevSortAsc = _sortAsc;
+        _lastTapCol = col;
+        _lastTapTick = Environment.TickCount;
         if (col == _sortCol) _sortAsc = !_sortAsc;
         else { _sortCol = col; _sortAsc = true; }
         SortRows();
@@ -381,23 +386,18 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
     private void Header_Enter(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e) =>
         SetHandCursor(true);
 
-    private void Header_Exit(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e) =>
-        SetHandCursor(false);
-
-    /// Double-click a header title: size that column to its contents (the
-    /// macOS table does the same). Sorting stays a single-click gesture: if
-    /// WinUI delivered the Tapped that opened the pair, this undoes it —
-    /// the gesture recognizer can also swallow that tap, in which case
-    /// there is nothing to undo.
+    /// Double-click a header title: size the column to its contents (the
+    /// macOS table does the same). WinUI delivers the first tap of the pair
+    /// as a regular Tapped, so undo that sort toggle here — the order must
+    /// not move on a double-click.
     private void Header_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
     {
         if (sender is not FrameworkElement el || el.Tag is not string tag ||
             !int.TryParse(tag, out var col)) return;
-        if (unchecked(Environment.TickCount - _tapTick) < 600)
+        if (col == _lastTapCol && unchecked(Environment.TickCount - _lastTapTick) < 800)
         {
-            _tapTick = 0;
-            _sortCol = _tapCol;
-            _sortAsc = _tapAsc;
+            _sortCol = _prevSortCol;
+            _sortAsc = _prevSortAsc;
             SortRows();
             RefreshHeaders();
         }
@@ -405,6 +405,10 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
         e.Handled = true;
     }
 
+    private void Header_Exit(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e) =>
+        SetHandCursor(false);
+
+    /// Size the column to its widest cell (header title included).
     /// Measure with a throwaway TextBlock: the ListView virtualizes rows, so
     /// only the realized containers are on screen and measuring them would
     /// size the column to what happens to be visible. The data (all visible

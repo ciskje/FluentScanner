@@ -187,6 +187,17 @@ Standard Win11 window, no custom chrome beyond this:
   caption headers, and the gripper `Rectangle` stays on top of the strip.
   A row created while a filter is active is only added if it matches; the
   next `SortRows()` reconsiders every row once data fills in.
+- Header gestures: single click sorts, **double-click sizes the column to
+  its contents** (`AutoFitColumn`: every visible row measured with a
+  throwaway `TextBlock` — the rows are virtualized, so realized containers
+  only cover the viewport; header title + the widest cell + per-column
+  chrome, clamped 60–640 px). WinUI delivers the first tap of a
+  double-click as a plain `Tapped`, so `Header_DoubleTapped` (which does
+  fire, but **only with the `DoubleTapped` attribute wired in XAML**)
+  restores the pre-tap sort order first: a double-click must not move the
+  order. A long cell can push a column past the viewport (the ListView
+  scrolls horizontally — the header, being sticky, is what UIA reports as
+  clipped).
 - **Never bind null to a Brush in `x:Bind`**: on virtualized (recycled)
   `ListView` containers the text stays invisible even though UIA reads the
   right value — see the blank-IP bug (only the self row, with its explicit
