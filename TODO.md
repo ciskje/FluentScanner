@@ -18,9 +18,9 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
 
 - `generic` — Vendor and Type in separate columns (Windows already had
   them; macOS showed `Vendor — Type` combined). `mac:[x] win:[x]`
-- `generic` — click-to-sort columns + text filter (1.1.0). `mac:[x] win:[ ]`
+- `generic` — click-to-sort columns + text filter (1.1.0). `mac:[x] win:[x]`
 - `generic` — editable discovery/scan ports + ping/discovery/port timeouts
-  (1.1.0). `mac:[x] win:[ ]`
+  (1.1.0). `mac:[x] win:[x]`
 - `generic` — clickable HTTP/HTTPS service links: HTTP(S) entries in the
   services column open the responding host in the browser (1.1.0).
   `win:[x] mac:[x]`

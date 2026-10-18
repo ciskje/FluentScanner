@@ -84,9 +84,12 @@ Standard Win11 window, no custom chrome beyond this:
   `Assets/AppIcon.ico` next to the exe + title text). Taskbar icon via
   `AppWindow.SetIcon()` with the same file.
 - Standard `MenuBar` (File / Scan / View / Help) instead of toolbar
-  buttons for app commands; the scan toolbar keeps only range inputs.
+  buttons for app commands; the scan toolbar keeps only range inputs
+  (start/end IP + the results filter box).
   View menu owns all former settings-dialog options (theme + language
-  radio groups, monospaced toggle, font-size 10–16 radios).
+  radio groups, monospaced toggle, font-size 10–16 radios) and opens the
+  `Settings…` dialog (discovery/service port lists + ping/discovery/port
+  timeouts — `AppSettings.ApplyTuning()` pushes them into `Scanner`).
 - Self-host highlight is theme-aware: yellow IP on dark, dark amber
   `#8A6D00` on light (pure yellow is unreadable on white).
   `HostRow.DarkMode` is set from `EffectiveDark()` (settings override,
@@ -113,10 +116,14 @@ Standard Win11 window, no custom chrome beyond this:
   targets (union of hits, wall time ≈ the slower pass); both populate the
   ARP table. Progress tracks `(pingTested + tcpTested) / 2*total`.
 - Discovery probes 445, 80, 8080, 22, 443, 3389, 9100, 631; the port sweep
-  runs the fixed common-services list (`ScanPorts` in `Scanner.cs`). Keep
-  both lists identical to `macos/Sources/FluentScanner/Scanner.swift`
-  (`discoveryPorts` / `scanPorts`) and port names, so results are
-  comparable across platforms.
+  runs the common-services list (`DefaultScanPorts` in `Scanner.cs`). Both
+  are built-in defaults only: the Settings dialog overrides them
+  (`AppSettings` port texts → `ApplyTuning()`), exactly like the macOS
+  UserDefaults-backed `discoveryPorts` / `scanPorts`. Keep the defaults
+  identical to `macos/Sources/FluentScanner/Scanner.swift` and the port
+  names in sync, so results stay comparable across platforms.
+  `ParsePorts` (1-65535, deduped, max 256, invalid → null) mirrors the
+  macOS `parsePorts` and is exercised by the self-test.
 - MAC via `arp -a` text parse (`Scanner.ArpTable()`), refreshed **after** the
   discovery pass (the TCP connects populate it); both platforms share the
   same two-format line parser. Responders with still-missing entries get a
@@ -170,6 +177,16 @@ Standard Win11 window, no custom chrome beyond this:
   Tabular look: per-cell right `Border`s with a theme-aware `RowSeparator`
   brush, zebra `RowBackground` driven by `RowIndex` set in `SortRows()`,
   accent header underline + semibold headers.
+- Sorting/filtering lives entirely in `SortRows()`: `_byIp.Values` →
+  filter (`MatchesFilter`: ip/hostname/mac/vendor text/services, same
+  fields as the macOS `publishAll`) → `CompareRows` (`_sortCol`/`_sortAsc`,
+  IP tie-break) → refill `_rows`, renumbering `RowIndex` for the zebra.
+  So the visible order *is* the CSV export order (mirrors macOS). Header
+  clicks are `Tapped` on the header `TextBlock`s (`Tag` = column index,
+  arrow appended by `RefreshHeaders()`), not buttons: no restyling of the
+  caption headers, and the gripper `Rectangle` stays on top of the strip.
+  A row created while a filter is active is only added if it matches; the
+  next `SortRows()` reconsiders every row once data fills in.
 - **Never bind null to a Brush in `x:Bind`**: on virtualized (recycled)
   `ListView` containers the text stays invisible even though UIA reads the
   right value — see the blank-IP bug (only the self row, with its explicit
