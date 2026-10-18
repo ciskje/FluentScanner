@@ -12,6 +12,9 @@ struct ContentView: View {
     @State private var fits: [String: CGFloat] = [:]
     @State private var colFrames: [String: CGRect] = [:]
     @State private var hoverPt: CGPoint = .zero
+    // Table ignores width changes on an existing view: bump the identity
+    // so it rebuilds with the new ideals (scroll jumps to top, sort stays).
+    @State private var tableID = 0
 
     var body: some View {
         VStack(spacing: 0) {
@@ -79,18 +82,18 @@ struct ContentView: View {
             }
             .font(settings.bodyFont)
             .frame(minWidth: 860)
+            .id(tableID)
             .coordinateSpace(name: "table")
             .onContinuousHover { if case .active(let p) = $0 { hoverPt = p } }
             .onPreferenceChange(ColFrameKey.self) { colFrames = $0 }
             .onTapGesture(count: 2) {
                 // Double-click outside any row = header band (no magic
                 // y numbers — works in any flipped space): fit the column
-                // under the pointer.
-                guard !colFrames.values.contains(where: { $0.contains(hoverPt) }),
-                    let col = colFrames.first(where: {
-                        hoverPt.x >= $0.value.minX && hoverPt.x <= $0.value.maxX
-                    })?.key
-                else { return }
+                // at or left of the pointer (dividers belong to the left
+                // column, the Finder convention).
+                guard !colFrames.values.contains(where: { $0.contains(hoverPt) }) else { return }
+                let byX = colFrames.sorted { $0.value.minX < $1.value.minX }
+                guard let col = byX.last(where: { hoverPt.x >= $0.value.minX })?.key else { return }
                 fitColumn(col)
             }
             .onChange(of: vm.sort) { vm.resort() }
@@ -126,6 +129,11 @@ struct ContentView: View {
             .keyboardShortcut(.defaultAction)
             Button(L("exportCsv")) { vm.exportCSV() }
                 .disabled(vm.rows.isEmpty || vm.running)
+            Button { fitAll() } label: {
+                Image(systemName: "arrow.left.and.right")
+            }
+            .help(L("fitAll"))
+            .keyboardShortcut("f", modifiers: [.command, .shift])
             Button { showHelp = true } label: {
                 Image(systemName: "questionmark.circle")
             }
@@ -206,10 +214,8 @@ struct ContentView: View {
         max(dflt, fits[key] ?? dflt)
     }
 
-    /// Double-click a header: size that column to its contents and sort it
-    /// ascending (deterministic — also neutralizes the two sort toggles
-    /// the double-click itself fires).
-    private func fitColumn(_ key: String) {
+    /// Measured content width for a column (header + rows).
+    private func fittedWidth(_ key: String) -> CGFloat {
         let vals: [String]
         let mono: Bool
         switch key {
@@ -232,7 +238,22 @@ struct ContentView: View {
             ? NSFont.monospacedSystemFont(ofSize: settings.fontSize, weight: .regular)
             : NSFont.systemFont(ofSize: settings.fontSize)
         let w = vals.map { ($0 as NSString).size(withAttributes: [.font: font]).width }.max() ?? 0
-        fits[key] = min(600, max(70, w + 30))
+        return min(600, max(70, w + 30))
+    }
+
+    /// Fit every column at once (toolbar button + Cmd+Shift+F).
+    private func fitAll() {
+        for key in ["ip", "hostname", "mac", "vendor", "type", "services", "latency"] {
+            fits[key] = fittedWidth(key)
+        }
+        tableID += 1
+    }
+
+    /// Double-click a header: size that column to its contents and sort it
+    /// ascending (deterministic — also neutralizes the two sort toggles
+    /// the double-click itself fires).
+    private func fitColumn(_ key: String) {
+        fits[key] = fittedWidth(key)
         let cmp: KeyPathComparator<HostRow>
         switch key {
         case "hostname": cmp = KeyPathComparator(\.sortHostname)
@@ -244,6 +265,7 @@ struct ContentView: View {
         default: cmp = KeyPathComparator(\.sortIp)
         }
         vm.sort = [cmp]
+        tableID += 1
     }
 
     /// Services cell: one Text (markdown links for HTTP/HTTPS) so the
