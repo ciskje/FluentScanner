@@ -42,13 +42,17 @@ Both builds implement the same intents; platform-native details may differ:
 - Live results list: IP (with a device-type color dot), hostname, MAC,
   vendor (each brand in its own stable color) + type, discovered services
   (HTTP/HTTPS entries open the responding host in the browser), latency
-  (ping round-trip, else TCP connect time of the first open port);
-  a color legend sits in the footer; the scanning host itself is always
-  listed and highlighted (accent IP + computer icon) — the highlight must
+  (ping round-trip, else TCP connect time of the first open port); header
+  clicks sort by column and a text filter narrows the list; a color legend
+  sits in the footer; the scanning host itself is always listed and
+  highlighted (accent IP + computer icon) — the highlight must
   stay readable in both light and dark mode (pure yellow fails on light
   backgrounds, use a darker amber there)
 - Progress bar, stop mid-scan, CSV export
 - Light/dark/system theme, UI in English and Italian
+- Settings: table font size + monospaced toggle; the discovery/scan port
+  lists and the ping/discovery/port timeouts have fixed working defaults,
+  editable in the app
 
 ## Change workflow
 

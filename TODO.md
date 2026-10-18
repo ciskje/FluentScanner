@@ -16,21 +16,12 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
 
 ## Pending
 
-- `generic` — 1.1.0 editable ports + timeouts, sorting, filter, readable
-  self highlight. `mac:[x] win:[ ]`
-- `generic` — settings for the port list and timeouts (1.1.0).
-  `win:[ ]` `mac:[x]`
-- `generic` — theme selector light/dark/system via Settings (0.10.0).
-  `win:[ ]` `mac:[x]`
-- `generic` — result sorting (click a column header) and text filter
-  (1.1.0). `win:[ ]` `mac:[x]`
+- `generic` — click-to-sort columns + text filter (1.1.0). `mac:[x] win:[ ]`
+- `generic` — editable discovery/scan ports + ping/discovery/port timeouts
+  (1.1.0). `mac:[x] win:[ ]`
 - `generic` — clickable HTTP/HTTPS service links: HTTP(S) entries in the
-  services column open the responding host in the browser. `win:[x]` `mac:[ ]`
-- `macos` — copy-back also brings `dist/FluentScanner.dmg` back from the
-  build dir (it stayed in `/var/tmp/fscan-build`, only the app came back);
-  step fixed in `macos/AGENTS.md`. `mac:[x]`
-- `macos` — 1.1.0 publish: get `FluentScanner.dmg` onto the NAS, then tag
-  `macos-v1.1.0` + `gh release create` with it. `mac:[x]`
+  services column open the responding host in the browser (1.1.0).
+  `win:[x] mac:[ ]`
 
 ## Done
 
