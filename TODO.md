@@ -24,6 +24,8 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
   `win:[ ]` `mac:[x]`
 - `generic` — result sorting (click a column header) and text filter
   (1.1.0). `win:[ ]` `mac:[x]`
+- `generic` — clickable HTTP/HTTPS service links: HTTP(S) entries in the
+  services column open the responding host in the browser. `win:[x]` `mac:[ ]`
 - `macos` — copy-back also brings `dist/FluentScanner.dmg` back from the
   build dir (it stayed in `/var/tmp/fscan-build`, only the app came back);
   step fixed in `macos/AGENTS.md`. `mac:[x]`

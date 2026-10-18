@@ -40,8 +40,9 @@ Both builds implement the same intents; platform-native details may differ:
   ride in the additional section), NetBIOS node-status for Windows PCs,
   classic reverse DNS last
 - Live results list: IP (with a device-type color dot), hostname, MAC,
-  vendor (each brand in its own stable color) + type, discovered services,
-  latency (ping round-trip, else TCP connect time of the first open port);
+  vendor (each brand in its own stable color) + type, discovered services
+  (HTTP/HTTPS entries open the responding host in the browser), latency
+  (ping round-trip, else TCP connect time of the first open port);
   a color legend sits in the footer; the scanning host itself is always
   listed and highlighted (accent IP + computer icon) — the highlight must
   stay readable in both light and dark mode (pure yellow fails on light
