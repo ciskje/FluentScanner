@@ -28,7 +28,7 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
   build dir (it stayed in `/var/tmp/fscan-build`, only the app came back);
   step fixed in `macos/AGENTS.md`. `mac:[x]`
 - `macos` — 1.1.0 publish: get `FluentScanner.dmg` onto the NAS, then tag
-  `macos-v1.1.0` + `gh release create` with it. `mac:[ ]`
+  `macos-v1.1.0` + `gh release create` with it. `mac:[x]`
 
 ## Done
 
