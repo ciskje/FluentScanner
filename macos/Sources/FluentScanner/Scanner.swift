@@ -83,6 +83,35 @@ enum Scanner {
         return "\(name) (\(port))"
     }
 
+    /// One-line services markdown: HTTP/HTTPS entries become links so the
+    /// cell truncates as a unit instead of wrapping per entry. Pure —
+    /// exercised in the self-test.
+    static func servicesMarkdown(ip: String, ports: [UInt16], server: String?) -> String {
+        ports.sorted().map { p in
+            let label = serviceLabel(p, server: server)
+            let scheme: String?
+            switch portNames[p] {
+            case "HTTP": scheme = "http"
+            case "HTTPS": scheme = "https"
+            default: scheme = nil
+            }
+            if let scheme {
+                return "[\(mdEscape(label))](\(scheme)://\(ip):\(p))"
+            }
+            return mdEscape(label)
+        }.joined(separator: ", ")
+    }
+
+    private static func mdEscape(_ s: String) -> String {
+        var out = ""
+        out.reserveCapacity(s.count)
+        for c in s {
+            if "\\[]()_*~`#".contains(c) { out.append("\\") }
+            out.append(c)
+        }
+        return out
+    }
+
     // MARK: Target parsing
 
     /// Accepts "10.0.0.5", "10.0.0.0/24", "10.0.0.1-10.0.0.254",
@@ -924,6 +953,13 @@ enum Scanner {
             "service label https")
         check(Scanner.serviceLabel(9999, server: nil) == "9999",
             "service label unknown port")
+        check(Scanner.servicesMarkdown(ip: "1.2.3.4", ports: [80], server: "Caddy")
+            == "[HTTP/Caddy \\(80\\)](http://1.2.3.4:80)", "services markdown link")
+        check((try? AttributedString(
+            markdown: Scanner.servicesMarkdown(ip: "1.2.3.4", ports: [22, 80],
+                                               server: "Caddy"),
+            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) != nil,
+            "services markdown parses")
         if let sub = localSubnet() {
             check(ipv4(sub.start) != nil && ipv4(sub.end) != nil
                 && ipv4(sub.start)! < ipv4(sub.end)!, "localSubnet range")

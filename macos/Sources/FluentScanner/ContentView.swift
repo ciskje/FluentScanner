@@ -160,31 +160,22 @@ struct ContentView: View {
         colorScheme == .dark ? .yellow : Color(red: 0.7, green: 0.45, blue: 0.0)
     }
 
-    /// Services cell: HTTP/HTTPS entries are links opening the host in
-    /// the browser, everything else plain text (same wording as the CSV).
+    /// Services cell: one Text (markdown links for HTTP/HTTPS) so the
+    /// whole cell truncates on a single line instead of wrapping per entry.
     private func servicesCell(_ r: HostRow) -> some View {
-        HStack(spacing: 0) {
-            ForEach(Array(r.ports.sorted().enumerated()), id: \.offset) { i, p in
-                if i > 0 { Text(", ") }
-                if let url = serviceURL(r.ip, p) {
-                    Link(Scanner.serviceLabel(p, server: r.server), destination: url)
-                } else {
-                    Text(Scanner.serviceLabel(p, server: r.server))
-                }
-            }
-        }
-        .lineLimit(1)
-        .truncationMode(.middle)
-        .help(r.services ?? "")
-        .fontWeight(r.isLocal ? .bold : .regular)
+        Text(servicesAttributed(r))
+            .lineLimit(1)
+            .truncationMode(.middle)
+            .help(r.services ?? "")
+            .fontWeight(r.isLocal ? .bold : .regular)
     }
 
-    private func serviceURL(_ ip: String, _ port: UInt16) -> URL? {
-        switch Scanner.portNames[port] {
-        case "HTTP": return URL(string: "http://\(ip):\(port)")
-        case "HTTPS": return URL(string: "https://\(ip):\(port)")
-        default: return nil
-        }
+    private func servicesAttributed(_ r: HostRow) -> AttributedString {
+        (try? AttributedString(
+            markdown: Scanner.servicesMarkdown(ip: r.ip, ports: r.ports,
+                                               server: r.server),
+            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+            ?? AttributedString(r.services ?? "")
     }
 
     /// Device-type palette, shared by the row dots and the footer legend
