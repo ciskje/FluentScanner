@@ -1,0 +1,54 @@
+"start" = "Start";
+"stop" = "Stop";
+"exportCsv" = "Export CSV";
+"exported" = "CSV exported";
+"exportedFailed" = "Export failed";
+"scanning" = "Scanning %ld of %ld…";
+"doneFmt" = "%ld hosts found";
+"stopped" = "Stopped";
+"portScanFmt" = "%ld live hosts — checking services…";
+"dnsFmt" = "Resolving hostnames…";
+"invalidRange" = "Invalid target (use an IP, CIDR or range)";
+"colIp" = "IP Address";
+"colHostname" = "Hostname";
+"colMac" = "MAC Address";
+"colServices" = "Services";
+"colLatency" = "Latency";
+"colVendor" = "Vendor / Type";
+"thisMac" = "This Mac (scanning host)";
+"randomMac" = "Randomized MAC (privacy address, no vendor)";
+"startIp" = "Start IP";
+"endIp" = "End IP";
+"getIp" = "Get IP";
+"getIpHelp" = "Fill with this machine's subnet range";
+"randomMacLegend" = "Randomized MAC";
+"thisMacLegend" = "This Mac (scanning host)";
+"helpTitle" = "FluentScanner Help";
+"helpBody" = "Enter a start and end IP and press Start (Return works too). Get IP fills the range of this machine's own subnet. A single IP scans just that host. Network (.0) and broadcast (.255) addresses are never probed.
+
+Discovery pings every address and probes common TCP ports in parallel; live hosts then get a full port sweep. The progress bar tracks discovery; Stop halts a running scan. Export saves the table as CSV.
+
+The dot before each IP is the device type (see the legend below the table); the brand name gets its own stable color. A shuffle icon marks a randomized MAC, which carries no vendor. The yellow row with the computer icon is this machine.
+
+Hostnames come from Bonjour (mDNS), NetBIOS and reverse DNS. Quiet devices with no open port and no name service stay anonymous — open ports, a real MAC vendor and mDNS are what identify a device.";
+"aboutMenu" = "About FluentScanner";
+"aboutTitle" = "About FluentScanner";
+"aboutDesc" = "Finds every device on your LAN: ping plus TCP discovery, open-port sweep, MAC and vendor identification, hostnames.";
+"aboutOui" = "Vendor data: IEEE OUI registry.";
+"aboutLicense" = "MIT License — © 2026 Francesco Ferrara.";
+"closeBtn" = "Close";
+"languageLabel" = "Language";
+"languageSystem" = "System";
+"fontSizeLabel" = "Font size";
+"monoLabel" = "Monospaced table text";
+"themeLabel" = "Theme";
+"themeSystem" = "System";
+"themeLight" = "Light";
+"themeDark" = "Dark";
+"pingTimeoutLabel" = "Ping timeout";
+"discTimeoutLabel" = "Discovery timeout";
+"portTimeoutLabel" = "Port timeout";
+"discPortsLabel" = "Discovery ports (comma separated)";
+"scanPortsLabel" = "Service ports (comma separated)";
+"portsInvalid" = "Invalid port list — use numbers 1-65535 separated by commas";
+"searchLabel" = "Filter";

@@ -1,0 +1,54 @@
+"start" = "Avvia";
+"stop" = "Ferma";
+"exportCsv" = "Esporta CSV";
+"exported" = "CSV esportato";
+"exportedFailed" = "Esportazione fallita";
+"scanning" = "Scansione %ld di %ld…";
+"doneFmt" = "%ld host trovati";
+"stopped" = "Interrotta";
+"portScanFmt" = "%ld host attivi — controllo servizi…";
+"dnsFmt" = "Risoluzione nomi host…";
+"invalidRange" = "Destinazione non valida (usa un IP, CIDR o range)";
+"colIp" = "Indirizzo IP";
+"colHostname" = "Nome host";
+"colMac" = "Indirizzo MAC";
+"colServices" = "Servizi";
+"colLatency" = "Latenza";
+"colVendor" = "Produttore / Tipo";
+"thisMac" = "Questo Mac (host di scansione)";
+"randomMac" = "MAC randomizzato (indirizzo privacy, nessun produttore)";
+"startIp" = "IP inizio";
+"endIp" = "IP fine";
+"getIp" = "Get IP";
+"getIpHelp" = "Riempie con il range della subnet di questa macchina";
+"randomMacLegend" = "MAC randomizzato";
+"thisMacLegend" = "Questo Mac (host di scansione)";
+"helpTitle" = "Aiuto di FluentScanner";
+"helpBody" = "Inserisci IP inizio e IP fine e premi Start (vale anche Invio). Get IP riempie il range della subnet di questa macchina. Un singolo IP scansiona solo quell'host. Gli indirizzi di rete (.0) e broadcast (.255) non vengono mai sondati.
+
+La discovery fa ping su ogni indirizzo e sonda le porte TCP comuni in parallelo; gli host attivi ricevono poi la scansione completa delle porte. La barra mostra l'avanzamento; Stop ferma la scansione. Export salva la tabella in CSV.
+
+Il pallino prima di ogni IP è il tipo di dispositivo (vedi legenda sotto la tabella); la marca ha un suo colore stabile. L'icona shuffle indica un MAC randomizzato, senza produttore. La riga gialla con l'icona del computer è questa macchina.
+
+Gli hostname arrivano da Bonjour (mDNS), NetBIOS e reverse DNS. I dispositivi silenziosi senza porte aperte né servizio nomi restano anonimi: porte aperte, MAC reale e mDNS sono ciò che identifica un dispositivo.";
+"aboutMenu" = "Informazioni su FluentScanner";
+"aboutTitle" = "Informazioni su FluentScanner";
+"aboutDesc" = "Trova tutti i dispositivi della tua LAN: discovery ping più TCP, scansione porte, identificazione MAC e produttore, hostname.";
+"aboutOui" = "Dati produttori: registro IEEE OUI.";
+"aboutLicense" = "Licenza MIT — © 2026 Francesco Ferrara.";
+"closeBtn" = "Chiudi";
+"languageLabel" = "Lingua";
+"languageSystem" = "Sistema";
+"fontSizeLabel" = "Dimensione font";
+"monoLabel" = "Testo tabella monospaziato";
+"themeLabel" = "Tema";
+"themeSystem" = "Sistema";
+"themeLight" = "Chiaro";
+"themeDark" = "Scuro";
+"pingTimeoutLabel" = "Timeout ping";
+"discTimeoutLabel" = "Timeout discovery";
+"portTimeoutLabel" = "Timeout porte";
+"discPortsLabel" = "Porte discovery (separate da virgole)";
+"scanPortsLabel" = "Porte servizi (separate da virgole)";
+"portsInvalid" = "Lista non valida — numeri 1-65535 separati da virgole";
+"searchLabel" = "Filtra";

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- XAML strings (x:Uid → <uid>.<property>) -->
+  <data name="InputLabel.Text"><value>Target</value></data>
+  <data name="Start.Content"><value>Start</value></data>
+  <data name="Stop.Content"><value>Stop</value></data>
+  <data name="ExportCsv.Content"><value>Export CSV</value></data>
+  <data name="HdrIp.Text"><value>IP Address</value></data>
+  <data name="HdrHostname.Text"><value>Hostname</value></data>
+  <data name="HdrMac.Text"><value>MAC Address</value></data>
+  <data name="HdrServices.Text"><value>Services</value></data>
+  <data name="HdrVendor.Text"><value>Vendor / Type</value></data>
+  <data name="HdrLatency.Text"><value>Latency</value></data>
+  <!-- Code-behind strings (Str()). NB: names must NOT collide
+       case-insensitively with any x:Uid scope above (PRI175). -->
+  <data name="btnStart"><value>Start</value></data>
+  <data name="btnStop"><value>Stop</value></data>
+  <data name="btnExport"><value>Export CSV</value></data>
+  <data name="exported"><value>CSV exported</value></data>
+  <data name="exportedFailed"><value>Export failed</value></data>
+  <data name="scanningFmt"><value>Scanning {0} of {1}…</value></data>
+  <data name="doneFmt"><value>{0} hosts found</value></data>
+  <data name="stopped"><value>Stopped</value></data>
+  <data name="portScanFmt"><value>{0} live hosts — checking services…</value></data>
+  <data name="dnsFmt"><value>Resolving hostnames…</value></data>
+  <data name="invalidRange"><value>Invalid target (use an IP, CIDR or range)</value></data>
+  <data name="targetHint"><value>IP / CIDR / range (e.g. 192.168.1.0/24)</value></data>
+  <data name="empty"><value>Enter a range and press Start.</value></data>
+  <data name="thIp"><value>IP Address</value></data>
+  <data name="thHostname"><value>Hostname</value></data>
+  <data name="thMac"><value>MAC Address</value></data>
+  <data name="thBrand"><value>Vendor</value></data>
+  <data name="thKind"><value>Type</value></data>
+  <data name="thServices"><value>Services</value></data>
+  <data name="thLatency"><value>Latency</value></data>
+  <data name="startIp"><value>Start IP</value></data>
+  <data name="endIp"><value>End IP</value></data>
+  <data name="getIp"><value>Get IP</value></data>
+  <data name="getIpHelp"><value>Fill with this machine's subnet range</value></data>
+  <data name="randomMac"><value>Randomized MAC (privacy address, no vendor)</value></data>
+  <data name="randomMacLegend"><value>Randomized MAC</value></data>
+  <data name="thisPc"><value>This PC (scanning host)</value></data>
+  <data name="thisPcLegend"><value>This PC (scanning host)</value></data>
+  <data name="helpTitle"><value>FluentScanner Help</value></data>
+  <data name="helpBody"><value>Enter a start and end IP and press Start (Return works too). Get IP fills the range of this machine's own subnet. A single IP scans just that host. Network (.0) and broadcast (.255) addresses are never probed.
+
+Discovery pings every address and probes common TCP ports in parallel; live hosts then get a full port sweep. The progress bar tracks discovery; Stop halts a running scan. Export saves the table as CSV.
+
+The dot before each IP is the device type (see the legend below the table); the brand name gets its own stable color. A shuffle icon marks a randomized MAC, which carries no vendor. The yellow row with the computer icon is this machine.
+
+Hostnames come from Bonjour (mDNS), NetBIOS and reverse DNS. Quiet devices with no open port and no name service stay anonymous — open ports, a real MAC vendor and mDNS are what identify a device.</value></data>
+  <data name="aboutTitle"><value>About FluentScanner</value></data>
+  <data name="aboutDesc"><value>Finds every device on your LAN: ping plus TCP discovery, open-port sweep, MAC and vendor identification, hostnames.</value></data>
+  <data name="aboutOui"><value>Vendor data: IEEE OUI registry.</value></data>
+  <data name="aboutLicense"><value>MIT License — © 2026 Francesco Ferrara.</value></data>
+  <data name="closeBtn"><value>Close</value></data>
+  <data name="menuFile"><value>File</value></data>
+  <data name="menuScan"><value>Scan</value></data>
+  <data name="menuView"><value>View</value></data>
+  <data name="menuHelp"><value>Help</value></data>
+  <data name="fileExport"><value>Export CSV</value></data>
+  <data name="fileExit"><value>Exit</value></data>
+  <data name="helpItem"><value>Help</value></data>
+  <data name="aboutItem"><value>About</value></data>
+  <data name="settingsTitle"><value>Settings</value></data>
+  <data name="languageLabel"><value>Language</value></data>
+  <data name="languageSystem"><value>System</value></data>
+  <data name="fontSizeLabel"><value>Font size</value></data>
+  <data name="monoLabel"><value>Monospaced table text</value></data>
+  <data name="themeLabel"><value>Theme</value></data>
+  <data name="themeSystem"><value>System</value></data>
+  <data name="themeLight"><value>Light</value></data>
+  <data name="themeDark"><value>Dark</value></data>
+</root>

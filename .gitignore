@@ -1,0 +1,22 @@
+# Windows (dotnet / MSBuild)
+bin/
+obj/
+# Runnables (rebuild via build; macos/dist/ mirrors this on the Mac)
+windows/dist/
+# Release publish tree consumed by the installer (copied by MSBuild, see below)
+windows/publish/
+# Inno Setup output (not versioned: rebuild with iscc)
+windows/installer/dist/
+# VS / Rider
+.vs/
+.idea/
+*.user
+*.suo
+
+# macOS (SwiftPM)
+.build/
+macos/dist/
+
+# OS / junk (all platforms)
+.DS_Store
+._*

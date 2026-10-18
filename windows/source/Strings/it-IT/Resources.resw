@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- XAML strings (x:Uid → <uid>.<property>) -->
+  <data name="InputLabel.Text"><value>Destinazione</value></data>
+  <data name="Start.Content"><value>Avvia</value></data>
+  <data name="Stop.Content"><value>Ferma</value></data>
+  <data name="ExportCsv.Content"><value>Esporta CSV</value></data>
+  <data name="HdrIp.Text"><value>Indirizzo IP</value></data>
+  <data name="HdrHostname.Text"><value>Nome host</value></data>
+  <data name="HdrMac.Text"><value>Indirizzo MAC</value></data>
+  <data name="HdrServices.Text"><value>Servizi</value></data>
+  <data name="HdrVendor.Text"><value>Produttore / Tipo</value></data>
+  <data name="HdrLatency.Text"><value>Latenza</value></data>
+  <!-- Code-behind strings (Str()). NB: names must NOT collide
+       case-insensitively with any x:Uid scope above (PRI175). -->
+  <data name="btnStart"><value>Avvia</value></data>
+  <data name="btnStop"><value>Ferma</value></data>
+  <data name="btnExport"><value>Esporta CSV</value></data>
+  <data name="exported"><value>CSV esportato</value></data>
+  <data name="exportedFailed"><value>Esportazione fallita</value></data>
+  <data name="scanningFmt"><value>Scansione {0} di {1}…</value></data>
+  <data name="doneFmt"><value>{0} host trovati</value></data>
+  <data name="stopped"><value>Interrotta</value></data>
+  <data name="portScanFmt"><value>{0} host attivi — controllo servizi…</value></data>
+  <data name="dnsFmt"><value>Risoluzione nomi host…</value></data>
+  <data name="invalidRange"><value>Destinazione non valida (usa un IP, CIDR o range)</value></data>
+  <data name="targetHint"><value>IP / CIDR / range (es. 192.168.1.0/24)</value></data>
+  <data name="empty"><value>Inserisci un range e premi Avvia.</value></data>
+  <data name="thIp"><value>Indirizzo IP</value></data>
+  <data name="thHostname"><value>Nome host</value></data>
+  <data name="thMac"><value>Indirizzo MAC</value></data>
+  <data name="thBrand"><value>Produttore</value></data>
+  <data name="thKind"><value>Tipo</value></data>
+  <data name="thServices"><value>Servizi</value></data>
+  <data name="thLatency"><value>Latenza</value></data>
+  <data name="startIp"><value>IP inizio</value></data>
+  <data name="endIp"><value>IP fine</value></data>
+  <data name="getIp"><value>Leggi IP</value></data>
+  <data name="getIpHelp"><value>Riempie con il range della subnet di questa macchina</value></data>
+  <data name="randomMac"><value>MAC randomizzato (indirizzo privacy, nessun produttore)</value></data>
+  <data name="randomMacLegend"><value>MAC randomizzato</value></data>
+  <data name="thisPc"><value>Questo PC (host di scansione)</value></data>
+  <data name="thisPcLegend"><value>Questo PC (host di scansione)</value></data>
+  <data name="helpTitle"><value>Aiuto di FluentScanner</value></data>
+  <data name="helpBody"><value>Inserisci IP inizio e IP fine e premi Avvia (vale anche Invio). Get IP riempie il range della subnet di questa macchina. Un singolo IP scansiona solo quell'host. Gli indirizzi di rete (.0) e broadcast (.255) non vengono mai sondati.
+
+La discovery fa ping su ogni indirizzo e sonda le porte TCP comuni in parallelo; gli host attivi ricevono poi la scansione completa delle porte. La barra mostra l'avanzamento; Ferma interrompe la scansione. Esporta salva la tabella in CSV.
+
+Il pallino prima di ogni IP è il tipo di dispositivo (vedi legenda sotto la tabella); la marca ha un suo colore stabile. L'icona shuffle indica un MAC randomizzato, senza produttore. La riga gialla con l'icona del computer è questa macchina.
+
+Gli hostname arrivano da Bonjour (mDNS), NetBIOS e reverse DNS. I dispositivi silenziosi senza porte aperte né servizio nomi restano anonimi: porte aperte, MAC reale e mDNS sono ciò che identifica un dispositivo.</value></data>
+  <data name="aboutTitle"><value>Informazioni su FluentScanner</value></data>
+  <data name="aboutDesc"><value>Trova tutti i dispositivi della tua LAN: discovery ping più TCP, scansione porte, identificazione MAC e produttore, hostname.</value></data>
+  <data name="aboutOui"><value>Dati produttori: registro IEEE OUI.</value></data>
+  <data name="aboutLicense"><value>Licenza MIT — © 2026 Francesco Ferrara.</value></data>
+  <data name="closeBtn"><value>Chiudi</value></data>
+  <data name="menuFile"><value>File</value></data>
+  <data name="menuScan"><value>Scansione</value></data>
+  <data name="menuView"><value>Visualizza</value></data>
+  <data name="menuHelp"><value>Aiuto</value></data>
+  <data name="fileExport"><value>Esporta CSV</value></data>
+  <data name="fileExit"><value>Esci</value></data>
+  <data name="helpItem"><value>Aiuto</value></data>
+  <data name="aboutItem"><value>Informazioni</value></data>
+  <data name="settingsTitle"><value>Impostazioni</value></data>
+  <data name="languageLabel"><value>Lingua</value></data>
+  <data name="languageSystem"><value>Sistema</value></data>
+  <data name="fontSizeLabel"><value>Dimensione font</value></data>
+  <data name="monoLabel"><value>Testo tabella monospaziato</value></data>
+  <data name="themeLabel"><value>Tema</value></data>
+  <data name="themeSystem"><value>Sistema</value></data>
+  <data name="themeLight"><value>Chiaro</value></data>
+  <data name="themeDark"><value>Scuro</value></data>
+</root>

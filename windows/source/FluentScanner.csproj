@@ -1,0 +1,88 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>FluentScanner</RootNamespace>
+    <AssemblyName>FluentScanner</AssemblyName>
+    <!-- Exe icon (Explorer, shortcuts, Control Panel): without this
+         the default .NET one remains, because AppWindow.SetIcon only applies at runtime -->
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+    <Version>1.1.0</Version>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>x86;x64;ARM64</Platforms>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture.ToString().ToLowerInvariant())</RuntimeIdentifier>
+    <UseWinUI>true</UseWinUI>
+    <WinUISDKReferences>false</WinUISDKReferences>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- OUI vendor table (generated once from the IEEE registry, same file as macos/) -->
+    <Content Include="oui.csv" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\AppIcon.ico" CopyToOutputDirectory="PreserveNewest" />
+    <!-- .resw also as plain files (for code-behind strings without MRT:
+         ResourceLoader needs package identity, missing in unpackaged apps) -->
+    <Content Include="Strings\it-IT\Resources.resw" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Strings\en-US\Resources.resw" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.4.0" />
+  </ItemGroup>
+
+  <!-- Publish Properties -->
+  <PropertyGroup>
+    <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
+    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
+    <!-- Trimming disabled in Release too: WinUI 3 does not support it -->
+    <PublishTrimmed>False</PublishTrimmed>
+  </PropertyGroup>
+
+  <!-- The app's own PRI/XBF (FluentScanner.pri, *.xbf) are generated into
+       the build output dir but `dotnet publish` does not copy them to the
+       publish dir (framework .pri files do get copied): without them the
+       installed app dies at startup with 0xC000027B in Microsoft.UI.Xaml.dll
+       (verified). Copy them over on every publish. -->
+  <Target Name="CopyAppResourcesToPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <AppGenFiles Include="$(OutputPath)FluentScanner.pri;$(OutputPath)App.xbf;$(OutputPath)MainWindow.xbf" />
+    </ItemGroup>
+    <Copy SourceFiles="@(AppGenFiles)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- Completed publish tree back to the NAS (outside source/, so globbing
+       never picks it up as build inputs): the .iss consumes windows/publish/.
+       NAS source/bin + source/obj must NEVER exist — with BaseOutputPath /
+       BaseIntermediateOutputPath redirected to temp, the default bin/obj
+       excludes stop applying and stale copies get compiled twice (duplicate
+       symbols) or merged into the PRI (conflicting values). -->
+  <Target Name="CopyPublishToNas" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup>
+      <PubFiles Include="$(PublishDir)**" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PubFiles)"
+          DestinationFiles="@(PubFiles->'$(ProjectDir)..\publish\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- Runnable app in windows/dist/ (gitignored, mirrors macos/dist/):
+       the build itself runs on the SSD temp (see windows/AGENTS.md), only
+       this copy lands on the NAS. SkipUnchangedFiles keeps it incremental. -->
+  <Target Name="CopyToDist" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+    <ItemGroup>
+      <DistFiles Include="$(OutputPath)**" />
+    </ItemGroup>
+    <Copy SourceFiles="@(DistFiles)"
+          DestinationFiles="@(DistFiles->'$(ProjectDir)..\dist\FluentScanner\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+</Project>

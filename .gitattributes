@@ -1,0 +1,5 @@
+# Line endings: LF everywhere (Mac builds from this repo too),
+# except CRLF for batch files (cmd.exe needs it).
+* text=auto eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf

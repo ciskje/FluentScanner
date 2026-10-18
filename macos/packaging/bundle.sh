@@ -1,0 +1,39 @@
+#!/bin/bash
+# Builds FluentScanner.app (no Xcode needed: swift build + manual bundle).
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+echo "==> swift build (release)"
+swift build -c release 2>&1 | tail -2
+
+BIN=".build/release/FluentScanner"
+APP="dist/FluentScanner.app"
+rm -rf "$APP"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+
+cp "$BIN" "$APP/Contents/MacOS/FluentScanner"
+cp packaging/Info.plist "$APP/Contents/Info.plist"
+cp -R Sources/FluentScanner/Resources/en.lproj Sources/FluentScanner/Resources/it.lproj \
+  "$APP/Contents/Resources/"
+cp Sources/FluentScanner/Resources/oui.csv "$APP/Contents/Resources/"
+
+# Icon: hand-drawn radar sweep (packaging/AppIcon.svg).
+# Rendered with rsvg-convert (brew install librsvg): Quick Look's qlmanage
+# renders SVGs shrunken and off-center, so it must NOT be used here.
+SRC_SVG="packaging/AppIcon.svg"
+if [ -f "$SRC_SVG" ]; then
+  command -v rsvg-convert >/dev/null || { echo "missing rsvg-convert (brew install librsvg)"; exit 1; }
+  echo "==> icon"
+  rm -rf /tmp/FS.iconset && mkdir -p /tmp/FS.iconset
+  rsvg-convert -w 1024 -h 1024 "$SRC_SVG" -o /tmp/FS.iconset/base1024.png
+  for s in 16 32 128 256 512; do
+    sips -z $s $s /tmp/FS.iconset/base1024.png --out /tmp/FS.iconset/icon_${s}x${s}.png >/dev/null
+    sips -z $((s*2)) $((s*2)) /tmp/FS.iconset/base1024.png --out /tmp/FS.iconset/icon_${s}x${s}@2x.png >/dev/null
+  done
+  rm /tmp/FS.iconset/base1024.png
+  iconutil -c icns /tmp/FS.iconset -o "$APP/Contents/Resources/AppIcon.icns"
+  rm -rf /tmp/FS.iconset
+fi
+codesign --force --deep --sign - "$APP" 2>/dev/null || true
+echo "==> $APP"
+ls -la dist/ | grep app
