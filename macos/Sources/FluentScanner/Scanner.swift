@@ -73,6 +73,16 @@ enum Scanner {
     // ever drops connects under load
     static let portChunk = 256
 
+    /// Display text for one open port, shared by the table cell and the
+    /// CSV export (`refreshServices`): the HTTP software joins in when known.
+    static func serviceLabel(_ port: UInt16, server: String?) -> String {
+        guard let name = portNames[port] else { return "\(port)" }
+        if name == "HTTP", let srv = server {
+            return "\(name)/\(srv) (\(port))" // e.g. HTTP/Caddy (80)
+        }
+        return "\(name) (\(port))"
+    }
+
     // MARK: Target parsing
 
     /// Accepts "10.0.0.5", "10.0.0.0/24", "10.0.0.1-10.0.0.254",
@@ -908,6 +918,12 @@ enum Scanner {
         check(parsePorts("0") == nil, "ports zero rejected")
         check(parsePorts("abc") == nil, "ports garbage rejected")
         check(parsePorts("") == nil, "ports empty rejected")
+        check(Scanner.serviceLabel(80, server: "Caddy") == "HTTP/Caddy (80)",
+            "service label http server")
+        check(Scanner.serviceLabel(443, server: nil) == "HTTPS (443)",
+            "service label https")
+        check(Scanner.serviceLabel(9999, server: nil) == "9999",
+            "service label unknown port")
         if let sub = localSubnet() {
             check(ipv4(sub.start) != nil && ipv4(sub.end) != nil
                 && ipv4(sub.start)! < ipv4(sub.end)!, "localSubnet range")

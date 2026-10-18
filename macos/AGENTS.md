@@ -69,9 +69,17 @@ at releases.
   never all-in-one `withTaskGroup` on a /24.
 - Entitlement-free: no packet sniffing, no promiscuous mode — only
   `arp -a`, DNS and TCP connects, so the app needs no special permissions.
-- Table alignment: `List` applies its own row insets — the header and the
-  rows must live in the same container; the view uses
-  `ScrollView` + `LazyVStack` whose rows carry the header's 12pt padding.
+- Results use a native SwiftUI `Table` (resizable columns for free):
+  header clicks sort via `value:` key paths — pre-sort the stored rows
+  with the same comparator so the CSV export matches the display order.
+- Swift `String.split(separator: "\n")` never fires on CRLF text:
+  `"\r\n"` is a single `Character` (grapheme cluster). Parse network text
+  with `components(separatedBy:)` (NSString semantics) instead — this bug
+  silenced every HTTP `Server:` header until the self-test caught it.
+- Screenshots: find the app window via its `CGWindowNumber`
+  (`CoreGraphics` one-liner) and capture with `screencapture -l <id>`;
+  trigger a scan first with AppleScript
+  (`tell application "System Events" to keystroke return`).
 - Vendor (OUI): `oui.csv` in `Sources/FluentScanner/Resources/` ("aabbcc<TAB>Org",
   full unfiltered IEEE registry, ~40k rows, ~1.2 MB) is copied by bundle.sh
   next to the .lproj dirs; lookups via `Oui.vendor(mac)`. Regenerate from

@@ -54,10 +54,7 @@ struct ContentView: View {
                     .width(min: 110, ideal: 150, max: 200)
                 TableColumn(L("colVendor"), value: \.sortVendor) { r in vendorCell(r) }
                     .width(min: 110, ideal: 220, max: 420)
-                TableColumn(L("colServices"), value: \.sortServices) { r in
-                    Text(r.services ?? "")
-                        .fontWeight(r.isLocal ? .bold : .regular)
-                }
+                TableColumn(L("colServices"), value: \.sortServices) { r in servicesCell(r) }
                     .width(min: 120, ideal: 200, max: 560)
                 TableColumn(L("colLatency"), value: \.sortLatency) { r in
                     Text(r.latencyText).monospaced()
@@ -159,6 +156,33 @@ struct ContentView: View {
     /// so light mode gets a darker amber instead.
     private var selfColor: Color {
         colorScheme == .dark ? .yellow : Color(red: 0.7, green: 0.45, blue: 0.0)
+    }
+
+    /// Services cell: HTTP/HTTPS entries are links opening the host in
+    /// the browser, everything else plain text (same wording as the CSV).
+    private func servicesCell(_ r: HostRow) -> some View {
+        HStack(spacing: 0) {
+            ForEach(Array(r.ports.sorted().enumerated()), id: \.offset) { i, p in
+                if i > 0 { Text(", ") }
+                if let url = serviceURL(r.ip, p) {
+                    Link(Scanner.serviceLabel(p, server: r.server), destination: url)
+                } else {
+                    Text(Scanner.serviceLabel(p, server: r.server))
+                }
+            }
+        }
+        .lineLimit(1)
+        .truncationMode(.middle)
+        .help(r.services ?? "")
+        .fontWeight(r.isLocal ? .bold : .regular)
+    }
+
+    private func serviceURL(_ ip: String, _ port: UInt16) -> URL? {
+        switch Scanner.portNames[port] {
+        case "HTTP": return URL(string: "http://\(ip):\(port)")
+        case "HTTPS": return URL(string: "https://\(ip):\(port)")
+        default: return nil
+        }
     }
 
     /// Device-type palette, shared by the row dots and the footer legend

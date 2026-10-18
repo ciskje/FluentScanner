@@ -49,10 +49,13 @@ Both builds implement the same intents; platform-native details may differ:
   stay readable in both light and dark mode (pure yellow fails on light
   backgrounds, use a darker amber there)
 - Progress bar, stop mid-scan, CSV export
-- Light/dark/system theme, UI in English and Italian
+- Light/dark/system theme (selectable in Settings), UI in English and
+  Italian (override in Settings: system/EN/IT)
 - Settings: table font size + monospaced toggle; the discovery/scan port
   lists and the ping/discovery/port timeouts have fixed working defaults,
   editable in the app
+- Help sheet + About panel, in both languages
+- App icon: radar-sweep SVG source, rendered per platform
 
 ## Change workflow
 

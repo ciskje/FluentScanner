@@ -11,7 +11,6 @@ namespace FluentScanner;
 /// (identical port lists, ARP parsing and phases; keep them in sync).
 internal static class Scanner
 {
-    // ponytail: fixed tuning knobs; editable settings intent is in TODO.md
     /// TTL guess from the ping reply (identical to the macOS ttlKind):
     /// only 128 (Windows) is distinctive — 255 is the default of many
     /// embedded stacks, not a router signature.
@@ -21,18 +20,44 @@ internal static class Scanner
         _ => null,
     };
 
-    /// Always-probed ports for host discovery (ordered by LAN hit rate).
-    /// Wide list: devices that only answer on ssh/https/RDP/print ports must
-    /// still be found. Swapped 1:1 with the macOS `discoveryPorts`.
-    internal static readonly int[] DiscoveryPorts = [445, 80, 8080, 22, 443, 3389, 9100, 631];
-    /// Common-services list scanned for every live host (keep == macOS).
-    internal static readonly int[] ScanPorts =
+    /// Built-in discovery ports (ordered by LAN hit rate) — the fixed working
+    /// default the settings dialog can override. Wide list: devices that only
+    /// answer on ssh/https/RDP/print ports must still be found. Swapped 1:1
+    /// with the macOS `discoveryPorts`.
+    internal static readonly int[] DefaultDiscoveryPorts = [445, 80, 8080, 22, 443, 3389, 9100, 631];
+    /// Built-in common-services list (keep == the macOS `scanPorts`).
+    internal static readonly int[] DefaultScanPorts =
     [
         21, 22, 23, 25, 53, 80, 110, 111, 123, 135, 139, 143, 161, 389, 443,
         445, 465, 587, 631, 993, 995, 1433, 1521, 2049, 2375, 3260, 3306,
         3389, 5432, 5900, 5985, 6379, 8000, 8006, 8080, 8443, 8888, 9000,
         9100, 49152,
     ];
+
+    // Effective tuning: the built-in defaults above, overridden by the
+    // settings dialog (AppSettings.ApplyTuning) — the macOS side does the
+    // same through UserDefaults.
+    internal static int[] DiscoveryPorts = DefaultDiscoveryPorts;
+    internal static int[] ScanPorts = DefaultScanPorts;
+    internal static int PingTimeoutMs = 1000;
+    internal static int DiscoveryTimeoutMs = 2000;
+    internal static int PortTimeoutMs = 1500;
+
+    /// Comma/whitespace separated 1-65535 port list, deduped, max 256
+    /// entries; null when empty or invalid (mirrors the macOS parsePorts).
+    internal static int[]? ParsePorts(string text)
+    {
+        var ports = new List<int>();
+        foreach (var tok in text.Split([',', ';', ' ', '\t', '\r', '\n'],
+            StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (!int.TryParse(tok, out var p) || p < 1 || p > 65535) return null;
+            if (ports.Contains(p)) continue;
+            if (ports.Count >= 256) return null;
+            ports.Add(p);
+        }
+        return ports.Count == 0 ? null : [.. ports];
+    }
     internal static readonly Dictionary<int, string> PortNames = new()
     {
         [21] = "FTP", [22] = "SSH", [23] = "Telnet", [25] = "SMTP", [53] = "DNS",
@@ -47,11 +72,8 @@ internal static class Scanner
         [9000] = "HTTP", [9100] = "JetDirect", [49152] = "WinRPC",
     };
     // Tuned for over-Wi-Fi RTT + ARP retries; short timeouts silently drop
-    // slow devices (identical values to the macOS side).
-    internal const int PingTimeoutMs = 1000;
+    // slow devices (defaults, identical values to the macOS side).
     internal const int PingChunk = 64;
-    internal const int DiscoveryTimeoutMs = 2000;
-    internal const int PortTimeoutMs = 1500;
     internal const int MaxTargets = 4096;
     // ponytail: fixed concurrency caps; adaptive limiter if a /24+ scan
     // ever drops connects under load
@@ -680,6 +702,11 @@ internal static class Scanner
         Check(Classify(null, new HashSet<int> { 3389 })?.Contains("Windows host") == true, "classify rdp windows");
         Check(IsRandomized("4e:5e:ae:67:1f:98"), "randomized bit set");
         Check(!IsRandomized("f8:e9:03:00:4b:21"), "global mac");
+        Check(ParsePorts("80, 443,8080") is [80, 443, 8080], "parse ports comma+space");
+        Check(ParsePorts("80 80 443") is [80, 443], "parse ports dedupe");
+        Check(ParsePorts("") is null && ParsePorts("  ") is null, "parse ports rejects empty");
+        Check(ParsePorts("0") is null && ParsePorts("70000") is null
+            && ParsePorts("80,abc") is null, "parse ports rejects invalid");
         Check(!IsRandomized(""), "randomized empty");
         Check(Vendor("4e:5e:ae:67:1f:98") is null, "vendor skips randomized");
         if (LocalSubnet() is { } sub)

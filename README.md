@@ -6,6 +6,8 @@ one repo, same features on both platforms.
 
 ![FluentScanner on Windows after a LAN scan (last IP digits and MAC addresses pixelated)](screenshotV2.png)
 
+![FluentScanner on macOS after a LAN scan](macos/screenshot.png)
+
 ## Features (both platforms)
 
 Same intents on both platforms — see the parity checklist in [AGENTS.md](AGENTS.md).

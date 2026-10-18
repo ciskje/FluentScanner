@@ -409,13 +409,7 @@ extension HostRow {
     }
 
     mutating func refreshServices() {
-        let texts = ports.sorted().compactMap { port -> String? in
-            guard let name = Scanner.portNames[port] else { return "\(port)" }
-            if name == "HTTP", let srv = server {
-                return "\(name)/\(srv) (\(port))" // e.g. HTTP/Caddy (80)
-            }
-            return "\(name) (\(port))"
-        }
-        services = texts.joined(separator: ", ")
+        services = ports.sorted().map { Scanner.serviceLabel($0, server: server) }
+            .joined(separator: ", ")
     }
 }
