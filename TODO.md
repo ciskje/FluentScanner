@@ -16,6 +16,11 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
 
 ## Pending
 
+- `windows` — ARP icon in Settings > Installed apps: add
+  `UninstallDisplayIcon={app}\FluentScanner.exe` to
+  `windows/installer/FluentScanner.iss` (per skill `windows-setup`
+  template). `win:[x]` (`.iss` + rebuilt `installer/dist/...-1.2.2.exe`;
+  takes effect on reinstall).
 - `generic` — size-to-fit button: a toolbar button fits every column to
   its contents (macOS: ↔ icon + Cmd+Shift+F, the fitted set pinched so it
   never overflows the window). `mac:[x]` (1.2.3). `win:[ ]` — add the same

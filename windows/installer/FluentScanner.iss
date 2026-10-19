@@ -23,6 +23,9 @@ DefaultGroupName={#MyAppName}
 OutputDir=.\dist
 OutputBaseFilename={#MyAppName}-Setup-{#MyAppVersion}-win-x64
 SetupIconFile={#IconFile}
+; Icon in Settings > Apps > Installed apps / Control Panel (skill windows-setup):
+; without this the ARP entry shows the generic placeholder.
+UninstallDisplayIcon={app}\{#MyAppExeName}
 Compression=lzma2/ultra64
 ArchitecturesAllowed=x64compatible
 ; 64-bit mode: without this the (32-bit) Setup resolves {autopf} to
