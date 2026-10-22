@@ -21,15 +21,16 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
   `mac:[x]` — fr/de/es `.lproj` + help-src (8 chapters each, hiutil-indexed),
   `L()` + picker cover EN/FR/IT/DE/ES, `CFBundleLocalizations` set
   (shipped in 1.4.0).
-  `win:[ ]` — resw `Strings/fr-FR,de-DE,es-ES` + language menu + Help/changelog
-  translations (Windows rebuild + verify there).
-- `generic` — changelog in Help (IT + EN): a separate Novità/What's new
+  `win:[ ]` — resw `Strings/fr-FR,de-DE,es-ES` + `UiLang` non-it→`en` +
+  language menu + Help/changelog translations (Windows rebuild + verify
+  there).
+- `generic` — changelog in Help (EFIGS): a separate Novità/What's new
   entry with its own Help-menu item, every version dated. `mac:[x]`
   (1.3.0: `ChangelogView` + dated `changelogBody` in both `.lproj`).
   `win:[x]` — resw `changelogItem/Title/Body` + Help-menu item opening a
   changelog dialog (code written from the macOS machine — Windows rebuild
   + FSCAN_SELFTEST pending there).
-- `generic` — structured multi-chapter help with working search (IT + EN):
+- `generic` — structured multi-chapter help with working search (EFIGS):
   macOS ships an Apple Help Book (`packaging/help-src`, hiutil-indexed in
   `bundle.sh`, opened from the Help menu + toolbar ?); Windows mirrors with
   chapters + in-dialog search. The dated Novità/What's new sheet + its own

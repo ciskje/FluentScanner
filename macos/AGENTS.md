@@ -104,3 +104,9 @@ at releases.
   `hiutil -I corespotlight -C -a` with `-s` stopwords per language. The old
   in-app help sheet is gone (deleted, not kept as fallback); About +
   Changelog sheets stay.
+- Adding a UI language: copy `en.lproj/Localizable.strings` + `help-src/en.lproj/*.html`
+  and translate (keep every key, keep `%ld` placeholders), add the code to
+  `supportedLocalizations` in `Strings.swift`, a picker row in `Settings.swift`,
+  the `.lproj` dirs in `bundle.sh` (both the Resources copy and the hiutil loop)
+  and `CFBundleLocalizations` in `packaging/Info.plist`. Windows mirrors with
+  `Strings/<lang>/` resw + a language-menu entry.
