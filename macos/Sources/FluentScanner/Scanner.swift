@@ -10,7 +10,7 @@ enum Scanner {
     /// Pure — exercised in the self-test.
     static func parsePorts(_ text: String) -> [UInt16]? {
         var out: [UInt16] = []
-        for tok in text.split(whereSeparator: { $0 == "," || $0.isWhitespace }) {
+        for tok in text.split(whereSeparator: { $0 == "," || $0 == ";" || $0.isWhitespace }) {
             guard let p = UInt16(tok), p > 0 else { return nil }
             if !out.contains(p) {
                 guard out.count < 256 else { return nil }
@@ -1195,6 +1195,7 @@ enum Scanner {
         check(!isRandomized(""), "randomized empty")
         check(parsePorts("80, 443") == [80, 443], "ports parse")
         check(parsePorts("80 80 443") == [80, 443], "ports dedupe")
+        check(parsePorts("80;443 8080") == [80, 443, 8080], "ports semicolon")
         check(parsePorts("0") == nil, "ports zero rejected")
         check(parsePorts("abc") == nil, "ports garbage rejected")
         check(parsePorts("") == nil, "ports empty rejected")

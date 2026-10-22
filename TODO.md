@@ -16,6 +16,11 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
 
 ## Pending
 
+- `generic` — third-language fallback + `;` port separator: a system
+  language outside EN/IT shows Italian (never raw keys), and `;` joins
+  port lists like `,`/space. `win:[x]` (already so: `UiLang` non-en→it,
+  `ParsePorts` splits `;`). `mac:[x]` (`L()` falls back to `it`,
+  `parsePorts` splits `;`; no version bump, ships with the next release).
 - `windows` — ARP icon in Settings > Installed apps: add
   `UninstallDisplayIcon={app}\FluentScanner.exe` to
   `windows/installer/FluentScanner.iss` (per skill `windows-setup`
