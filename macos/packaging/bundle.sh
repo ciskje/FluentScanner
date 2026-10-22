@@ -17,6 +17,22 @@ cp -R Sources/FluentScanner/Resources/en.lproj Sources/FluentScanner/Resources/i
   "$APP/Contents/Resources/"
 cp Sources/FluentScanner/Resources/oui.csv "$APP/Contents/Resources/"
 
+# Apple Help Book (chapters + menu search): HTML per language, indexed
+# with hiutil (Spotlight format, anchors on, stopwords per language).
+HELP="$APP/Contents/Resources/FluentScanner.help/Contents"
+rm -rf "$APP/Contents/Resources/FluentScanner.help"
+mkdir -p "$HELP/Resources"
+cp packaging/help-Info.plist "$HELP/Info.plist"
+for lang in en it; do
+  mkdir -p "$HELP/Resources/$lang.lproj"
+  cp packaging/help-src/$lang.lproj/*.html "$HELP/Resources/$lang.lproj/"
+  hiutil -I corespotlight -C -a -s $lang -l $lang \
+    -f "$HELP/Resources/$lang.lproj/search.helpindex" \
+    "$HELP/Resources/$lang.lproj/"
+done
+echo "==> help book"
+ls "$HELP/Resources"
+
 # Icon: hand-drawn radar sweep (packaging/AppIcon.svg).
 # Rendered with rsvg-convert (brew install librsvg): Quick Look's qlmanage
 # renders SVGs shrunken and off-center, so it must NOT be used here.

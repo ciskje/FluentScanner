@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="AppleTitle" content="FluentScanner Help: MACs">
+<title>MAC addresses and vendors</title>
+<style>body{font-family:-apple-system,sans-serif;margin:20px;line-height:1.5}h1{font-size:1.3em}li{margin:5px 0}a{color:#0b6bcc}</style>
+</head>
+<body>
+<a name="macs"></a>
+<h1>MAC addresses and vendors</h1>
+<ul>
+<li>MACs come from the local ARP table, which the ping sweep and the TCP connects populate. Responders still missing an entry get a targeted re-ping and an ARP re-read.</li>
+<li>The vendor is the OUI prefix of the MAC (bundled IEEE table, works offline). The Type hint combines it with service clues (RDP/WinRM → Windows host, 9100 → Printer, 2049 → NAS, vendor names → NAS, IoT device, Router/AP…) and a ping-reply TTL guess (only 128 suggests Windows).</li>
+<li>When the OUI says nothing, the HTTP Server header (already-open 80/8080) or the UPnP device description fills the brand slot instead.</li>
+</ul>
+<p><a href="index.html">Contents</a></p>
+</body>
+</html>

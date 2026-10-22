@@ -96,3 +96,11 @@ at releases.
   Harvest-only ghosts get the full treatment too: post-harvest ARP re-read,
   rDNS + NetBIOS over all rows, ghost 80/8080 knock, re-classify of
   still-blank kinds.
+- Help menu search works through a real Apple Help Book:
+  `packaging/help-src/<lang>.lproj/*.html`, assembled + `hiutil`-indexed by
+  `bundle.sh` into `FluentScanner.help` (registered via
+  `CFBundleHelpBookFolder/Name` in `packaging/Info.plist`, opened with
+  `NSHelpManager.openHelpAnchor`). No Xcode help tooling needed;
+  `hiutil -I corespotlight -C -a` with `-s` stopwords per language. The old
+  in-app help sheet is gone (deleted, not kept as fallback); About +
+  Changelog sheets stay.

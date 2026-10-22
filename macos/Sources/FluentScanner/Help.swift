@@ -3,31 +3,13 @@ import SwiftUI
 
 extension Notification.Name {
     static let showAbout = Notification.Name("FluentScanner.showAbout")
-    static let showHelp = Notification.Name("FluentScanner.showHelp")
     static let showChangelog = Notification.Name("FluentScanner.showChangelog")
 }
 
-/// How-to sheet (toolbar "?" and the Help menu open it).
-struct HelpView: View {
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(L("helpTitle"))
-                .font(.title2.weight(.semibold))
-            ScrollView {
-                Text(L("helpBody"))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            HStack {
-                Spacer()
-                Button(L("closeBtn")) { dismiss() }
-                    .keyboardShortcut(.defaultAction)
-            }
-        }
-        .padding(20)
-        .frame(width: 520, height: 420)
-    }
+/// Opens the bundled Apple Help Book (chapters + menu search) in Help Viewer.
+func openHelpBook() {
+    guard let book = Bundle.main.object(forInfoDictionaryKey: "CFBundleHelpBookName") as? String else { return }
+    NSHelpManager.shared.openHelpAnchor("index", inBook: book)
 }
 
 /// Version changelog sheet (the Help menu's second item opens it).

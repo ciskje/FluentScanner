@@ -74,9 +74,10 @@ Both builds implement the same intents; platform-native details may differ:
 - Settings: table font size + monospaced toggle; the discovery/scan port
   lists and the ping/discovery/port timeouts have fixed working defaults,
   editable in the app
-- Help sheet + About panel, in both languages; a separate Novità/What's new
-  sheet (own Help-menu item, every version dated) carries the changelog
-  in both languages
+- Help sheet + About panel, in both languages; a structured Apple Help Book
+  (chapters + Help-menu search via hiutil index) replaces the old help
+  sheet; a separate Novità/What's new sheet (own Help-menu item, every
+  version dated) carries the changelog in both languages
 - App icon: radar-sweep SVG source, rendered per platform
 
 ## Change workflow

@@ -24,13 +24,6 @@
 "randomMacLegend" = "Randomized MAC";
 "thisMacLegend" = "This Mac (scanning host)";
 "helpTitle" = "FluentScanner Help";
-"helpBody" = "Enter a start and end IP and press Start (Return works too). Get IP fills the range of this machine's own subnet. A single IP scans just that host. Network (.0) and broadcast (.255) addresses are never probed.
-
-Discovery pings every address and probes common TCP ports in parallel; live hosts then get a full port sweep. The progress bar tracks discovery; Stop halts a running scan. Export saves the table as CSV.
-
-The dot before each IP is the device type (see the legend below the table); the brand name gets its own stable color. A shuffle icon marks a randomized MAC, which carries no vendor. The yellow row with the computer icon is this machine.
-
-Hostnames come from Bonjour (mDNS), NetBIOS and reverse DNS. Quiet devices with no open port and no name service stay anonymous — open ports, a real MAC vendor and mDNS are what identify a device. The size-to-fit button in the toolbar (Cmd+Shift+F) fits every column to its contents.";
 "changelogTitle" = "What's new";
 "changelogBody" = "1.2.7 — Oct 22, 2026 — Third system languages show English; `;` also separates port lists.
 1.2.6 — Oct 22, 2026 — Live results on both platforms; harvest ghosts gain MAC, DNS, NetBIOS and UPnP clues; theme-aware header underline; running spinner.

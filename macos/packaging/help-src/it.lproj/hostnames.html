@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="AppleTitle" content="Aiuto di FluentScanner: Hostname">
+<title>Hostname</title>
+<style>body{font-family:-apple-system,sans-serif;margin:20px;line-height:1.5}h1{font-size:1.3em}li{margin:5px 0}a{color:#0b6bcc}</style>
+</head>
+<body>
+<a name="hostnames"></a>
+<h1>Hostname</h1>
+<ul>
+<li>I nomi arrivano da tre fonti, dalla migliore: harvest Bonjour (mDNS), NetBIOS per i PC Windows, reverse DNS per ultimo. Nessun fallimento è fatale: un nome mancante non blocca il resto.</li>
+<li>Gli host visti solo dalle harvest (speaker mDNS/UPnP che ignorano ping e porte) ricevono comunque tutto: re-lettura ARP per MAC + marca, reverse DNS e NetBIOS su tutte le righe, knock 80/8080 e label UPnP.</li>
+<li>I dispositivi silenziosi senza porte aperte né servizio nomi restano anonimi: porte aperte, MAC reale e mDNS sono ciò che identifica un dispositivo.</li>
+</ul>
+<p><a href="index.html">Indice</a></p>
+</body>
+</html>

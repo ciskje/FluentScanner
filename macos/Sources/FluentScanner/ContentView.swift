@@ -7,7 +7,6 @@ struct ContentView: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var start = Scanner.localSubnet()?.start ?? "192.168.1.1"
     @State private var end = Scanner.localSubnet()?.end ?? "192.168.1.254"
-    @State private var showHelp = false
     @State private var showAbout = false
     @State private var showChangelog = false
     @State private var fits: [String: CGFloat] = [:]
@@ -124,7 +123,7 @@ struct ContentView: View {
             }
             .help(L("fitAll"))
             .keyboardShortcut("f", modifiers: [.command, .shift])
-            Button { showHelp = true } label: {
+            Button { openHelpBook() } label: {
                 Image(systemName: "questionmark.circle")
             }
             .help(L("helpTitle"))
@@ -134,14 +133,10 @@ struct ContentView: View {
             .help(L("aboutTitle"))
         }
         .padding(8)
-        .sheet(isPresented: $showHelp) { HelpView() }
         .sheet(isPresented: $showAbout) { AboutView() }
         .sheet(isPresented: $showChangelog) { ChangelogView() }
         .onReceive(NotificationCenter.default.publisher(for: .showAbout)) { _ in
             showAbout = true
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .showHelp)) { _ in
-            showHelp = true
         }
         .onReceive(NotificationCenter.default.publisher(for: .showChangelog)) { _ in
             showChangelog = true

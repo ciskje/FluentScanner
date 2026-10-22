@@ -10,6 +10,10 @@
 	<string>FluentScanner</string>
 	<key>CFBundleIdentifier</key>
 	<string>app.fluentscanner.mac</string>
+	<key>CFBundleHelpBookFolder</key>
+	<string>FluentScanner.help</string>
+	<key>CFBundleHelpBookName</key>
+	<string>app.fluentscanner.mac.help</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

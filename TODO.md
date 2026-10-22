@@ -16,12 +16,13 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
 
 ## Pending
 
-- `generic` — changelog in Help (IT + EN): a separate Novità/What's new
-  sheet with its own Help-menu item, every version dated (same entries as
-  the README Changelog, both languages). `mac:[x]` (`ChangelogView` +
-  `showChangelog`, `changelogTitle`/`changelogBody` in both `.lproj`).
-  `win:[ ]` — mirror with resw keys + Help-dialog item opening a changelog
-  dialog.
+- `generic` — structured multi-chapter help with working search (IT + EN):
+  macOS ships an Apple Help Book (`packaging/help-src`, hiutil-indexed in
+  `bundle.sh`, opened from the Help menu + toolbar ?); Windows mirrors with
+  chapters + in-dialog search. The dated Novità/What's new sheet + its own
+  Help-menu item stay as they are.
+  `mac:[ ]` — write `help-src`, wire `bundle.sh` + `openHelpBook`, drop the
+  `HelpView` sheet. `win:[ ]` — chapters + search in the Help dialog.
 - `generic` — third-language default: a system language outside EN/IT shows
   English (never raw keys). `win:[ ]` (`UiLang` currently falls back to
   Italian — change to English). `mac:[x]` (`L()` falls back to `en`;

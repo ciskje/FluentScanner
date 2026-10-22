@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="AppleTitle" content="FluentScanner Help: Troubleshooting">
+<title>Troubleshooting</title>
+<style>body{font-family:-apple-system,sans-serif;margin:20px;line-height:1.5}h1{font-size:1.3em}li{margin:5px 0}a{color:#0b6bcc}</style>
+</head>
+<body>
+<a name="troubleshooting"></a>
+<h1>Troubleshooting</h1>
+<ul>
+<li>Scanning an access point with no internet: every lookup that needs a working resolver has a hard deadline, so the scan never sits waiting on something that can never arrive. Partial results stay on screen.</li>
+<li>Missing MACs: the scan re-pings responders whose ARP entry was lost and re-reads the table. Entries outside the local subnet never have a MAC.</li>
+<li>Rows seem missing: a text filter may be active — clear the search field. Rows with no open port yet gain their 80/8080 knock only after the harvests.</li>
+<li>Export is disabled while a scan runs; stop it first.</li>
+</ul>
+<p><a href="index.html">Contents</a></p>
+</body>
+</html>

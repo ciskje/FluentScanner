@@ -24,13 +24,6 @@
 "randomMacLegend" = "MAC randomizzato";
 "thisMacLegend" = "Questo Mac (host di scansione)";
 "helpTitle" = "Aiuto di FluentScanner";
-"helpBody" = "Inserisci IP inizio e IP fine e premi Avvia (vale anche Invio). Get IP riempie il range della subnet di questa macchina. Un singolo IP scansiona solo quell'host. Gli indirizzi di rete (.0) e broadcast (.255) non vengono mai sondati.
-
-La discovery fa ping su ogni indirizzo e sonda le porte TCP comuni in parallelo; gli host attivi ricevono poi la scansione completa delle porte. La barra mostra l'avanzamento; Stop ferma la scansione. Export salva la tabella in CSV.
-
-Il pallino prima di ogni IP è il tipo di dispositivo (vedi legenda sotto la tabella); la marca ha un suo colore stabile. L'icona shuffle indica un MAC randomizzato, senza produttore. La riga gialla con l'icona del computer è questa macchina.
-
-Gli hostname arrivano da Bonjour (mDNS), NetBIOS e reverse DNS. I dispositivi silenziosi senza porte aperte né servizio nomi restano anonimi: porte aperte, MAC reale e mDNS sono ciò che identifica un dispositivo. Il bottone di adattamento in toolbar (Cmd+Maiusc+F) adatta ogni colonna al suo contenuto.";
 "changelogTitle" = "Novità";
 "changelogBody" = "1.2.7 — 22 ott 2026 — Le lingue di sistema oltre EN/IT mostrano l'inglese; anche `;` separa le liste porte.
 1.2.6 — 22 ott 2026 — Risultati live su entrambe le piattaforme; i ghost delle harvest ottengono MAC, DNS, NetBIOS e UPnP; sottolineatura header a tema; rotellina di attività.
