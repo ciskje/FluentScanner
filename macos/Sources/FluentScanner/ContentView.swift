@@ -138,6 +138,9 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .showAbout)) { _ in
             showAbout = true
         }
+        .onReceive(NotificationCenter.default.publisher(for: .showHelp)) { _ in
+            showHelp = true
+        }
     }
 
     private var footer: some View {

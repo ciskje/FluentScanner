@@ -3,6 +3,7 @@ import SwiftUI
 
 extension Notification.Name {
     static let showAbout = Notification.Name("FluentScanner.showAbout")
+    static let showHelp = Notification.Name("FluentScanner.showHelp")
 }
 
 /// How-to sheet (toolbar "?" and the Help menu open it).

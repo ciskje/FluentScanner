@@ -27,6 +27,11 @@ struct FluentScannerApp: App {
                     NotificationCenter.default.post(name: .showAbout, object: nil)
                 }
             }
+            CommandGroup(replacing: .help) {
+                Button(L("helpTitle")) {
+                    NotificationCenter.default.post(name: .showHelp, object: nil)
+                }
+            }
         }
         Settings {
             SettingsView()
