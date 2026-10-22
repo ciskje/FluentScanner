@@ -106,11 +106,11 @@ implemented those intents; if the other lags, its release waits.
 
 - Z = bugfix/tweak, Y = new feature/behavior, X = upheaval.
 - Docs/refactor/build never change the version.
-- Current: Windows `1.2.6`, macOS `1.2.7` (1.2.2 was Windows-only:
+- Current: Windows `1.2.6`, macOS `1.3.0` (1.2.2 was Windows-only:
   Excel-style column resize; macOS got the header double-click in 1.2.3;
   1.2.4 fixes the size-to-fit button, which 1.2.3 had broken; macOS skipped
-  the 1.2.5 release and caught up at 1.2.6; 1.2.7 ships two macOS tweaks
-  whose Windows mirror is still open — same intents once it lands).
+  the 1.2.5 release and caught up at 1.2.6; 1.2.7–1.3.0 ship macOS tweaks
+  whose Windows mirrors are still open — same intents once they land).
 - Single source: `<Version>` in `windows/source/FluentScanner.csproj`
   and `CFBundleShortVersionString` in `macos/packaging/Info.plist`.
 
