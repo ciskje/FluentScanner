@@ -136,7 +136,13 @@ Standard Win11 window, no custom chrome beyond this:
 - Local interfaces via `NetworkInterface` (no `getifaddrs` on Windows):
   `LocalSubnet()` powers Get IP, `LocalAddrs()` pre-inserts + highlights
   the scanning host row.
-- Results arrive per host as the scan progresses (UI updates live).
+- Results arrive per host as the scan progresses (UI updates live): the ping
+  and TCP discovery sweeps publish each chunk as soon as it answers, and the
+  phase-3 hostname lookups merge per chunk. `HostRow.NameRank` keeps the
+  mDNS(3) > reverse DNS(2) > NetBIOS(1) precedence whatever the arrival order;
+  `ReverseDnsAsync` caps every lookup at 1500 ms, so a network with no working
+  resolver (an AP with no internet) can never hold the scan open. macOS still
+  needs the same (see TODO.md).
 
 ## WinUI gotchas learned
 

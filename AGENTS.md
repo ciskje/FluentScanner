@@ -54,6 +54,12 @@ Both builds implement the same intents; platform-native details may differ:
   highlighted (accent IP + computer icon) — the highlight must
   stay readable in both light and dark mode (pure yellow fails on light
   backgrounds, use a darker amber there)
+- Results land live: a host appears the moment it answers (the discovery
+  passes publish chunk by chunk, hostname lookups merge as each chunk
+  answers), and every lookup that depends on the network having a working
+  resolver has a hard per-host deadline — a scan must never sit waiting on
+  something that can never arrive (an AP with no internet) once partial
+  results are already on screen
 - Progress bar, stop mid-scan, CSV export
 - Light/dark/system theme (selectable in Settings), UI in English and
   Italian (override in Settings: system/EN/IT)

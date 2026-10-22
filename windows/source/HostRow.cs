@@ -22,6 +22,10 @@ public sealed class HostRow : INotifyPropertyChanged
     }
 
     private string _hostname = "";
+    // Source precedence of the hostname, kept even when the lookups land out
+    // of order: 3 mDNS > 2 reverse DNS > 1 NetBIOS.
+    private int _nameRank;
+    public int NameRank { get => _nameRank; set => _nameRank = value; }
     private string _mac = "";
     private string _vendor = "";
     private string _kind = "";

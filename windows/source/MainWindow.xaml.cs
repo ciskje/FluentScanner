@@ -498,6 +498,20 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
         old.Kind = kind;
     }
 
+    /// Merge a hostname keeping the source precedence (3 mDNS > 2 reverse DNS
+    /// > 1 NetBIOS). Lookups land chunk by chunk, in whatever order they
+    /// answer, so the rank — not the merge order — decides who wins.
+    private void SetHostname(string ip, string name, int rank)
+    {
+        var r = RowFor(ip);
+        if (name.EndsWith(".local", StringComparison.OrdinalIgnoreCase))
+            name = name[..^".local".Length];
+        name = name.TrimEnd('.');
+        if (name.Length == 0 || r.NameRank >= rank) return;
+        r.Hostname = name;
+        r.NameRank = rank;
+    }
+
     private void UpdateStatus(int done, int total) =>
         StatusTxt.Text = string.Format(Str("scanningFmt"), done, total);
 
@@ -898,24 +912,11 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
         ct.ThrowIfCancellationRequested();
         var pingHits = await pingTask;
         var tcpHits = await tcpTask;
+        // Both passes populate the ARP table → one refresh for all MACs. The
+        // rows and their latency already landed chunk by chunk in the sweeps.
         var alive = new HashSet<string>(StringComparer.Ordinal);
         foreach (var (ip, _, _) in pingHits) alive.Add(ip);
         foreach (var (ip, _) in tcpHits) alive.Add(ip);
-        await DispatchAsync(() =>
-        {
-            foreach (var (ip, ms, ttl) in pingHits)
-            {
-                var r = RowFor(ip);
-                if (r.LatencyMs is null) r.LatencyMs = ms;
-                if (ttl is { } t && Scanner.TtlKind(t) is { } hint) ApplyKind(ip, hint);
-            }
-            foreach (var (ip, ms) in tcpHits)
-            {
-                var r = RowFor(ip);
-                if (r.LatencyMs is null) r.LatencyMs = ms;
-            }
-        });
-        // Both passes populate the ARP table → one refresh for all MACs.
         foreach (var kv in Scanner.ArpTable()) arp[kv.Key] = kv.Value;
         await DispatchAsync(() =>
         {
@@ -988,9 +989,13 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
             SortRows();
         });
 
-        // Phase 3 — hostname + software lookups run CONCURRENTLY (wall time ≈
-        // the slowest, not the sum). Precedence: mDNS → reverse DNS → NetBIOS;
-        // the HTTP Server header fills the brand slot only when OUI is silent.
+        // Phase 3 — hostname + software lookups run CONCURRENTLY, and every
+        // chunk is merged the moment it answers: names fill in progressively,
+        // so a slow source (reverse DNS with no reachable resolver, e.g. an
+        // AP with no internet) never holds the hosts already found hostage.
+        // Precedence stays mDNS → reverse DNS → NetBIOS (ranked, arrival order
+        // irrelevant); the HTTP Server header fills the brand slot only when
+        // OUI is silent.
         Post(() => StatusTxt.Text = Str("dnsFmt"));
         await DispatchAsync(SortRows);
         var snap = alive.ToList();
@@ -999,34 +1004,15 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
             .Select(r => (r.Ip, port: r.Ports.Contains(80) ? 80 : 8080))
             .ToList());
         var mdnsTask = Scanner.MdnsHarvestAsync(2.5, ct);
-        var dnsTask = ReverseAllAsync(snap, ct);
-        var nbnsTask = NbnsAllAsync(snap, ct);
-        var httpTask = HttpAllAsync(httpPairs, ct);
+        var dnsTask = ReverseAllAsync(snap, ct);      // merges per chunk
+        var nbnsTask = NbnsAllAsync(snap, ct);        // merges per chunk
+        var httpTask = HttpAllAsync(httpPairs, ct);   // merges per chunk
         await Task.WhenAll(mdnsTask, dnsTask, nbnsTask, httpTask);
         ct.ThrowIfCancellationRequested();
         var mdnsHosts = await mdnsTask;
-        var dnsHosts = await dnsTask;
-        var nbnsHosts = await nbnsTask;
-        var httpHosts = await httpTask;
         await DispatchAsync(() =>
         {
-            foreach (var (ip, name) in mdnsHosts)
-            {
-                if (!_byIp.TryGetValue(ip, out var row) || !string.IsNullOrEmpty(row.Hostname)) continue;
-                var baseName = name.EndsWith(".local", StringComparison.OrdinalIgnoreCase)
-                    ? name[..^".local".Length] : name;
-                row.Hostname = baseName.TrimEnd('.');
-            }
-            foreach (var (ip, name) in dnsHosts)
-                if (_byIp.TryGetValue(ip, out var row) && string.IsNullOrEmpty(row.Hostname))
-                    row.Hostname = name;
-            foreach (var (ip, name) in nbnsHosts)
-                if (_byIp.TryGetValue(ip, out var row) && string.IsNullOrEmpty(row.Hostname))
-                    row.Hostname = name;
-            foreach (var (ip, srv) in httpHosts)
-                if (_byIp.TryGetValue(ip, out var row))
-                    row.Server = srv;
-            foreach (var ip in _byIp.Keys) _byIp[ip].RefreshServices();
+            foreach (var (ip, name) in mdnsHosts) SetHostname(ip, name, 3);
             SortRows();
         });
     }
@@ -1047,13 +1033,26 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
                     using var ping = new System.Net.NetworkInformation.Ping();
                     var reply = await ping.SendPingAsync(ip, Scanner.PingTimeoutMs);
                     var ok = reply.Status == System.Net.NetworkInformation.IPStatus.Success;
-                    return (ip, ok ? (int)reply.RoundtripTime : 0,
-                        ok ? reply.Options?.Ttl : null);
+                    return (ip: ip, ms: ok ? (int)reply.RoundtripTime : 0,
+                        ttl: ok ? reply.Options?.Ttl : null);
                 }
-                catch { return (ip, 0, (int?)null); }
+                catch { return (ip: ip, ms: 0, ttl: (int?)null); }
             }));
-            foreach (var (ip, ms, ttl) in results)
-                if (ms > 0) hits.Add((ip, ms, ttl));
+            var found = results.Where(r => r.ms > 0).ToList();
+            hits.AddRange(found);
+            // Partial results: each chunk's answers are on screen before the
+            // next one starts, so the first hosts show up while the sweep is
+            // still running (MACs fill in after the ARP re-read).
+            await DispatchAsync(() =>
+            {
+                foreach (var (ip, ms, ttl) in found)
+                {
+                    var r = RowFor(ip);
+                    if (r.LatencyMs is null) r.LatencyMs = ms;
+                    if (ttl is { } t && Scanner.TtlKind(t) is { } hint) ApplyKind(ip, hint);
+                }
+                SortRows();
+            });
             Interlocked.Add(ref counters.Ping, chunk.Count);
             report();
         }
@@ -1072,55 +1071,82 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
             var results = await Task.WhenAll(chunk.Select(async t =>
             {
                 var ms = await Scanner.ProbeAsync(t.ip, t.p, Scanner.DiscoveryTimeoutMs, ct);
-                return (t.ip, ms);
+                return (ip: t.ip, ms: ms);
             }));
-            foreach (var (ip, ms) in results)
-                if (ms is { } m) hits.Add((ip, m));
+            var found = new List<(string ip, int ms)>();
+            foreach (var r in results)
+                if (r.ms is { } m) found.Add((r.ip, m));
+            foreach (var (ip, ms) in found) hits.Add((ip, ms));
+            // Same live merge as the ping pass: an open discovery port is a
+            // row the moment the connect succeeds.
+            await DispatchAsync(() =>
+            {
+                foreach (var (ip, ms) in found)
+                {
+                    var r = RowFor(ip);
+                    if (r.LatencyMs is null) r.LatencyMs = ms;
+                }
+                SortRows();
+            });
             Interlocked.Add(ref counters.Tcp, chunk.Count / Scanner.DiscoveryPorts.Length);
             report();
         }
         return hits.DistinctBy(h => h.Item1).ToList();
     }
 
-    private static async Task<List<(string, string)>> ReverseAllAsync(List<string> hosts, CancellationToken ct)
+    /// Reverse DNS, chunked and merged chunk by chunk (ReverseDnsAsync has a
+    /// 1.5 s cap, so an unreachable resolver can never stall the phase).
+    private async Task ReverseAllAsync(List<string> hosts, CancellationToken ct)
     {
-        var out_ = new List<(string, string)>();
         for (int c = 0; c < hosts.Count && !ct.IsCancellationRequested; c += 32)
         {
             var chunk = hosts.Skip(c).Take(32).ToList();
             var names = await Task.WhenAll(chunk.Select(async ip =>
                 (ip, name: await Scanner.ReverseDnsAsync(ip, ct))));
-            foreach (var (ip, name) in names)
-                if (name is not null) out_.Add((ip, name));
+            await DispatchAsync(() =>
+            {
+                foreach (var (ip, name) in names)
+                    if (name is not null) SetHostname(ip, name, 2);
+                SortRows();
+            });
         }
-        return out_;
     }
 
-    private static async Task<List<(string, string)>> NbnsAllAsync(List<string> hosts, CancellationToken ct)
+    /// NetBIOS node-status, chunked, merged as each chunk answers.
+    private async Task NbnsAllAsync(List<string> hosts, CancellationToken ct)
     {
-        var out_ = new List<(string, string)>();
         for (int c = 0; c < hosts.Count && !ct.IsCancellationRequested; c += 32)
         {
             var chunk = hosts.Skip(c).Take(32).ToList();
             var names = await Task.WhenAll(chunk.Select(async ip =>
                 (ip, name: await Scanner.NbnsNameAsync(ip, ct))));
-            foreach (var (ip, name) in names)
-                if (name is not null) out_.Add((ip, name));
+            await DispatchAsync(() =>
+            {
+                foreach (var (ip, name) in names)
+                    if (name is not null) SetHostname(ip, name, 1);
+                SortRows();
+            });
         }
-        return out_;
     }
 
-    private static async Task<List<(string, string)>> HttpAllAsync(List<(string ip, int port)> httpPairs, CancellationToken ct)
+    /// HTTP Server headers for 80/8080 hosts (only already-open ports).
+    private async Task HttpAllAsync(List<(string ip, int port)> httpPairs, CancellationToken ct)
     {
-        var out_ = new List<(string, string)>();
         for (int c = 0; c < httpPairs.Count && !ct.IsCancellationRequested; c += 16)
         {
             var chunk = httpPairs.Skip(c).Take(16).ToList();
             var srvs = await Task.WhenAll(chunk.Select(async t =>
                 (t.ip, srv: await Scanner.HttpServerAsync(t.ip, t.port, ct))));
-            foreach (var (ip, srv) in srvs)
-                if (srv is not null) out_.Add((ip, srv));
+            await DispatchAsync(() =>
+            {
+                foreach (var (ip, srv) in srvs)
+                    if (srv is not null)
+                    {
+                        _byIp[ip].Server = srv;
+                        _byIp[ip].RefreshServices();
+                    }
+                SortRows();
+            });
         }
-        return out_;
     }
 }
