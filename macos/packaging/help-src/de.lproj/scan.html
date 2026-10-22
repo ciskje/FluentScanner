@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="AppleTitle" content="FluentScanner-Hilfe: Scannen">
+<title>Netzwerk scannen</title>
+<style>body{font-family:-apple-system,sans-serif;margin:20px;line-height:1.5}h1{font-size:1.3em}li{margin:5px 0}a{color:#0b6bcc}</style>
+</head>
+<body>
+<a name="scan"></a>
+<h1>Netzwerk scannen</h1>
+<ul>
+<li>Start- und End-IP eingeben und starten (Return geht auch). Eine einzelne IP scannt nur diesen Host.</li>
+<li>IP lesen füllt den Bereich des eigenen Subnetzes.</li>
+<li>CIDR-Bereiche (192.168.1.0/24) und volle Bereiche (192.168.1.1-192.168.1.254, oder 192.168.1.1-254) sind möglich. Netz (.0) und Broadcast (.255) werden nie angetastet.</li>
+<li>Die Discovery pingt jede Adresse und tastet gängige TCP-Ports parallel ab; aktive Hosts erhalten danach den vollen Port-Scan. Der Balken zeigt den Fortschritt, die Anzeige markiert einen laufenden Scan.</li>
+<li>Stopp hält den Scan an; gefundene Zeilen bleiben. Ergebnisse landen live, sobald jeder Host antwortet.</li>
+</ul>
+<p><a href="index.html">Inhalt</a></p>
+</body>
+</html>

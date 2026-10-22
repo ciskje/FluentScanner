@@ -1,0 +1,86 @@
+"start" = "Starten";
+"stop" = "Stoppen";
+"exportCsv" = "CSV exportieren";
+"exported" = "CSV exportiert";
+"exportedFailed" = "Export fehlgeschlagen";
+"scanning" = "Scanne %ld von %ld…";
+"doneFmt" = "%ld Hosts gefunden";
+"stopped" = "Gestoppt";
+"portScanFmt" = "%ld aktive Hosts — prüfe Dienste…";
+"dnsFmt" = "Hostnamen werden aufgelöst…";
+"invalidRange" = "Ungültiges Ziel (IP, CIDR oder Bereich erwartet)";
+"colIp" = "IP-Adresse";
+"colHostname" = "Hostname";
+"colMac" = "MAC-Adresse";
+"colServices" = "Dienste";
+"colLatency" = "Latenz";
+"colVendor" = "Hersteller";
+"thisMac" = "Dieser Mac (Scan-Host)";
+"randomMac" = "Zufällige MAC (private Adresse, kein Hersteller)";
+"startIp" = "Start-IP";
+"endIp" = "End-IP";
+"getIp" = "IP lesen";
+"getIpHelp" = "Mit dem Subnetzbereich dieses Rechners füllen";
+"randomMacLegend" = "Zufällige MAC";
+"thisMacLegend" = "Dieser Mac (Scan-Host)";
+"helpTitle" = "FluentScanner-Hilfe";
+"changelogTitle" = "Neuigkeiten";
+"changelogBody" = "1.2.7 — 22. Okt. 2026 — Systemsprachen außerhalb von EFIGS zeigen Englisch; auch `;` trennt Portlisten.
+1.2.6 — 22. Okt. 2026 — Live-Ergebnisse auf beiden Plattformen; Harvest-Geister erhalten MAC, DNS, NetBIOS und UPnP; Theme-Trennlinie; Aktivitätsanzeige.
+1.2.5 — 22. Okt. 2026 — Live-Ergebnisse (Windows): Hostnamen-Merges pro Block, harte Resolver-Deadlines.
+1.2.4 — 18. Okt. 2026 — Größen-Button funktioniert wieder (macOS).
+1.2.3 — 18. Okt. 2026 — Größen-Button + Cmd+Umschalt+F (macOS).
+1.2.2 — 18. Okt. 2026 — Excel-Spaltenvergrößerung (Windows).
+1.2.1 — 18. Okt. 2026 — Doppelklick auf die Kopfzeile passt die Spalte an (beide).
+1.2.0 — 18. Okt. 2026 — Volle Parität: Sortierung, Filter, Ports/Timeouts editierbar, klickbare Dienste, Hersteller/Typ-Spalten.
+1.1.0 — 18. Okt. 2026 — Ports/Timeouts editierbar, Sortierung + Filter, lesbare Markierung; Windows: Mica, Menü, Tabelle, Installer.
+1.0.0 — 18. Okt. 2026 — Erste stabile Version.
+0.10.0 — 18. Okt. 2026 — Einstellungen: Sprache, Schriftgröße + Mono, Theme.
+0.9.0 — 18. Okt. 2026 — Hilfe- und Info-Dialoge; EN/IT-Prüfung.
+0.8.4 — 18. Okt. 2026 — Legende deckt das Computer-Symbol ab.
+0.8.3 — 18. Okt. 2026 — Legende deckt zufällige MACs ab; breitere IP-Spalte.
+0.8.2 — 18. Okt. 2026 — Breitere IP-Felder.
+0.8.1 — 18. Okt. 2026 — Markierung überlebt ARP-Aktualisierung.
+0.8.0 — 18. Okt. 2026 — Bereich editierbar + IP-lesen-Button.
+0.7.2 — 18. Okt. 2026 — Scan-Host-IP in Gelb.
+0.7.1 — 18. Okt. 2026 — HTTP nennt die Software: HTTP/Caddy (80).
+0.7.0 — 18. Okt. 2026 — Alle Lookups parallel; Dauer ≈ langsamster.
+0.6.3 — 18. Okt. 2026 — Zufällige MACs markiert, nie zugeordnet; eigene Zeile fett.
+0.6.2 — 18. Okt. 2026 — Volle IEEE-OUI-Tabelle (40k Hersteller), offline.
+0.6.1 — 18. Okt. 2026 — HTTP-Server-Header als Hersteller-Ersatz auf 80/8080.
+0.6.0 — 18. Okt. 2026 — Host immer gelistet; mehr Hersteller, Hinweise, mDNS-Typen.
+0.5.3 — 18. Okt. 2026 — Ungepolsterte MAC-Gruppen geparst.
+0.5.2 — 18. Okt. 2026 — CIDR überspringt .0/.255; ein /24 scannt 254 Hosts.
+0.5.1 — 18. Okt. 2026 — TTL 255 sind Embedded-Stacks, keine Router; nur 128 deutet Windows an.
+0.5.0 — 18. Okt. 2026 — Radar-Icon.
+0.4.3 — 18. Okt. 2026 — Stabile Herstellerfarben; Typ-Legende.
+0.4.2 — 18. Okt. 2026 — Typ-Farbpunkt; generischer Linux-TTL-Hinweis entfernt.
+0.4.1 — 18. Okt. 2026 — Hostnamen repariert: `.local`-Anfragen, A-Records, NetBIOS.
+0.4.0 — 18. Okt. 2026 — Weniger fehlende MACs (Re-Ping + ARP-Neulesen); TTL-Hinweise.
+0.3.0 — 18. Okt. 2026 — ICMP-Ping-Sweep + TCP-Fallback; WLAN-Ports/Timeouts.
+0.2.1 — 18. Okt. 2026 — Kopfzeilen-/Zeilenausrichtung; OUI-Lookup-Fix.
+0.2.0 — 18. Okt. 2026 — Hersteller/Typ-Spalte; 4× schnellere Discovery; progressive Ergebnisse.
+0.1.0 — 18. Okt. 2026 — Grundgerüst: Ziele, TCP-Discovery, Ports, ARP-MACs, Reverse-DNS, CSV, EN/IT.";
+"aboutMenu" = "Über FluentScanner";
+"aboutTitle" = "Über FluentScanner";
+"aboutDesc" = "Findet alle Geräte in Ihrem LAN: Ping- plus TCP-Discovery, Port-Scan, MAC- und Herstellererkennung, Hostnamen.";
+"aboutOui" = "Herstellerdaten: IEEE-OUI-Register.";
+"aboutLicense" = "MIT-Lizenz — © 2026 Francesco Ferrara.";
+"closeBtn" = "Schließen";
+"languageLabel" = "Sprache";
+"languageSystem" = "System";
+"fontSizeLabel" = "Schriftgröße";
+"monoLabel" = "Monospace-Tabellentext";
+"themeLabel" = "Farbschema";
+"themeSystem" = "System";
+"themeLight" = "Hell";
+"themeDark" = "Dunkel";
+"pingTimeoutLabel" = "Ping-Timeout";
+"discTimeoutLabel" = "Discovery-Timeout";
+"portTimeoutLabel" = "Port-Timeout";
+"discPortsLabel" = "Discovery-Ports (kommagetrennt)";
+"scanPortsLabel" = "Dienst-Ports (kommagetrennt)";
+"portsInvalid" = "Ungültige Portliste — Zahlen 1-65535, kommagetrennt";
+"searchLabel" = "Filter";
+"colType" = "Typ";
+"fitAll" = "Spalten einpassen";

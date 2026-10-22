@@ -1,0 +1,86 @@
+"start" = "Démarrer";
+"stop" = "Arrêter";
+"exportCsv" = "Exporter CSV";
+"exported" = "CSV exporté";
+"exportedFailed" = "Échec de l'export";
+"scanning" = "Analyse %ld sur %ld…";
+"doneFmt" = "%ld hôtes trouvés";
+"stopped" = "Arrêté";
+"portScanFmt" = "%ld hôtes actifs — analyse des services…";
+"dnsFmt" = "Résolution des noms d'hôtes…";
+"invalidRange" = "Cible invalide (IP, CIDR ou plage attendus)";
+"colIp" = "Adresse IP";
+"colHostname" = "Nom d'hôte";
+"colMac" = "Adresse MAC";
+"colServices" = "Services";
+"colLatency" = "Latence";
+"colVendor" = "Fabricant";
+"thisMac" = "Ce Mac (hôte d'analyse)";
+"randomMac" = "MAC aléatoire (adresse privée, sans fabricant)";
+"startIp" = "IP de début";
+"endIp" = "IP de fin";
+"getIp" = "Lire IP";
+"getIpHelp" = "Remplir avec la plage du sous-réseau local";
+"randomMacLegend" = "MAC aléatoire";
+"thisMacLegend" = "Ce Mac (hôte d'analyse)";
+"helpTitle" = "Aide de FluentScanner";
+"changelogTitle" = "Nouveautés";
+"changelogBody" = "1.2.7 — 22 oct 2026 — Les langues système hors EFIGS affichent l'anglais ; `;` sépare aussi les listes de ports.
+1.2.6 — 22 oct 2026 — Résultats en direct sur les deux plateformes ; les fantômes des récoltes obtiennent MAC, DNS, NetBIOS et UPnP ; soulignement d'en-tête au thème ; indicateur d'activité.
+1.2.5 — 22 oct 2026 — Résultats en direct (Windows) : fusions de noms par bloc, délais stricts sur le resolver.
+1.2.4 — 18 oct 2026 — Le bouton d'ajustement refonctionne (macOS).
+1.2.3 — 18 oct 2026 — Bouton d'ajustement + Cmd+Maj+F (macOS).
+1.2.2 — 18 oct 2026 — Redimensionnement des colonnes façon Excel (Windows).
+1.2.1 — 18 oct 2026 — Double-clic sur l'en-tête ajuste la colonne (les deux).
+1.2.0 — 18 oct 2026 — Parité complète : tri, filtre, ports/délais modifiables, services cliquables, colonnes fabricant/type.
+1.1.0 — 18 oct 2026 — Ports/délais modifiables, tri + filtre, surlignage lisible ; Windows : Mica, menu, tableau, installeur.
+1.0.0 — 18 oct 2026 — Première version stable.
+0.10.0 — 18 oct 2026 — Réglages : langue, taille de police + mono, thème.
+0.9.0 — 18 oct 2026 — Panneaux Aide et À propos ; contrôle EN/IT.
+0.8.4 — 18 oct 2026 — La légende couvre l'icône de l'ordinateur.
+0.8.3 — 18 oct 2026 — La légende couvre les MAC aléatoires ; colonne IP élargie.
+0.8.2 — 18 oct 2026 — Champs IP élargis.
+0.8.1 — 18 oct 2026 — Le surlignage survit au rafraîchissement ARP.
+0.8.0 — 18 oct 2026 — Plage modifiable + bouton Lire IP.
+0.7.2 — 18 oct 2026 — IP de l'hôte en jaune.
+0.7.1 — 18 oct 2026 — HTTP nomme le logiciel : HTTP/Caddy (80).
+0.7.0 — 18 oct 2026 — Toutes les recherches en parallèle ; durée ≈ la plus lente.
+0.6.3 — 18 oct 2026 — MAC aléatoires signalés, jamais attribués ; ligne hôte en gras.
+0.6.2 — 18 oct 2026 — Table OUI IEEE complète (40k fabricants), hors ligne.
+0.6.1 — 18 oct 2026 — En-tête HTTP Server comme fabricant de repli sur 80/8080.
+0.6.0 — 18 oct 2026 — Hôte toujours listé ; plus de fabricants, d'indices, de types mDNS.
+0.5.3 — 18 oct 2026 — Groupes MAC non remplis analysés.
+0.5.2 — 18 oct 2026 — CIDR saute .0/.255 ; un /24 sonde 254 hôtes.
+0.5.1 — 18 oct 2026 — TTL 255 = piles embarquées, pas routeurs ; seul 128 indique Windows.
+0.5.0 — 18 oct 2026 — Icône radar.
+0.4.3 — 18 oct 2026 — Couleurs de marque stables ; légende des types.
+0.4.2 — 18 oct 2026 — Pastille de type ; indice TTL Linux générique supprimé.
+0.4.1 — 18 oct 2026 — Noms d'hôtes corrigés : requêtes `.local`, enregistrements A, NetBIOS.
+0.4.0 — 18 oct 2026 — Moins de MAC manquants (re-ping + relecture ARP) ; indices TTL.
+0.3.0 — 18 oct 2026 — Balayage ping ICMP + repli TCP ; ports/délais pour le Wi-Fi.
+0.2.1 — 18 oct 2026 — Alignement en-tête/lignes ; correctif recherche OUI.
+0.2.0 — 18 oct 2026 — Colonne Fabricant/Type ; découverte 4× plus rapide ; résultats progressifs.
+0.1.0 — 18 oct 2026 — Squelette : cibles, découverte TCP, ports, MAC via ARP, DNS inverse, CSV, EN/IT.";
+"aboutMenu" = "À propos de FluentScanner";
+"aboutTitle" = "À propos de FluentScanner";
+"aboutDesc" = "Trouve tous les appareils de votre LAN : découverte ping et TCP, balayage des ports, identification MAC et fabricant, noms d'hôtes.";
+"aboutOui" = "Données fabricants : registre IEEE OUI.";
+"aboutLicense" = "Licence MIT — © 2026 Francesco Ferrara.";
+"closeBtn" = "Fermer";
+"languageLabel" = "Langue";
+"languageSystem" = "Système";
+"fontSizeLabel" = "Taille de police";
+"monoLabel" = "Texte du tableau en chasse fixe";
+"themeLabel" = "Thème";
+"themeSystem" = "Système";
+"themeLight" = "Clair";
+"themeDark" = "Sombre";
+"pingTimeoutLabel" = "Délai du ping";
+"discTimeoutLabel" = "Délai de découverte";
+"portTimeoutLabel" = "Délai des ports";
+"discPortsLabel" = "Ports de découverte (séparés par des virgules)";
+"scanPortsLabel" = "Ports de service (séparés par des virgules)";
+"portsInvalid" = "Liste de ports invalide — utilisez des nombres 1-65535 séparés par des virgules";
+"searchLabel" = "Filtre";
+"colType" = "Type";
+"fitAll" = "Ajuster les colonnes";

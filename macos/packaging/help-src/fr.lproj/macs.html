@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="AppleTitle" content="Aide de FluentScanner : MAC">
+<title>Adresses MAC et fabricants</title>
+<style>body{font-family:-apple-system,sans-serif;margin:20px;line-height:1.5}h1{font-size:1.3em}li{margin:5px 0}a{color:#0b6bcc}</style>
+</head>
+<body>
+<a name="macs"></a>
+<h1>Adresses MAC et fabricants</h1>
+<ul>
+<li>Les MAC viennent de la table ARP locale, remplie par le balayage ping et les connexions TCP. Tout répondant sans entrée reçoit un re-ping ciblé et une relecture ARP.</li>
+<li>Le fabricant est le préfixe OUI de la MAC (table IEEE incluse, hors ligne). Le type combine OUI et indices de service (RDP/WinRM → Windows host, 9100 → Printer, 2049 → NAS, noms → NAS, IoT, Router/AP…) plus le TTL du ping (seul 128 suggère Windows).</li>
+<li>Quand l'OUI se tait, l'en-tête HTTP Server (80/8080 déjà ouverts) ou la description UPnP remplit la marque à la place.</li>
+</ul>
+<p><a href="index.html">Sommaire</a></p>
+</body>
+</html>

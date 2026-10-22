@@ -13,7 +13,7 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
 cp "$BIN" "$APP/Contents/MacOS/FluentScanner"
 cp packaging/Info.plist "$APP/Contents/Info.plist"
-cp -R Sources/FluentScanner/Resources/en.lproj Sources/FluentScanner/Resources/it.lproj \
+cp -R Sources/FluentScanner/Resources/en.lproj Sources/FluentScanner/Resources/fr.lproj Sources/FluentScanner/Resources/it.lproj Sources/FluentScanner/Resources/de.lproj Sources/FluentScanner/Resources/es.lproj \
   "$APP/Contents/Resources/"
 cp Sources/FluentScanner/Resources/oui.csv "$APP/Contents/Resources/"
 
@@ -23,7 +23,7 @@ HELP="$APP/Contents/Resources/FluentScanner.help/Contents"
 rm -rf "$APP/Contents/Resources/FluentScanner.help"
 mkdir -p "$HELP/Resources"
 cp packaging/help-Info.plist "$HELP/Info.plist"
-for lang in en it; do
+for lang in en fr it de es; do
   mkdir -p "$HELP/Resources/$lang.lproj"
   cp packaging/help-src/$lang.lproj/*.html "$HELP/Resources/$lang.lproj/"
   hiutil -I corespotlight -C -a -s $lang -l $lang \

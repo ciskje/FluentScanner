@@ -67,7 +67,10 @@ struct SettingsView: View {
             Picker(L("languageLabel"), selection: $settings.language) {
                 Text(L("languageSystem")).tag("system")
                 Text("English").tag("en")
+                Text("Français").tag("fr")
                 Text("Italiano").tag("it")
+                Text("Deutsch").tag("de")
+                Text("Español").tag("es")
             }
             Slider(value: $settings.fontSize, in: 10 ... 16, step: 1) {
                 Text("\(L("fontSizeLabel")): \(Int(settings.fontSize))")

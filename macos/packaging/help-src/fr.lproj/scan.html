@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="AppleTitle" content="Aide de FluentScanner : Analyse">
+<title>Analyser le réseau</title>
+<style>body{font-family:-apple-system,sans-serif;margin:20px;line-height:1.5}h1{font-size:1.3em}li{margin:5px 0}a{color:#0b6bcc}</style>
+</head>
+<body>
+<a name="scan"></a>
+<h1>Analyser le réseau</h1>
+<ul>
+<li>Entrez les IP de début et de fin puis Démarrer (Entrée marche aussi). Une seule IP n'analyse que cet hôte.</li>
+<li>Lire IP remplit la plage du sous-réseau de cette machine.</li>
+<li>Les plages CIDR (192.168.1.0/24) et les intervalles complets (192.168.1.1-192.168.1.254, ou 192.168.1.1-254) sont acceptés. Le réseau (.0) et le broadcast (.255) ne sont jamais sondés.</li>
+<li>La découverte pingue chaque adresse et sonde les ports TCP courants en parallèle ; les hôtes actifs reçoivent ensuite le balayage complet. La barre suit la progression, l'indicateur signale l'analyse en cours.</li>
+<li>Arrêter interrompt l'analyse ; les lignes trouvées restent. Les résultats arrivent en direct, dès que chaque hôte répond.</li>
+</ul>
+<p><a href="index.html">Sommaire</a></p>
+</body>
+</html>

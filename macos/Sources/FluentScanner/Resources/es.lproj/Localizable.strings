@@ -1,0 +1,86 @@
+"start" = "Iniciar";
+"stop" = "Detener";
+"exportCsv" = "Exportar CSV";
+"exported" = "CSV exportado";
+"exportedFailed" = "Error al exportar";
+"scanning" = "Analizando %ld de %ld…";
+"doneFmt" = "%ld hosts encontrados";
+"stopped" = "Detenido";
+"portScanFmt" = "%ld hosts activos — comprobando servicios…";
+"dnsFmt" = "Resolviendo nombres de host…";
+"invalidRange" = "Objetivo no válido (se esperaba IP, CIDR o rango)";
+"colIp" = "Dirección IP";
+"colHostname" = "Nombre de host";
+"colMac" = "Dirección MAC";
+"colServices" = "Servicios";
+"colLatency" = "Latencia";
+"colVendor" = "Fabricante";
+"thisMac" = "Este Mac (host de análisis)";
+"randomMac" = "MAC aleatoria (dirección privada, sin fabricante)";
+"startIp" = "IP inicial";
+"endIp" = "IP final";
+"getIp" = "Leer IP";
+"getIpHelp" = "Rellenar con el rango de la subred local";
+"randomMacLegend" = "MAC aleatoria";
+"thisMacLegend" = "Este Mac (host de análisis)";
+"helpTitle" = "Ayuda de FluentScanner";
+"changelogTitle" = "Novedades";
+"changelogBody" = "1.2.7 — 22 oct 2026 — Los idiomas fuera de EFIGS muestran inglés; `;` también separa listas de puertos.
+1.2.6 — 22 oct 2026 — Resultados en directo en ambas plataformas; los fantasmas obtienen MAC, DNS, NetBIOS y UPnP; subrayado según tema; indicador de actividad.
+1.2.5 — 22 oct 2026 — Resultados en directo (Windows): fusiones por bloque, plazos estrictos del resolver.
+1.2.4 — 18 oct 2026 — El botón de ajuste vuelve a funcionar (macOS).
+1.2.3 — 18 oct 2026 — Botón de ajuste + Cmd+Mayús+F (macOS).
+1.2.2 — 18 oct 2026 — Cambio de tamaño estilo Excel (Windows).
+1.2.1 — 18 oct 2026 — Doble clic en el encabezado ajusta la columna (ambos).
+1.2.0 — 18 oct 2026 — Paridad total: orden, filtro, puertos/plazos editables, servicios clicables, columnas fabricante/tipo.
+1.1.0 — 18 oct 2026 — Puertos/plazos editables, orden + filtro, resaltado legible; Windows: Mica, menú, tabla, instalador.
+1.0.0 — 18 oct 2026 — Primera versión estable.
+0.10.0 — 18 oct 2026 — Ajustes: idioma, tamaño de fuente + mono, tema.
+0.9.0 — 18 oct 2026 — Paneles Ayuda e Información; revisión EN/IT.
+0.8.4 — 18 oct 2026 — La leyenda cubre el icono del ordenador.
+0.8.3 — 18 oct 2026 — La leyenda cubre las MAC aleatorias; columna IP más ancha.
+0.8.2 — 18 oct 2026 — Campos IP más anchos.
+0.8.1 — 18 oct 2026 — El resaltado sobrevive a la actualización ARP.
+0.8.0 — 18 oct 2026 — Rango editable + botón Leer IP.
+0.7.2 — 18 oct 2026 — IP del host en amarillo.
+0.7.1 — 18 oct 2026 — HTTP nombra el software: HTTP/Caddy (80).
+0.7.0 — 18 oct 2026 — Búsquedas en paralelo; tiempo ≈ la más lenta.
+0.6.3 — 18 oct 2026 — MAC aleatorias marcadas, nunca atribuidas; fila propia en negrita.
+0.6.2 — 18 oct 2026 — Tabla OUI IEEE completa (40k fabricantes), sin conexión.
+0.6.1 — 18 oct 2026 — Cabecera HTTP Server como marca alternativa en 80/8080.
+0.6.0 — 18 oct 2026 — Host siempre listado; más fabricantes, pistas, tipos mDNS.
+0.5.3 — 18 oct 2026 — Grupos MAC sin relleno analizados.
+0.5.2 — 18 oct 2026 — CIDR omite .0/.255; un /24 analiza 254 hosts.
+0.5.1 — 18 oct 2026 — TTL 255 son pilas embebidas, no routers; solo 128 indica Windows.
+0.5.0 — 18 oct 2026 — Icono de radar.
+0.4.3 — 18 oct 2026 — Colores de marca estables; leyenda de tipos.
+0.4.2 — 18 oct 2026 — Punto de tipo; eliminado el TTL Linux genérico.
+0.4.1 — 18 oct 2026 — Hostnames corregidos: consultas `.local`, registros A, NetBIOS.
+0.4.0 — 18 oct 2026 — Menos MAC perdidas (re-ping + relectura ARP); pistas TTL.
+0.3.0 — 18 oct 2026 — Barrido ping ICMP + TCP alternativo; puertos/plazos para Wi-Fi.
+0.2.1 — 18 oct 2026 — Alineación encabezado/filas; corrección OUI.
+0.2.0 — 18 oct 2026 — Columna Fabricante/Tipo; descubrimiento 4× más rápido; resultados progresivos.
+0.1.0 — 18 oct 2026 — Esqueleto: objetivos, descubrimiento TCP, puertos, MAC vía ARP, DNS inverso, CSV, EN/IT.";
+"aboutMenu" = "Acerca de FluentScanner";
+"aboutTitle" = "Acerca de FluentScanner";
+"aboutDesc" = "Encuentra todos los dispositivos de tu LAN: descubrimiento ping más TCP, análisis de puertos, identificación MAC y fabricante, nombres de host.";
+"aboutOui" = "Datos de fabricantes: registro IEEE OUI.";
+"aboutLicense" = "Licencia MIT — © 2026 Francesco Ferrara.";
+"closeBtn" = "Cerrar";
+"languageLabel" = "Idioma";
+"languageSystem" = "Sistema";
+"fontSizeLabel" = "Tamaño de fuente";
+"monoLabel" = "Texto de tabla monoespaciado";
+"themeLabel" = "Tema";
+"themeSystem" = "Sistema";
+"themeLight" = "Claro";
+"themeDark" = "Oscuro";
+"pingTimeoutLabel" = "Plazo del ping";
+"discTimeoutLabel" = "Plazo de descubrimiento";
+"portTimeoutLabel" = "Plazo de puertos";
+"discPortsLabel" = "Puertos de descubrimiento (separados por comas)";
+"scanPortsLabel" = "Puertos de servicio (separados por comas)";
+"portsInvalid" = "Lista de puertos no válida — usa números 1-65535 separados por comas";
+"searchLabel" = "Filtro";
+"colType" = "Tipo";
+"fitAll" = "Ajustar columnas";

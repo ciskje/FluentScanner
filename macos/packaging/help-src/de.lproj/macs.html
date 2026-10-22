@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="AppleTitle" content="FluentScanner-Hilfe: MACs">
+<title>MAC-Adressen und Hersteller</title>
+<style>body{font-family:-apple-system,sans-serif;margin:20px;line-height:1.5}h1{font-size:1.3em}li{margin:5px 0}a{color:#0b6bcc}</style>
+</head>
+<body>
+<a name="macs"></a>
+<h1>MAC-Adressen und Hersteller</h1>
+<ul>
+<li>MACs kommen aus der lokalen ARP-Tabelle, gefüllt vom Ping-Sweep und den TCP-Connects. Antwortende ohne Eintrag erhalten einen gezielten Re-Ping und ein ARP-Neulesen.</li>
+<li>Der Hersteller ist das OUI-Präfix der MAC (IEEE-Tabelle gebündelt, offline). Der Typ verbindet OUI mit Dienst-Hinweisen (RDP/WinRM → Windows host, 9100 → Printer, 2049 → NAS, Namen → NAS, IoT, Router/AP…) plus Ping-TTL (nur 128 deutet Windows an).</li>
+<li>Wenn die OUI schweigt, füllt der HTTP-Server-Header (bereits offene 80/8080) oder die UPnP-Beschreibung die Marke.</li>
+</ul>
+<p><a href="index.html">Inhalt</a></p>
+</body>
+</html>

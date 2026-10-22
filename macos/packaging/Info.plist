@@ -8,6 +8,14 @@
 	<string>FluentScanner</string>
 	<key>CFBundleExecutable</key>
 	<string>FluentScanner</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>fr</string>
+		<string>it</string>
+		<string>de</string>
+		<string>es</string>
+	</array>
 	<key>CFBundleIdentifier</key>
 	<string>app.fluentscanner.mac</string>
 	<key>CFBundleHelpBookFolder</key>

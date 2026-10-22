@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="AppleTitle" content="Aide de FluentScanner : Dépannage">
+<title>Dépannage</title>
+<style>body{font-family:-apple-system,sans-serif;margin:20px;line-height:1.5}h1{font-size:1.3em}li{margin:5px 0}a{color:#0b6bcc}</style>
+</head>
+<body>
+<a name="troubleshooting"></a>
+<h1>Dépannage</h1>
+<ul>
+<li>Point d'accès sans internet : chaque recherche dépendant du resolver a un délai strict, l'analyse ne reste jamais bloquée et les résultats partiels restent à l'écran.</li>
+<li>MAC manquantes : l'analyse re-pingue les répondants ayant perdu leur entrée ARP et relit la table. Hors sous-réseau local, jamais de MAC.</li>
+<li>Lignes disparues : un filtre est peut-être actif — videz la recherche. Les lignes sans port ouvert reçoivent leur test 80/8080 après les récoltes.</li>
+<li>Export désactivé pendant l'analyse ; arrêtez-la d'abord.</li>
+</ul>
+<p><a href="index.html">Sommaire</a></p>
+</body>
+</html>

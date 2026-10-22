@@ -69,8 +69,8 @@ Both builds implement the same intents; platform-native details may differ:
 - Progress bar, stop mid-scan, CSV export; the header underline follows the
   theme (never the progress accent) and a spinner next to the status marks
   a running scan, so final results are recognizable
-- Light/dark/system theme (selectable in Settings), UI in English and
-  Italian (override in Settings: system/EN/IT)
+- Light/dark/system theme (selectable in Settings), UI in EFIGS
+  (override in Settings: system/EN/FR/IT/DE/ES)
 - Settings: table font size + monospaced toggle; the discovery/scan port
   lists and the ping/discovery/port timeouts have fixed working defaults,
   editable in the app

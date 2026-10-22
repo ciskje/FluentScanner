@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="AppleTitle" content="Ayuda de FluentScanner: Análisis">
+<title>Analizar la red</title>
+<style>body{font-family:-apple-system,sans-serif;margin:20px;line-height:1.5}h1{font-size:1.3em}li{margin:5px 0}a{color:#0b6bcc}</style>
+</head>
+<body>
+<a name="scan"></a>
+<h1>Analizar la red</h1>
+<ul>
+<li>Introduce IP inicial y final y pulsa Iniciar (Intro también vale). Una sola IP analiza solo ese host.</li>
+<li>Leer IP rellena el rango de la subred de esta máquina.</li>
+<li>Se aceptan rangos CIDR (192.168.1.0/24) e intervalos completos (192.168.1.1-192.168.1.254, o 192.168.1.1-254). La red (.0) y el broadcast (.255) nunca se sondan.</li>
+<li>El descubrimiento hace ping a cada dirección y sonda puertos TCP comunes en paralelo; los hosts activos reciben luego el análisis completo. La barra muestra el avance y el indicador la actividad en curso.</li>
+<li>Detener interrumpe el análisis; las filas halladas quedan. Los resultados llegan en directo, en cuanto responde cada host.</li>
+</ul>
+<p><a href="index.html">Índice</a></p>
+</body>
+</html>
