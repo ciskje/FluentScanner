@@ -129,9 +129,13 @@ Standard Win11 window, no custom chrome beyond this:
   same two-format line parser. Responders with still-missing entries get a
   targeted re-ping + one more ARP re-read.
 - Hostnames, best effort, concurrent: mDNS harvest (`.local` queries, A
-  records in the additional section) → reverse DNS → NetBIOS node-status;
-  the HTTP `Server:` header fills the brand slot only when OUI is silent
-  (only for already-open 80/8080, annotated `HTTP/Caddy (80)`).
+  records in the additional section — query burst sent twice, plus
+  `_privet._tcp.local`) → reverse DNS → NetBIOS node-status, all three over
+  the FULL row set (harvest-only ghosts included, not just alive hosts);
+  UPnP M-SEARCH harvest + description maker/friendlyName as second brand
+  fallback; the HTTP `Server:` header fills the brand slot only when OUI
+  is silent (already-open 80/8080, annotated `HTTP/Caddy (80)`; rows with
+  no open port yet get a short 80/8080 knock first).
 - TTL hint: only 128 → "Windows host" (`TtlKind`); 255 is embedded stacks.
 - Local interfaces via `NetworkInterface` (no `getifaddrs` on Windows):
   `LocalSubnet()` powers Get IP, `LocalAddrs()` pre-inserts + highlights

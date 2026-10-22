@@ -40,16 +40,6 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
   (only when OUI/vendor silent), rDNS + NetBIOS over all `byIp` keys, ghost
   80/8080 probe, ARP re-read applied to all rows, re-run classify for
   still-blank kinds, add `_privet._tcp.local` to `mdnsTypes`.
-- `generic` — live results + never stall on an unreachable resolver: hosts
-  appear the moment they answer, the internet-dependent lookups run **after**
-  the partial results are already on screen. `win:[x]` (chunk-by-chunk
-  publishing in `SweepPingAsync`/`SweepTcpAsync`, per-chunk merges in
-  `ReverseAllAsync`/`NbnsAllAsync`/`HttpAllAsync`, `HostRow.NameRank`
-  3/2/1 precedence; reverse DNS already capped at 1500 ms).
-  `mac:[x]` — shipped (reverseDNS 1.5 s deadline on a concurrent queue,
-  per-chunk `publishAll()` in `sweepPing`/`sweepTCP`, per-chunk + per-source
-  merges with `HostRow.hostnameRank` 3/2/1 precedence; `CFBundleVersion` 33).
-  Done on both platforms — archive at the next release.
 - `windows` — ARP icon in Settings > Installed apps: add
   `UninstallDisplayIcon={app}\FluentScanner.exe` to
   `windows/installer/FluentScanner.iss` (per skill `windows-setup`
