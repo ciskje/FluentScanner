@@ -18,6 +18,9 @@ struct ContentView: View {
         VStack(spacing: 0) {
             toolbar
             if vm.running { ProgressView(value: vm.progress).padding([.horizontal]) }
+            // Theme-aware separator under the toolbar: the header underline
+            // follows the theme (like the footer legend), never the accent.
+            Divider()
             // Native Table: resizable columns, keyboard navigation, row
             // selection for free — no hand-rolled header alignment needed.
             // Header clicks sort via the value: key paths (vm.resort keeps
@@ -166,12 +169,17 @@ struct ContentView: View {
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 8)
-            Text(vm.status)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 8)
-                .padding(.bottom, 6)
+            HStack(spacing: 6) {
+                // Spinner next to the status: a running scan is recognizable,
+                // idle final results are not.
+                if vm.running { ProgressView().controlSize(.small) }
+                Text(vm.status)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 8)
+            .padding(.bottom, 6)
         }
     }
 

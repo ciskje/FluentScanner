@@ -66,7 +66,9 @@ Both builds implement the same intents; platform-native details may differ:
   resolver has a hard per-host deadline — a scan must never sit waiting on
   something that can never arrive (an AP with no internet) once partial
   results are already on screen
-- Progress bar, stop mid-scan, CSV export
+- Progress bar, stop mid-scan, CSV export; the header underline follows the
+  theme (never the progress accent) and a spinner next to the status marks
+  a running scan, so final results are recognizable
 - Light/dark/system theme (selectable in Settings), UI in English and
   Italian (override in Settings: system/EN/IT)
 - Settings: table font size + monospaced toggle; the discovery/scan port
@@ -103,12 +105,11 @@ implemented those intents; if the other lags, its release waits.
 
 - Z = bugfix/tweak, Y = new feature/behavior, X = upheaval.
 - Docs/refactor/build never change the version.
-- Current: Windows `1.2.6`, macOS `1.2.4` (1.2.2 was Windows-only:
+- Current: Windows `1.2.6`, macOS `1.2.6` (1.2.2 was Windows-only:
   Excel-style column resize; macOS got the header double-click in 1.2.3;
-  1.2.4 fixes the size-to-fit button, which 1.2.3 had broken; 1.2.5 is the
-  live-results/deadline intent Windows-only until macOS catches up; 1.2.6
-  is the harvest-ghost evidence intent, Windows-only until macOS mirrors
-  it).
+  1.2.4 fixes the size-to-fit button, which 1.2.3 had broken; macOS skipped
+  the 1.2.5 release and caught up at 1.2.6 with both the live-results and
+  the harvest-ghost intents).
 - Single source: `<Version>` in `windows/source/FluentScanner.csproj`
   and `CFBundleShortVersionString` in `macos/packaging/Info.plist`.
 

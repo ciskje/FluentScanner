@@ -32,7 +32,14 @@ Or build it yourself: see `windows/AGENTS.md` (Build/run) and
 ## Changelog
 
 Same version number = same features everywhere. Windows is at `1.2.6`,
-macOS at `1.2.4`.
+macOS at `1.2.6`.
+
+- **1.2.6** — macOS: same as Windows 1.2.5–1.2.6 (this Mac skipped the
+  1.2.5 release). Results land live as each discovery chunk answers, the
+  hostname lookups merge chunk by chunk with a hard deadline on
+  resolver-dependent ones, harvest-only ghosts (mDNS/UPnP speakers that
+  ignore ping and discovery ports) gain MAC, vendor, DNS, NetBIOS and UPnP
+  clues, and a spinner next to the status marks a running scan.
 
 - **1.2.6** — Windows: every IP gets every clue. Hosts seen only through
   the harvests (mDNS/UPnP speakers that ignore ping and every discovery

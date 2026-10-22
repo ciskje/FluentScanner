@@ -86,8 +86,13 @@ at releases.
   the `(hex)` lines of https://standards-oui.ieee.org/oui/oui.txt
   (key = lowercase hex without dashes) and update **both**
   `macos/.../Resources/oui.csv` and `windows/source/oui.csv`.
-- Hostnames need three sources: the router publishes no PTR, so reverse DNS
+- Hostnames need four sources: the router publishes no PTR, so reverse DNS
   alone stays empty — mDNS harvest first (queries MUST end in `.local`,
   bare service types get zero answers; the A records live in the AR
-  additional section, not AN), NetBIOS NBSTAT (UDP 137) for Windows PCs,
-  reverse DNS last.
+  additional section, not AN; burst sent twice so flaky IoT responders are
+  caught), UPnP M-SEARCH harvest (unicast replies need no multicast
+  membership; description maker/friendlyName as second brand fallback),
+  NetBIOS NBSTAT (UDP 137) for Windows PCs, reverse DNS last.
+  Harvest-only ghosts get the full treatment too: post-harvest ARP re-read,
+  rDNS + NetBIOS over all rows, ghost 80/8080 knock, re-classify of
+  still-blank kinds.

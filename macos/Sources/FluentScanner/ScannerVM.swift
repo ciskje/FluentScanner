@@ -311,23 +311,46 @@ final class ScannerVM: ObservableObject {
         }
         publishAll()
 
-        // Phase 3 — hostname + software lookups run CONCURRENTLY (all need
-        // only the alive set): wall time ≈ the slowest, not the sum. Each
-        // source merges the moment it lands (rank keeps mDNS 3 >
-        // reverse DNS 2 > NetBIOS 1 whatever the arrival order); the HTTP
-        // Server header fills the brand slot only when OUI is silent.
+        // Phase 3 — hostname + software lookups. Harvests first (mDNS A
+        // records + UPnP M-SEARCH answers, both multicast, both
+        // unprivileged, concurrent): either can reveal hosts the sweeps
+        // never saw. Then names over the FULL row set (alive + harvest
+        // ghosts) chunk by chunk, a short 80/8080 knock for rows with no
+        // open port yet, the Server-header fetch over every 80/8080 row,
+        // and a final ARP re-read + classify so harvest-only rows gain
+        // MAC + vendor like everyone else.
+        // Precedence stays mDNS 3 > reverse DNS 2 > NetBIOS 1 (ranked,
+        // arrival order irrelevant); the HTTP Server header and the UPnP
+        // description fill the brand slot only when OUI is silent.
         status = L("dnsFmt")
         publishAll()
-        let snap = Array(alive)
-        await withTaskGroup(of: Void.self) { group in
-            group.addTask { @MainActor in
-                let mdns = await Scanner.mdnsHarvest(seconds: 2.5)
-                for (ip, name) in mdns { self.setHostname(ip, name, rank: 3) }
-                self.publishAll()
-            }
-            group.addTask { _ = await self.reverseAll(snap) }
-            group.addTask { _ = await self.nbnsAll(snap) }
-            group.addTask { _ = await self.httpAll(snap) }
+        // 3a — harvests.
+        async let mdnsHosts = Scanner.mdnsHarvest(seconds: 2.5)
+        async let ssdpHits = Scanner.ssdpDiscover(seconds: 3)
+        let (mdns, ssdp) = await (mdnsHosts, ssdpHits)
+        for (ip, name) in mdns { setHostname(ip, name, rank: 3) }
+        publishAll()
+        // 3b — names over everything known, UPnP descriptions alongside.
+        let snap = Array(byIp.keys)
+        async let dnsHosts = reverseAll(snap)
+        async let nbnsHosts = nbnsAll(snap)
+        async let ssdpDone: Void = ssdpAll(ssdp)
+        _ = await (dnsHosts, nbnsHosts, ssdpDone)
+        // 3c — ghost web knock: rows with no open port yet get a short
+        // 80/8080 probe (Services evidence + unlocks the Server fetch),
+        // then the header fetch covers every 80/8080 row, ghosts included.
+        let ghosts = byIp.values.filter { $0.ports.isEmpty }.map(\.ip)
+        await ghostWeb(ghosts)
+        await httpAll(Array(byIp.keys))
+        // Ghosts arrived after the vendor/kind pass: one more ARP re-read
+        // so mDNS/UPnP-only rows gain MAC + vendor, and classify anything
+        // still blank.
+        arp.merge(Scanner.arpTable()) { _, new in new }
+        for ip in byIp.keys { applyMac(ip, arp: arp) }
+        for ip in byIp.keys where byIp[ip]?.kind?.isEmpty ?? true {
+            let vendor = byIp[ip]?.vendor
+            let ports = byIp[ip]?.ports ?? []
+            byIp[ip]?.kind = Scanner.classify(vendor: vendor, ports: Set(ports))
         }
         for ip in byIp.keys { byIp[ip]?.refreshServices() } // server now known
         publishAll()
@@ -406,6 +429,53 @@ final class ScannerVM: ObservableObject {
             publishAll()
         }
         return out
+    }
+
+    /// UPnP description fetch per M-SEARCH hit, merged chunk by chunk:
+    /// maker + friendly name fill the brand slot only when OUI is silent
+    /// (same fallback philosophy as the HTTP Server header).
+    private func ssdpAll(_ hits: [(ip: String, location: String, server: String)]) async {
+        for chunk in hits.chunked(8) {
+            if Task.isCancelled { break }
+            await withTaskGroup(of: (String?, String?).self) { batch in
+                for h in chunk {
+                    batch.addTask {
+                        (Scanner.ssdpRowIp(h.location, sender: h.ip),
+                         await Scanner.ssdpDevice(h.location))
+                    }
+                }
+                for await (ip, label) in batch {
+                    guard let ip, let label else { continue }
+                    if byIp[ip]?.vendor?.isEmpty ?? true,
+                        byIp[ip]?.server?.isEmpty ?? true {
+                        byIp[ip, default: HostRow(ip: ip)].server = label
+                    }
+                }
+            }
+            publishAll()
+        }
+    }
+
+    /// Short 80/8080 knock for rows the sweeps never opened a port on
+    /// (mDNS/UPnP-only ghosts): an open web port is Services evidence and
+    /// unlocks the Server-header fetch. Chunked like the port sweep.
+    private func ghostWeb(_ ips: [String]) async {
+        let pairs: [(String, UInt16)] = ips.flatMap { ip in [(ip, UInt16(80)), (ip, UInt16(8080))] }
+        for chunk in pairs.chunked(64) {
+            if Task.isCancelled { break }
+            await withTaskGroup(of: (String, UInt16).self) { batch in
+                for (ip, p) in chunk {
+                    batch.addTask {
+                        await Scanner.probe(ip, p, Scanner.portTimeout) != nil
+                            ? (ip, p) : (ip, 0)
+                    }
+                }
+                for await (ip, p) in batch where p != 0 {
+                    byIp[ip, default: HostRow(ip: ip)].addPort(p)
+                }
+            }
+            publishAll()
+        }
     }
 
     private func finish() {

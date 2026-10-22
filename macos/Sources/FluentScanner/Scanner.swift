@@ -474,7 +474,7 @@ enum Scanner {
         "_ipp._tcp.local", "_spotify-connect._tcp.local", "_hap._tcp.local",
         "_printer._tcp.local", "_pdl-datastream._tcp.local",
         "_androidtvremote._tcp.local", "_sonos._tcp.local", "_hue._tcp.local",
-        "_homekit._tcp.local",
+        "_homekit._tcp.local", "_privet._tcp.local",
     ]
 
     /// One-question PTR query with the QU (unicast-response) class bit.
@@ -597,18 +597,23 @@ enum Scanner {
                 dst.sin_family = sa_family_t(AF_INET)
                 dst.sin_port = UInt16(5353).bigEndian
                 dst.sin_addr.s_addr = UInt32(0xE000_00FB).bigEndian // 224.0.0.251
-                for t in mdnsTypes {
-                    let q = mdnsQuery(domain: t)
-                    var d = dst
-                    let sent = withUnsafePointer(to: &d) { dptr in
-                        dptr.withMemoryRebound(to: sockaddr.self, capacity: 1) { dptr2 in
-                            q.withUnsafeBytes { raw in
-                                sendto(fd, raw.baseAddress, raw.count, 0,
-                                       dptr2, socklen_t(MemoryLayout<sockaddr_in>.size))
+                // Burst twice (200 ms apart): flaky IoT responders often
+                // miss the first one.
+                for burst in 0 ..< 2 {
+                    for t in mdnsTypes {
+                        let q = mdnsQuery(domain: t)
+                        var d = dst
+                        let sent = withUnsafePointer(to: &d) { dptr in
+                            dptr.withMemoryRebound(to: sockaddr.self, capacity: 1) { dptr2 in
+                                q.withUnsafeBytes { raw in
+                                    sendto(fd, raw.baseAddress, raw.count, 0,
+                                           dptr2, socklen_t(MemoryLayout<sockaddr_in>.size))
+                                }
                             }
                         }
+                        if sent < 0 { break } // no route → nothing will answer
                     }
-                    if sent < 0 { break } // no route → nothing will answer
+                    if burst == 0 { usleep(200_000) }
                 }
                 let end = DispatchTime.now() + seconds
                 var hosts: [String: String] = [:]
@@ -624,6 +629,218 @@ enum Scanner {
                 }
                 cont.resume(returning: hosts)
             }
+        }
+    }
+
+    // MARK: SSDP/UPnP harvest (TVs, routers, speakers announce here —
+    // often the only clue for hosts that ignore ping and TCP)
+
+    /// M-SEARCH for everything; responders answer unicast to our port.
+    static func ssdpQuery() -> Data {
+        Data("M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\nMAN: \"ns:01\"\r\nMX: 2\r\nST: ssdp:all\r\n\r\n".utf8)
+    }
+
+    /// (location, server) from one M-SEARCH response; headers are
+    /// case-insensitive, garbage yields nil. Pure — exercised in self-test.
+    static func parseSsdpResponse(_ response: String) -> (location: String, server: String)? {
+        // NB: split(separator: "\n") never fires — "\r\n" is one Character
+        // (grapheme cluster), so only the NSString spelling splits CRLF.
+        var loc: String?
+        var srv = ""
+        for raw in response.components(separatedBy: "\n") {
+            let line = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard let colon = line.firstIndex(of: ":") else { continue }
+            let name = line[..<colon].trimmingCharacters(in: .whitespaces)
+            let value = line[line.index(after: colon)...].trimmingCharacters(in: .whitespaces)
+            if name.caseInsensitiveCompare("location") == .orderedSame { loc = value }
+            else if name.caseInsensitiveCompare("server") == .orderedSame { srv = value }
+        }
+        guard let loc, !loc.isEmpty else { return nil }
+        return (loc, srv)
+    }
+
+    /// `(senderIp, location, server)` from the responses in the window.
+    /// Unprivileged UDP — the replies come back unicast, no multicast
+    /// membership needed. Same harvest shape as mDNS.
+    /// ponytail: fixed harvest window; per-device timing if a LAN needs it.
+    static func ssdpDiscover(seconds: Double = 3) async -> [(ip: String, location: String, server: String)] {
+        await withCheckedContinuation { cont in
+            DispatchQueue.global().async {
+                let fd = socket(AF_INET, SOCK_DGRAM, 0)
+                guard fd >= 0 else { return cont.resume(returning: []) }
+                defer { close(fd) }
+                var on: Int32 = 1
+                setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &on,
+                           socklen_t(MemoryLayout<Int32>.size))
+                var src = sockaddr_in()
+                src.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
+                src.sin_family = sa_family_t(AF_INET)
+                let bound = withUnsafePointer(to: &src) { p in
+                    p.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                        bind(fd, $0, socklen_t(MemoryLayout<sockaddr_in>.size))
+                    }
+                }
+                guard bound == 0 else { return cont.resume(returning: []) }
+                var dst = sockaddr_in()
+                dst.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
+                dst.sin_family = sa_family_t(AF_INET)
+                dst.sin_port = UInt16(1900).bigEndian
+                dst.sin_addr.s_addr = UInt32(0xEFFF_FFFA).bigEndian // 239.255.255.250
+                let q = ssdpQuery()
+                for burst in 0 ..< 2 {
+                    var d = dst
+                    let sent = withUnsafePointer(to: &d) { dptr in
+                        dptr.withMemoryRebound(to: sockaddr.self, capacity: 1) { dptr2 in
+                            q.withUnsafeBytes { raw in
+                                sendto(fd, raw.baseAddress, raw.count, 0,
+                                       dptr2, socklen_t(MemoryLayout<sockaddr_in>.size))
+                            }
+                        }
+                    }
+                    if sent < 0 { break } // no route → nothing will answer
+                    if burst == 0 { usleep(200_000) }
+                }
+                let end = DispatchTime.now() + seconds
+                var out: [(String, String, String)] = []
+                var seen = Set<String>() // location, case-insensitive
+                while DispatchTime.now() < end {
+                    var p = pollfd(fd: fd, events: Int16(0x1), revents: 0) // POLLIN
+                    if poll(&p, 1, 200) <= 0 { continue }
+                    var buf = [UInt8](repeating: 0, count: 8192)
+                    var from = sockaddr_storage()
+                    var fromLen = socklen_t(MemoryLayout<sockaddr_storage>.size)
+                    let n: Int = buf.withUnsafeMutableBytes { raw in
+                        withUnsafeMutablePointer(to: &from) { fptr in
+                            fptr.withMemoryRebound(to: sockaddr.self, capacity: 1) { sptr in
+                                recvfrom(fd, raw.baseAddress, raw.count, 0, sptr, &fromLen)
+                            }
+                        }
+                    }
+                    guard n > 12 else { continue }
+                    guard let text = String(bytes: buf[..<n], encoding: .ascii),
+                        text.lowercased().hasPrefix("http/") else { continue }
+                    guard let r = parseSsdpResponse(text), seen.insert(r.location.lowercased()).inserted else { continue }
+                    var ip = ""
+                    withUnsafePointer(to: from) { fptr in
+                        fptr.withMemoryRebound(to: sockaddr_in.self, capacity: 1) { sin in
+                            var a = sin.pointee.sin_addr
+                            var b = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
+                            if inet_ntop(AF_INET, &a, &b, socklen_t(INET_ADDRSTRLEN)) != nil {
+                                ip = String(cString: b)
+                            }
+                        }
+                    }
+                    guard !ip.isEmpty else { continue }
+                    out.append((ip, r.location, r.server))
+                }
+                cont.resume(returning: out)
+            }
+        }
+    }
+
+    /// The LOCATION host as the device sees itself is the most reliable
+    /// row key; fall back to the UDP sender on weird URLs. Pure —
+    /// exercised in the self-test.
+    static func ssdpRowIp(_ location: String, sender: String) -> String? {
+        if let host = URL(string: location)?.host, ipv4(host) != nil { return host }
+        return ipv4(sender) != nil ? sender : nil
+    }
+
+    /// First `<tag>…</tag>` text of a UPnP device description. The open-tag
+    /// match rejects `<manufacturerURL>` when looking for `manufacturer`
+    /// (prefix collision); nested markup bails. Pure — exercised in self-test.
+    static func ssdpTag(_ xml: String, _ tag: String) -> String? {
+        var s = xml.startIndex
+        while let open = xml.range(of: "<" + tag, options: .caseInsensitive, range: s ..< xml.endIndex) {
+            let after = open.upperBound
+            guard after < xml.endIndex else { return nil }
+            let c = xml[after]
+            guard c == ">" || c == "/" || c.isWhitespace else { s = after; continue }
+            guard let gt = xml[after...].firstIndex(of: ">"),
+                let close = xml.range(of: "</" + tag, options: .caseInsensitive,
+                                      range: gt ..< xml.endIndex) else { return nil }
+            let v = xml[xml.index(after: gt) ..< close.lowerBound]
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !v.isEmpty, v.count <= 80, !v.contains("<") else { return nil }
+            return v
+        }
+        return nil
+    }
+
+    static func parseSsdpDescription(_ xml: String) -> (manufacturer: String, friendlyName: String, modelName: String) {
+        (ssdpTag(xml, "manufacturer") ?? "", ssdpTag(xml, "friendlyName") ?? "",
+         ssdpTag(xml, "modelName") ?? "")
+    }
+
+    /// Display label: the user-given name first, maker in parens.
+    /// Pure — exercised in the self-test.
+    static func ssdpLabel(manufacturer: String, friendlyName: String, modelName: String) -> String {
+        var parts: [String] = []
+        for s in [friendlyName, manufacturer, modelName] where !s.isEmpty && !parts.contains(s) {
+            parts.append(s)
+        }
+        guard !parts.isEmpty else { return "" }
+        let label = parts.count == 1 ? parts[0] : "\(parts[0]) (\(parts[1]))"
+        return label.count > 80 ? String(label.prefix(80)) : label
+    }
+
+    /// GET the description document → display label (nil on anything
+    /// unexpected). Same unprivileged-TCP shape as `httpServer`: ≤8 KB,
+    /// 2 s caps.
+    static func ssdpDevice(_ location: String) async -> String? {
+        guard let url = URL(string: location),
+            (url.scheme?.lowercased().hasPrefix("http") == true),
+            let host = url.host, !host.isEmpty else { return nil }
+        let port = UInt16(url.port ?? 80)
+        let path = (url.path.isEmpty ? "/" : url.path) + (url.query.map { "?\($0)" } ?? "")
+        return await withCheckedContinuation { cont in
+            let q = DispatchQueue(label: "fscan.ssdp")
+            let conn = NWConnection(host: NWEndpoint.Host(host),
+                                    port: NWEndpoint.Port(rawValue: port)!,
+                                    using: .tcp)
+            let lock = NSLock()
+            var finished = false
+            @Sendable func finish(_ value: String?) {
+                lock.lock()
+                defer { lock.unlock() }
+                guard !finished else { return }
+                finished = true
+                conn.cancel()
+                cont.resume(returning: value)
+            }
+            conn.stateUpdateHandler = { state in
+                switch state {
+                case .ready:
+                    let req = "GET \(path) HTTP/1.0\r\nHost: \(host)\r\nConnection: close\r\n\r\n"
+                    conn.send(content: Data(req.utf8),
+                              completion: .contentProcessed { _ in
+                                  conn.receive(minimumIncompleteLength: 1,
+                                               maximumLength: 8192) { data, _, _, _ in
+                                      guard let data,
+                                          let text = String(data: data, encoding: .utf8) else {
+                                          finish(nil)
+                                          return
+                                      }
+                                      let body: String
+                                      if let r = text.range(of: "\r\n\r\n") {
+                                          body = String(text[r.upperBound...])
+                                      } else if let r = text.range(of: "\n\n") {
+                                          body = String(text[r.upperBound...])
+                                      } else {
+                                          body = text
+                                      }
+                                      let (m, f, mo) = parseSsdpDescription(body)
+                                      let label = ssdpLabel(manufacturer: m, friendlyName: f, modelName: mo)
+                                      finish(label.isEmpty ? nil : label)
+                                  }
+                              })
+                case .failed, .cancelled: finish(nil)
+                case .waiting: finish(nil)
+                default: break
+                }
+            }
+            conn.start(queue: q)
+            q.asyncAfter(deadline: .now() + 2.0) { finish(nil) }
         }
     }
 
@@ -944,6 +1161,29 @@ enum Scanner {
         check(parseServerHeader("") == nil, "http empty")
         check(parseNbns(data: Data(rp3)) == "DESKTOP-ABC123", "nbns parse")
         check(parseNbns(data: Data([0, 1, 2, 3])) == nil, "nbns garbage")
+        let sq = String(decoding: ssdpQuery(), as: UTF8.self)
+        check(sq.contains("M-SEARCH * HTTP/1.1") && sq.contains("ST: ssdp:all"), "ssdp query")
+        let sr = parseSsdpResponse("HTTP/1.1 200 OK\r\nCACHE-CONTROL: max-age=1800\r\nLOCATION: http://192.168.1.115:7344/desc.xml\r\nServer: Linux/1.0 UPnP/1.0\r\nST: upnp:rootdevice\r\n\r\n")
+        check(sr?.location == "http://192.168.1.115:7344/desc.xml" && (sr?.server.hasPrefix("Linux") == true),
+            "ssdp response parse")
+        check(parseSsdpResponse("NOTIFY * HTTP/1.1\r\nNT: upnp:rootdevice\r\n\r\n") == nil,
+            "ssdp response needs location")
+        check(parseSsdpResponse("garbage") == nil, "ssdp response garbage")
+        let desc = "<root><device><manufacturer>LG Electronics</manufacturer><manufacturerURL>http://lg.com/</manufacturerURL><friendlyName>TV Soggiorno</friendlyName><modelName>OLED55C</modelName></device></root>"
+        let dd = parseSsdpDescription(desc)
+        check(dd.manufacturer == "LG Electronics" && dd.friendlyName == "TV Soggiorno"
+            && dd.modelName == "OLED55C", "ssdp description parse")
+        check(parseSsdpDescription("<root></root>") == ("", "", ""), "ssdp description empty")
+        check(ssdpLabel(manufacturer: "LG Electronics", friendlyName: "TV Soggiorno",
+            modelName: "OLED55C") == "TV Soggiorno (LG Electronics)", "ssdp label")
+        check(ssdpLabel(manufacturer: "Amazon", friendlyName: "", modelName: "") == "Amazon",
+            "ssdp label maker only")
+        check(ssdpLabel(manufacturer: "", friendlyName: "", modelName: "") == "", "ssdp label empty")
+        check(ssdpRowIp("http://192.168.1.115:7344/desc.xml", sender: "192.168.1.99") == "192.168.1.115",
+            "ssdp row ip location")
+        check(ssdpRowIp("http://[::1]/x", sender: "192.168.1.99") == "192.168.1.99",
+            "ssdp row ip sender fallback")
+        check(ssdpRowIp("garbage", sender: "garbage") == nil, "ssdp row ip garbage")
         check(classify(vendor: "Dreame Technology", ports: [])?
             .contains("IoT device") == true, "classify dreame iot")
         check(classify(vendor: "Advanced Digital Broadcast SA", ports: [])?
