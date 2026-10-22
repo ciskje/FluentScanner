@@ -169,6 +169,7 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
         _settings.ApplyTuning(); // port lists + timeouts → scan engine
         if (Content is FrameworkElement root) root.RequestedTheme = _settings.ThemeEnum();
         HostRow.DarkMode = EffectiveDark();
+        ApplyCaptionColors();
         GridLineBrush = new SolidColorBrush(HostRow.DarkMode
             ? Windows.UI.Color.FromArgb(255, 0xFF, 0xFF, 0xFF)
             : Windows.UI.Color.FromArgb(255, 0x00, 0x00, 0x00));
@@ -200,6 +201,24 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
         }
         catch { }
         return false;
+    }
+
+    /// Windows paints the caption buttons (min/max/close) with the OS app
+    /// theme, so a theme override leaves black glyphs on the dark mica title
+    /// bar — nearly invisible. Pin the button colours to the theme the app
+    /// actually renders (same rule as the rows: override wins, else system).
+    private void ApplyCaptionColors()
+    {
+        var tb = AppWindow.TitleBar;
+        bool dark = EffectiveDark();
+        var glyph = dark ? Windows.UI.Color.FromArgb(255, 0xE9, 0xE9, 0xE9)
+                        : Windows.UI.Color.FromArgb(255, 0x1A, 0x1A, 0x1A);
+        tb.ButtonForegroundColor = glyph;
+        tb.ButtonHoverForegroundColor = glyph;
+        tb.ButtonPressedForegroundColor = glyph;
+        tb.ButtonHoverBackgroundColor = dark
+            ? Windows.UI.Color.FromArgb(0x1A, 0xFF, 0xFF, 0xFF)
+            : Windows.UI.Color.FromArgb(0x1A, 0x00, 0x00, 0x00);
     }
 
     private void ApplyLanguage()

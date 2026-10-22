@@ -22,27 +22,10 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
   publishing in `SweepPingAsync`/`SweepTcpAsync`, per-chunk merges in
   `ReverseAllAsync`/`NbnsAllAsync`/`HttpAllAsync`, `HostRow.NameRank`
   3/2/1 precedence; reverse DNS already capped at 1500 ms).
-  `mac:[ ]` — reported slow on an AP with no internet ("waiting for something
-  that will never arrive"). Three things to change in `macos/Sources/FluentScanner/`:
-  1. `Scanner.reverseDNS` (`Scanner.swift`, "MARK: Reverse DNS") has **no
-     deadline**: `getnameinfo` blocks for many seconds when the resolver is
-     unreachable, and it runs on `DispatchQueue.global()` (limited
-     concurrency, so stalled lookups queue up and multiply). Mirror Windows'
-     1500 ms cap: `withCheckedContinuation` + `asyncAfter` deadline on a
-     **concurrent** queue (`DispatchQueue(label: "FluentScanner.dns",
-     attributes: .concurrent)`), first finisher wins, NSLock-guarded `finish`
-     so the continuation is resumed once (same pattern as `probe`).
-  2. `sweepPing` / `sweepTCP` (`ScannerVM.swift`) collect the hits and only
-     `publishAll()` once **both** passes finish: insert the hit rows as each
-     chunk lands (latency + TTL kind), `publishAll()` at the end of every
-     chunk. MACs stay empty until the ARP re-read — that is fine, the row is
-     already visible.
-  3. Phase 3 awaits all four lookups and merges them in one block: merge each
-     source the moment it lands. Add `hostnameRank` to `HostRow`
-     (mDNS 3 > reverse DNS 2 > NetBIOS 1) and a `setHostname(ip, name, rank)`
-     that only overwrites a lower rank, so precedence survives arrival order.
-  Bump `CFBundleVersion` in `macos/packaging/Info.plist` on the rebuild; the
-  version stays 1.2.x until both platforms ship the intent.
+  `mac:[x]` — shipped (reverseDNS 1.5 s deadline on a concurrent queue,
+  per-chunk `publishAll()` in `sweepPing`/`sweepTCP`, per-chunk + per-source
+  merges with `HostRow.hostnameRank` 3/2/1 precedence; `CFBundleVersion` 33).
+  Done on both platforms — archive at the next release.
 - `windows` — ARP icon in Settings > Installed apps: add
   `UninstallDisplayIcon={app}\FluentScanner.exe` to
   `windows/installer/FluentScanner.iss` (per skill `windows-setup`

@@ -12,6 +12,7 @@ struct HostRow: Identifiable {
     var kind: String?
     var server: String? // HTTP Server header: brand fallback when OUI is silent
     var isLocal = false // this machine: highlighted in the results
+    var hostnameRank = 0 // 3 mDNS > 2 reverse DNS > 1 NetBIOS: rank wins, not arrival order
     var id: String { ip }
 
     /// The combined "Vendor — Type" cell (Table column + CSV share it):
@@ -85,7 +86,7 @@ final class ScannerVM: ObservableObject {
                            ports: old.ports,
                            vendor: mac.flatMap { Oui.vendor($0) },
                            kind: old.kind, server: old.server,
-                           isLocal: old.isLocal)
+                           isLocal: old.isLocal, hostnameRank: old.hostnameRank)
     }
 
     private func applyKind(_ ip: String, _ kind: String) {
@@ -94,7 +95,24 @@ final class ScannerVM: ObservableObject {
         byIp[ip] = HostRow(ip: ip, mac: old.mac, hostname: old.hostname,
                            services: old.services, latencyMs: old.latencyMs,
                            ports: old.ports, vendor: old.vendor, kind: kind,
-                           server: old.server, isLocal: old.isLocal)
+                           server: old.server, isLocal: old.isLocal,
+                           hostnameRank: old.hostnameRank)
+    }
+
+    /// Merge a hostname keeping the source precedence (3 mDNS >
+    /// 2 reverse DNS > 1 NetBIOS). Lookups land chunk by chunk, in whatever
+    /// order they answer, so the rank — not the merge order — decides.
+    private func setHostname(_ ip: String, _ name: String, rank: Int) {
+        var r = byIp[ip, default: HostRow(ip: ip)]
+        var clean = name
+        if clean.hasSuffix(".local") {
+            clean = String(clean.dropLast(".local".count))
+        }
+        clean = clean.trimmingCharacters(in: CharacterSet(charactersIn: "."))
+        guard !clean.isEmpty, r.hostnameRank < rank else { return }
+        r.hostname = clean
+        r.hostnameRank = rank
+        byIp[ip] = r
     }
 
     private func reportDiscovery(total: Int) {
@@ -116,10 +134,19 @@ final class ScannerVM: ObservableObject {
                 }
                 for await (ip, res) in batch {
                     pingTested += 1
-                    if let res { hits.append((ip, res.ms, res.ttl)) }
+                    if let res {
+                        hits.append((ip, res.ms, res.ttl))
+                        if byIp[ip]?.latencyMs == nil {
+                            byIp[ip, default: HostRow(ip: ip)].latencyMs = res.ms
+                        }
+                        if let kind = res.ttl.flatMap(Scanner.ttlKind) {
+                            applyKind(ip, kind)
+                        }
+                    }
                 }
             }
             reportDiscovery(total: total)
+            publishAll()
         }
         return hits
     }
@@ -144,11 +171,17 @@ final class ScannerVM: ObservableObject {
                     }
                 }
                 for await (ip, ms) in batch {
-                    if let ms { hits.append((ip, ms)) }
+                    if let ms {
+                        hits.append((ip, ms))
+                        if byIp[ip]?.latencyMs == nil {
+                            byIp[ip, default: HostRow(ip: ip)].latencyMs = ms
+                        }
+                    }
                 }
             }
             tcpTested += chunk.count / Scanner.discoveryPorts.count
             reportDiscovery(total: total)
+            publishAll()
         }
         return hits
     }
@@ -279,32 +312,22 @@ final class ScannerVM: ObservableObject {
         publishAll()
 
         // Phase 3 — hostname + software lookups run CONCURRENTLY (all need
-        // only the alive set): wall time ≈ the slowest, not the sum. Merge
-        // keeps the old precedence: mDNS → reverse DNS → NetBIOS; the HTTP
+        // only the alive set): wall time ≈ the slowest, not the sum. Each
+        // source merges the moment it lands (rank keeps mDNS 3 >
+        // reverse DNS 2 > NetBIOS 1 whatever the arrival order); the HTTP
         // Server header fills the brand slot only when OUI is silent.
         status = L("dnsFmt")
         publishAll()
         let snap = Array(alive)
-        async let mdnsHosts = Scanner.mdnsHarvest(seconds: 2.5)
-        async let dnsHosts = reverseAll(snap)
-        async let nbnsHosts = nbnsAll(snap)
-        async let httpHosts = httpAll(snap)
-        let (mdns, dns, nbns, http) = await (mdnsHosts, dnsHosts, nbnsHosts, httpHosts)
-        for (ip, name) in mdns {
-            guard byIp[ip]?.hostname?.isEmpty ?? true else { continue }
-            let base = name.hasSuffix(".local")
-                ? String(name.dropLast(".local".count))
-                : name
-            byIp[ip]?.hostname = base.isEmpty ? nil : base
-        }
-        for (ip, name) in dns where byIp[ip]?.hostname?.isEmpty ?? true {
-            byIp[ip]?.hostname = name
-        }
-        for (ip, name) in nbns where byIp[ip]?.hostname?.isEmpty ?? true {
-            byIp[ip]?.hostname = name
-        }
-        for (ip, srv) in http {
-            byIp[ip]?.server = srv
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask { @MainActor in
+                let mdns = await Scanner.mdnsHarvest(seconds: 2.5)
+                for (ip, name) in mdns { self.setHostname(ip, name, rank: 3) }
+                self.publishAll()
+            }
+            group.addTask { _ = await self.reverseAll(snap) }
+            group.addTask { _ = await self.nbnsAll(snap) }
+            group.addTask { _ = await self.httpAll(snap) }
         }
         for ip in byIp.keys { byIp[ip]?.refreshServices() } // server now known
         publishAll()
@@ -312,6 +335,7 @@ final class ScannerVM: ObservableObject {
     }
 
     /// Reverse DNS for every host, chunked (independent pass for phase 3).
+    /// Each chunk merges the moment it answers (rank 2), so names land live.
     private func reverseAll(_ hosts: [String]) async -> [(String, String)] {
         var out: [(String, String)] = []
         for chunk in hosts.chunked(32) {
@@ -321,16 +345,20 @@ final class ScannerVM: ObservableObject {
                     batch.addTask { (ip, await Scanner.reverseDNS(ip)) }
                 }
                 for await (ip, name) in batch {
-                    if let name { out.append((ip, name)) }
+                    if let name {
+                        out.append((ip, name))
+                        setHostname(ip, name, rank: 2)
+                    }
                 }
             }
+            publishAll()
         }
         return out
     }
 
     /// NetBIOS node-status for every host (no hostname prefilter: mDNS runs
     /// concurrently, so a prefilter would query almost everything anyway —
-    /// a few spare UDP packets for a simpler flow).
+    /// a few spare UDP packets for a simpler flow). Merges per chunk (rank 1).
     private func nbnsAll(_ hosts: [String]) async -> [(String, String)] {
         var out: [(String, String)] = []
         for chunk in hosts.chunked(32) {
@@ -340,14 +368,19 @@ final class ScannerVM: ObservableObject {
                     batch.addTask { (ip, await Scanner.nbnsName(ip)) }
                 }
                 for await (ip, name) in batch {
-                    if let name { out.append((ip, name)) }
+                    if let name {
+                        out.append((ip, name))
+                        setHostname(ip, name, rank: 1)
+                    }
                 }
             }
+            publishAll()
         }
         return out
     }
 
     /// HTTP Server headers for 80/8080 hosts (only already-open ports).
+    /// Merges per chunk so brands land live.
     private func httpAll(_ hosts: [String]) async -> [(String, String)] {
         var out: [(String, String)] = []
         let pairs: [(String, UInt16)] = hosts.compactMap { ip in
@@ -363,9 +396,14 @@ final class ScannerVM: ObservableObject {
                     batch.addTask { (ip, await Scanner.httpServer(ip, p)) }
                 }
                 for await (ip, srv) in batch {
-                    if let srv { out.append((ip, srv)) }
+                    if let srv {
+                        out.append((ip, srv))
+                        byIp[ip]?.server = srv
+                        byIp[ip]?.refreshServices()
+                    }
                 }
             }
+            publishAll()
         }
         return out
     }

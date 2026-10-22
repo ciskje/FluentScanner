@@ -425,7 +425,17 @@ enum Scanner {
     static func reverseDNS(_ ip: String) async -> String? {
         guard let addr = ipv4(ip) else { return nil }
         return await withCheckedContinuation { cont in
-            DispatchQueue.global().async {
+            let q = DispatchQueue(label: "FluentScanner.dns", attributes: .concurrent)
+            let lock = NSLock()
+            var finished = false
+            @Sendable func finish(_ value: String?) {
+                lock.lock()
+                defer { lock.unlock() }
+                guard !finished else { return }
+                finished = true
+                cont.resume(returning: value)
+            }
+            q.async {
                 var sa = sockaddr_in()
                 sa.sin_family = sa_family_t(AF_INET)
                 sa.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
@@ -444,8 +454,9 @@ enum Scanner {
                     let s = String(cString: name)
                     if !s.isEmpty && s != ip { ret = s } // bare-IP answer = no name
                 }
-                cont.resume(returning: ret)
+                finish(ret)
             }
+            q.asyncAfter(deadline: .now() + 1.5) { finish(nil) }
         }
     }
 

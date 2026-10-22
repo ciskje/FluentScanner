@@ -167,6 +167,10 @@ Standard Win11 window, no custom chrome beyond this:
   IP): fixed hues go unreadable on one theme (yellow IP on white,
   dark-red brand on black). Switch on `DarkMode`, notify all three
   brushes in `RefreshTheme()`.
+- **Caption buttons follow the OS theme, not the app's**: with OS-light +
+  app-dark they render black-on-dark-mica (nearly invisible). Pin them in
+  `ApplySettings()` via `AppWindow.TitleBar.ButtonForegroundColor` (+
+  hover/pressed variants) from the same `EffectiveDark()` rule as the rows.
 - Never snapshot `Application.Current.Resources[...]` in code: it resolves
   with the *system* theme, so with OS-light + app-dark the legend labels
   came out black-on-dark. Resolve from the active theme dictionary
@@ -246,6 +250,11 @@ Standard Win11 window, no custom chrome beyond this:
 - Smoke start: **copy the exe dir to the local SSD first** (SmartScreen
   stalls unsigned exes on network drives; NAS I/O is slow), launch, wait,
   screenshot with `CopyFromScreen` via PowerShell, kill the process.
+  Synthetic mouse clicks (`mouse_event`) don't reliably reach WinUI
+  buttons — drive them with UIA instead: `UIAutomationClient` +
+  `UIAutomationTypes`, `FindAll(TreeScope.Descendants, Condition.TrueCondition)`,
+  match `Current.Name`, then `GetCurrentPattern(InvokePattern.Pattern)` +
+  `Invoke()` (the method is `GetCurrentPattern`, not `GetPattern`).
 - In this repo's shell, `cmd.exe /c` drops its arguments — use PowerShell
   (`Start-Process -PassThru` + poll `HasExited`/`ExitCode`), and always `cd`
   with an absolute path (the tool `workdir` is not always applied).

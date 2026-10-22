@@ -33,8 +33,17 @@ Or build it yourself: see `windows/AGENTS.md` (Build/run) and
 
 ## Changelog
 
-Same version number = same features everywhere. Windows is at `1.2.2`,
+Same version number = same features everywhere. Windows is at `1.2.5`,
 macOS at `1.2.4`.
+
+- **1.2.5** — Windows: results land live. Every ping/TCP discovery hit is on
+  the table as soon as it answers (no waiting for the whole sweep), the
+  hostname lookups merge chunk by chunk, and every lookup that needs a
+  working resolver has a hard deadline — a network with no internet (an
+  access point on its own) no longer leaves the scan hanging on something
+  that can never arrive. The title-bar buttons (min/max/close) now follow
+  the app theme instead of the OS one, so they stay visible when the app
+  is dark and the system is light (and vice versa).
 
 - **1.2.4** — macOS: the size-to-fit toolbar button works again (the 1.2.3
   cleanup had dropped the table rebuild that makes SwiftUI apply the
