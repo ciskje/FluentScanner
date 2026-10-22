@@ -35,8 +35,9 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
   `bundle.sh`, opened from the Help menu + toolbar ?); Windows mirrors with
   chapters + in-dialog search. The dated Novità/What's new sheet + its own
   Help-menu item stay as they are.
-  `mac:[x]` — Apple Help Book (`help-src`, hiutil index, `openHelpBook`;
-  `HelpView` sheet deleted; shipped in 1.5.0). `win:[x]` — Help dialog with 5 chapters + live
+  `mac:[x]` — Apple Help Book (`help-src`, hiutil index, `openHelpBook`
+  via `AHGotoPage` + explicit registration; `HelpView` sheet deleted;
+  shipped working in 1.5.1). `win:[x]` — Help dialog with 5 chapters + live
   search box, `helpBody` replaced by chapter keys (code written from the
   macOS machine — Windows rebuild + FSCAN_SELFTEST pending there).
 - `generic` — third-language default: a system language outside EN/IT shows
