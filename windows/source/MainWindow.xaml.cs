@@ -550,6 +550,8 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
 
         _running = true;
         _cts = new CancellationTokenSource();
+        ScanSpin.IsActive = true;
+        ScanSpin.Visibility = Visibility.Visible;
         StartBtn.Content = Str("btnStop");
         StartMenuItem.Text = Str("btnStop");
         StopBtn.IsEnabled = true;
@@ -582,6 +584,8 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
         {
             _running = false;
             _cts.Dispose();
+            ScanSpin.IsActive = false;
+            ScanSpin.Visibility = Visibility.Collapsed;
             StartBtn.Content = Str("btnStart");
             StartMenuItem.Text = Str("btnStart");
             StopBtn.IsEnabled = false;

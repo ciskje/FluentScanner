@@ -93,7 +93,7 @@
             </ListView.ItemContainerStyle>
             <ListView.Header>
                 <Border BorderThickness="0,0,0,2" Padding="0,0,0,4"
-                        BorderBrush="{ThemeResource AccentFillColorDefaultBrush}">
+                        BorderBrush="{x:Bind GridLineBrush, Mode=OneWay}">
                     <Grid x:Name="HeaderGrid" ColumnSpacing="12" Padding="12,2,12,4">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="{Binding W0, Source={StaticResource Cols}}" />
@@ -293,7 +293,11 @@
             </StackPanel>
         </StackPanel>
 
-        <TextBlock Grid.Row="6" x:Name="StatusTxt" Padding="12,4" FontSize="12"
-                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        <StackPanel Grid.Row="6" Orientation="Horizontal" Spacing="8" Padding="12,4">
+            <ProgressRing x:Name="ScanSpin" Width="14" Height="14" IsActive="False"
+                          Visibility="Collapsed" VerticalAlignment="Center" />
+            <TextBlock x:Name="StatusTxt" FontSize="12" VerticalAlignment="Center"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </StackPanel>
     </Grid>
 </Window>

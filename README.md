@@ -42,7 +42,9 @@ macOS at `1.2.4`.
   vendor from a post-harvest ARP re-read, reverse DNS and NetBIOS over the
   full row set, a short 80/8080 knock, and the UPnP description
   (maker/friendly name) as a second brand fallback; the mDNS query burst
-  goes out twice so flaky IoT responders are caught.
+  goes out twice so flaky IoT responders are caught. The results header
+  underline follows the theme (black/white) instead of the progress blue,
+  and a spinner next to the status marks a running scan.
 
 - **1.2.5** — Windows: results land live. Every ping/TCP discovery hit is on
   the table as soon as it answers (no waiting for the whole sweep), the

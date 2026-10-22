@@ -16,6 +16,15 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
 
 ## Pending
 
+- `generic` — scan-state readability: the header underline follows the
+  theme (black/white) instead of the accent blue reserved for progress,
+  and an animated spinner next to the status text marks a running scan so
+  final results are recognizable. `win:[x]` (1.2.6: header `Border`
+  bound to theme-aware `GridLineBrush`, `ProgressRing ScanSpin` toggled
+  in `Start_Click`/finally).
+  `mac:[ ]` — mirror: header underline in `.separatorColor` (theme-aware
+  automatically), `ProgressIndicator` spinning bound to the scan state,
+  hidden when idle.
 - `generic` — harvest-ghost evidence: hosts seen only through mDNS/UPnP
   (no ping, no discovery port — e.g. assistants answering as `none`) get
   every clue: MAC from a post-harvest ARP re-read, reverse DNS + NetBIOS
