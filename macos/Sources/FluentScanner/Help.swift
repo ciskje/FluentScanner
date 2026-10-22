@@ -16,6 +16,12 @@ struct HelpView: View {
             ScrollView {
                 Text(L("helpBody"))
                     .frame(maxWidth: .infinity, alignment: .leading)
+                Text(L("changelogTitle"))
+                    .font(.headline)
+                    .padding(.top, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text(L("changelogBody"))
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
             HStack {
                 Spacer()
@@ -24,7 +30,7 @@ struct HelpView: View {
             }
         }
         .padding(20)
-        .frame(width: 520, height: 420)
+        .frame(width: 520, height: 480)
     }
 }
 

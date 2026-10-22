@@ -74,7 +74,8 @@ Both builds implement the same intents; platform-native details may differ:
 - Settings: table font size + monospaced toggle; the discovery/scan port
   lists and the ping/discovery/port timeouts have fixed working defaults,
   editable in the app
-- Help sheet + About panel, in both languages
+- Help sheet + About panel, in both languages; the Help sheet ends with a
+  version changelog (same entries as the README Changelog, in both languages)
 - App icon: radar-sweep SVG source, rendered per platform
 
 ## Change workflow

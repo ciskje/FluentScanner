@@ -31,6 +31,43 @@ Discovery pings every address and probes common TCP ports in parallel; live host
 The dot before each IP is the device type (see the legend below the table); the brand name gets its own stable color. A shuffle icon marks a randomized MAC, which carries no vendor. The yellow row with the computer icon is this machine.
 
 Hostnames come from Bonjour (mDNS), NetBIOS and reverse DNS. Quiet devices with no open port and no name service stay anonymous — open ports, a real MAC vendor and mDNS are what identify a device. The size-to-fit button in the toolbar (Cmd+Shift+F) fits every column to its contents.";
+"changelogTitle" = "What's new";
+"changelogBody" = "1.2.7 — Third system languages show English; `;` also separates port lists.
+1.2.6 — Live results on both platforms; harvest ghosts gain MAC, DNS, NetBIOS and UPnP clues; theme-aware header underline; running spinner.
+1.2.5 — Results land live (Windows): per-chunk hostname merges, hard deadlines on resolver lookups.
+1.2.4 — Size-to-fit button works again (macOS).
+1.2.3 — Size-to-fit button + Cmd+Shift+F (macOS).
+1.2.2 — Excel-style column resize (Windows).
+1.2.1 — Double-click a header to size its column (both).
+1.2.0 — Full parity: sort, filter, editable ports/timeouts, clickable services, vendor/type columns.
+1.1.0 — Editable ports/timeouts, sort + filter, readable self-highlight; Windows gains Mica, menu bar, tabular results, installer.
+1.0.0 — First stable release.
+0.10.0 — Settings: language override, font size + mono, theme.
+0.9.0 — Help and About sheets; EN/IT audit.
+0.8.4 — Legend covers the computer icon.
+0.8.3 — Legend covers randomized MACs; wider IP column.
+0.8.2 — Wider start/end IP fields.
+0.8.1 — Self-highlight survives the ARP refresh.
+0.8.0 — Editable scan range + Get IP.
+0.7.2 — Scanning host IP in yellow.
+0.7.1 — HTTP names the software: HTTP/Caddy (80).
+0.7.0 — All lookups overlap; wall time ≈ slowest pass.
+0.6.3 — Randomized MACs flagged, never blamed; self row bold.
+0.6.2 — Full IEEE OUI table (40k vendors), works offline.
+0.6.1 — HTTP Server header as brand fallback on 80/8080.
+0.6.0 — Scanning host always listed; more vendors, hints, mDNS types.
+0.5.3 — Non-padded MAC groups parsed.
+0.5.2 — CIDR skips .0/.255; a /24 probes 254 hosts.
+0.5.1 — TTL 255 means embedded stacks, not routers; only 128 hints Windows.
+0.5.0 — Radar-sweep app icon.
+0.4.3 — Stable brand colors; device-type legend.
+0.4.2 — Device-type color dot; generic Linux TTL guess dropped.
+0.4.1 — Hostnames fixed: `.local` queries, A records, NetBIOS.
+0.4.0 — Fewer missing MACs (re-ping + ARP re-read); TTL hints.
+0.3.0 — ICMP ping sweep + TCP fallback; Wi-Fi-tuned ports/timeouts.
+0.2.1 — Header/row alignment; OUI lookup fix.
+0.2.0 — Vendor/Type column; 4× faster discovery; progressive results.
+0.1.0 — Skeleton: targets, TCP discovery, port sweep, ARP MACs, reverse DNS, CSV, EN/IT.";
 "aboutMenu" = "About FluentScanner";
 "aboutTitle" = "About FluentScanner";
 "aboutDesc" = "Finds every device on your LAN: ping plus TCP discovery, open-port sweep, MAC and vendor identification, hostnames.";
