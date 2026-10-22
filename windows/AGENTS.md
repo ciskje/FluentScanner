@@ -141,8 +141,15 @@ Standard Win11 window, no custom chrome beyond this:
   phase-3 hostname lookups merge per chunk. `HostRow.NameRank` keeps the
   mDNS(3) > reverse DNS(2) > NetBIOS(1) precedence whatever the arrival order;
   `ReverseDnsAsync` caps every lookup at 1500 ms, so a network with no working
-  resolver (an AP with no internet) can never hold the scan open. macOS still
-  needs the same (see TODO.md).
+  resolver (an AP with no internet) can never hold the scan open.
+- Ghost evidence (every IP gets every clue): phase 3 harvests first (mDNS
+  burst sent twice + UPnP M-SEARCH, concurrent), then rDNS/NetBIOS run over
+  the FULL row set (not just alive), `GhostWebAsync` knocks 80/8080 on rows
+  with no open port yet, `SsdpAllAsync` fetches UPnP descriptions (maker +
+  friendly name fill the brand slot only when OUI is silent, same rule as
+  the HTTP Server header), and a final ARP re-read + classify pass covers
+  harvest-only rows too — verified live (a `none-2` assistant gained MAC +
+  Amazon vendor). `_privet._tcp.local` is in the mDNS type list.
 
 ## WinUI gotchas learned
 

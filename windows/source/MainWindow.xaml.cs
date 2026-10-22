@@ -1008,30 +1008,67 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
             SortRows();
         });
 
-        // Phase 3 — hostname + software lookups run CONCURRENTLY, and every
-        // chunk is merged the moment it answers: names fill in progressively,
-        // so a slow source (reverse DNS with no reachable resolver, e.g. an
-        // AP with no internet) never holds the hosts already found hostage.
-        // Precedence stays mDNS → reverse DNS → NetBIOS (ranked, arrival order
-        // irrelevant); the HTTP Server header fills the brand slot only when
-        // OUI is silent.
+        // Phase 3 — hostname + software lookups, every chunk merged the
+        // moment it answers: names fill in progressively, so a slow source
+        // (reverse DNS with no reachable resolver, e.g. an AP with no
+        // internet) never holds the hosts already found hostage.
+        // Precedence stays mDNS → reverse DNS → NetBIOS (ranked, arrival
+        // order irrelevant); the HTTP Server header fills the brand slot
+        // only when OUI is silent. Hosts seen ONLY here (mDNS/UPnP speakers
+        // that ignore ping and all discovery ports) still get every clue:
+        // MAC from a fresh ARP re-read, reverse DNS + NetBIOS over the full
+        // row set, a short 80/8080 knock, and the UPnP description label as
+        // brand fallback.
         Post(() => StatusTxt.Text = Str("dnsFmt"));
         await DispatchAsync(SortRows);
-        var snap = alive.ToList();
+        // 3a — harvests: mDNS A records + UPnP M-SEARCH answers (both
+        // multicast, both unprivileged, concurrent). Either can reveal
+        // hosts the sweeps never saw.
+        var mdnsTask = Scanner.MdnsHarvestAsync(2.5, ct);
+        var ssdpTask = Scanner.SsdpDiscoverAsync(3, ct);
+        await Task.WhenAll(mdnsTask, ssdpTask);
+        ct.ThrowIfCancellationRequested();
+        var mdnsHosts = await mdnsTask;
+        var ssdpHits = await ssdpTask;
+        await DispatchAsync(() =>
+        {
+            foreach (var (ip, name) in mdnsHosts) SetHostname(ip, name, 3);
+            SortRows();
+        });
+        // 3b — second and third tools on the same IPs, over EVERYTHING
+        // known (alive + harvest ghosts): names chunk by chunk, UPnP
+        // descriptions alongside.
+        var snap = await DispatchAsync(() => _byIp.Keys.ToList());
+        var dnsTask = ReverseAllAsync(snap, ct);      // merges per chunk
+        var nbnsTask = NbnsAllAsync(snap, ct);        // merges per chunk
+        var ssdpFetch = SsdpAllAsync(ssdpHits, ct);   // merges per chunk
+        await Task.WhenAll(dnsTask, nbnsTask, ssdpFetch);
+        ct.ThrowIfCancellationRequested();
+        // 3c — ghost web knock: rows with no open port yet get a short
+        // 80/8080 probe (Services evidence + unlocks the Server fetch),
+        // then the header fetch covers every 80/8080 row, ghosts included.
+        var ghosts = await DispatchAsync(() => _byIp.Values
+            .Where(r => r.Ports.Count == 0).Select(r => r.Ip).ToList());
+        await GhostWebAsync(ghosts, ct);
         var httpPairs = await DispatchAsync(() => _byIp.Values
             .Where(r => r.Ports.Contains(80) || r.Ports.Contains(8080))
             .Select(r => (r.Ip, port: r.Ports.Contains(80) ? 80 : 8080))
             .ToList());
-        var mdnsTask = Scanner.MdnsHarvestAsync(2.5, ct);
-        var dnsTask = ReverseAllAsync(snap, ct);      // merges per chunk
-        var nbnsTask = NbnsAllAsync(snap, ct);        // merges per chunk
-        var httpTask = HttpAllAsync(httpPairs, ct);   // merges per chunk
-        await Task.WhenAll(mdnsTask, dnsTask, nbnsTask, httpTask);
-        ct.ThrowIfCancellationRequested();
-        var mdnsHosts = await mdnsTask;
+        await HttpAllAsync(httpPairs, ct);
+        // Ghosts arrived after the vendor/kind pass: classify anything
+        // still blank, and one more ARP re-read so mDNS/UPnP-only rows
+        // gain MAC + vendor like everyone else.
+        foreach (var kv in Scanner.ArpTable()) arp[kv.Key] = kv.Value;
         await DispatchAsync(() =>
         {
-            foreach (var (ip, name) in mdnsHosts) SetHostname(ip, name, 3);
+            foreach (var ip in _byIp.Keys.ToList()) ApplyMac(ip, arp);
+            foreach (var ip in _byIp.Keys.ToList())
+            {
+                var row = _byIp[ip];
+                row.Kind = Scanner.Classify(
+                    string.IsNullOrEmpty(row.Vendor) ? null : row.Vendor,
+                    new HashSet<int>(row.Ports)) ?? row.Kind;
+            }
             SortRows();
         });
     }
@@ -1145,6 +1182,62 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
                     if (name is not null) SetHostname(ip, name, 1);
                 SortRows();
             });
+        }
+    }
+
+    /// UPnP description fetch per M-SEARCH hit, merged chunk by chunk:
+    /// maker + friendly name fill the brand slot only when OUI is silent
+    /// (same fallback philosophy as the HTTP Server header).
+    private async Task SsdpAllAsync(List<(string ip, string location, string server)> hits, CancellationToken ct)
+    {
+        for (int c = 0; c < hits.Count && !ct.IsCancellationRequested; c += 8)
+        {
+            var chunk = hits.Skip(c).Take(8).ToList();
+            var labels = await Task.WhenAll(chunk.Select(async h =>
+                (ip: SsdpRowIp(h.location, h.ip), label: await Scanner.SsdpDeviceAsync(h.location, ct))));
+            await DispatchAsync(() =>
+            {
+                foreach (var (ip, label) in labels)
+                {
+                    if (ip is null || label is null) continue;
+                    var r = RowFor(ip);
+                    if (string.IsNullOrEmpty(r.Vendor) && string.IsNullOrEmpty(r.Server))
+                        r.Server = label;
+                }
+                SortRows();
+            });
+        }
+    }
+
+    /// The LOCATION host as the device sees itself is the most reliable
+    /// row key; fall back to the UDP sender on weird URLs.
+    private static string? SsdpRowIp(string location, string sender)
+    {
+        if (Uri.TryCreate(location, UriKind.Absolute, out var uri)
+            && Scanner.ParseIp(uri.Host) is { } n)
+            return Scanner.Dotted(n);
+        return Scanner.ParseIp(sender) is not null ? sender : null;
+    }
+
+    /// Short 80/8080 knock for rows the sweeps never opened a port on
+    /// (mDNS/UPnP-only ghosts): an open web port is Services evidence and
+    /// unlocks the Server-header fetch. Chunked like the port sweep.
+    private async Task GhostWebAsync(List<string> ips, CancellationToken ct)
+    {
+        var pairs = ips.SelectMany(ip => new[] { 80, 8080 }.Select(p => (ip, p))).ToList();
+        for (int c = 0; c < pairs.Count && !ct.IsCancellationRequested; c += 64)
+        {
+            var chunk = pairs.Skip(c).Take(64).ToList();
+            var opens = await Task.WhenAll(chunk.Select(async t =>
+                await Scanner.ProbeAsync(t.ip, t.p, Scanner.PortTimeoutMs, ct) is not null
+                    ? (ip: t.ip, p: t.p) : (ip: t.ip, p: 0)));
+            var found = opens.Where(o => o.p != 0).ToList();
+            if (found.Count > 0)
+                await DispatchAsync(() =>
+                {
+                    foreach (var (ip, p) in found) RowFor(ip).AddPort(p);
+                    SortRows();
+                });
         }
     }
 

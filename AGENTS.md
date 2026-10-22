@@ -32,13 +32,19 @@ Both builds implement the same intents; platform-native details may differ:
   combined with service hints ("Windows host" for RDP/WinRM, "Printer",
   "NAS", "Router/AP", "IoT device"…), plus a ping-reply TTL guess as
   fallback hint (128→Windows host only — 255 is the default of embedded
-  stacks like Tuya/Espressif, not a router signature), and the HTTP
+  stacks like Tuya/Espressif, not a router signature), the HTTP
   `Server:` header as brand fallback when OUI is silent,
-  shown in the same column when OUI/ports explain nothing
+  shown in the same column when OUI/ports explain nothing, and the UPnP
+  device description (M-SEARCH harvest + description maker/friendlyName)
+  as a second brand fallback in the same slot
 - Hostnames, best effort (no failure is fatal): mDNS harvest first
   (Bonjour `.local` names — queries need the `.local` suffix, A records
-  ride in the additional section), NetBIOS node-status for Windows PCs,
-  classic reverse DNS last
+  ride in the additional section; the query burst goes out twice so flaky
+  IoT responders are caught), NetBIOS node-status for Windows PCs,
+  classic reverse DNS last. Hosts seen only through harvests (no ping,
+  no discovery port) still get every clue: MAC from a post-harvest ARP
+  re-read, reverse DNS + NetBIOS over the full row set, a short 80/8080
+  knock, and the UPnP label
 - Live results list: IP (with a device-type color dot), hostname, MAC,
   vendor (each brand in its own stable color) and type in separate columns,
   discovered services
@@ -97,10 +103,12 @@ implemented those intents; if the other lags, its release waits.
 
 - Z = bugfix/tweak, Y = new feature/behavior, X = upheaval.
 - Docs/refactor/build never change the version.
-- Current: Windows `1.2.5`, macOS `1.2.4` (1.2.2 was Windows-only:
+- Current: Windows `1.2.6`, macOS `1.2.4` (1.2.2 was Windows-only:
   Excel-style column resize; macOS got the header double-click in 1.2.3;
   1.2.4 fixes the size-to-fit button, which 1.2.3 had broken; 1.2.5 is the
-  live-results/deadline intent Windows-only until macOS catches up).
+  live-results/deadline intent Windows-only until macOS catches up; 1.2.6
+  is the harvest-ghost evidence intent, Windows-only until macOS mirrors
+  it).
 - Single source: `<Version>` in `windows/source/FluentScanner.csproj`
   and `CFBundleShortVersionString` in `macos/packaging/Info.plist`.
 

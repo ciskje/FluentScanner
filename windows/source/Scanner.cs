@@ -400,7 +400,7 @@ internal static class Scanner
         "_ipp._tcp.local", "_spotify-connect._tcp.local", "_hap._tcp.local",
         "_printer._tcp.local", "_pdl-datastream._tcp.local",
         "_androidtvremote._tcp.local", "_sonos._tcp.local", "_hue._tcp.local",
-        "_homekit._tcp.local",
+        "_homekit._tcp.local", "_privet._tcp.local",
     ];
 
     /// One-question PTR query with the QU (unicast-response) class bit.
@@ -491,16 +491,30 @@ internal static class Scanner
             using var sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             sock.Bind(new IPEndPoint(IPAddress.Any, 0));
             var dst = new IPEndPoint(IPAddress.Parse("224.0.0.251"), 5353);
-            foreach (var t in MdnsTypes)
+            var queries = MdnsTypes.Select(MdnsQuery).ToList();
+            async Task Ask()
             {
-                try { await sock.SendToAsync(MdnsQuery(t), dst, ct); }
-                catch { break; }
+                foreach (var t in queries)
+                {
+                    try { await sock.SendToAsync(t, dst, ct); }
+                    catch { break; }
+                }
             }
+            await Ask();
+            // Flaky IoT responders miss the first burst: ask twice (same
+            // "use the tool twice" philosophy as the SSDP double send).
+            var start = DateTime.UtcNow;
+            bool resent = false;
             sock.ReceiveTimeout = 200;
-            var end = DateTime.UtcNow.AddSeconds(seconds);
+            var end = start.AddSeconds(seconds);
             var buf = new byte[65536];
             while (DateTime.UtcNow < end && !ct.IsCancellationRequested)
             {
+                if (!resent && DateTime.UtcNow > start.AddSeconds(seconds / 2))
+                {
+                    resent = true;
+                    await Ask();
+                }
                 try
                 {
                     EndPoint ep = new IPEndPoint(IPAddress.Any, 0);
@@ -514,6 +528,156 @@ internal static class Scanner
         }
         catch { }
         return hosts;
+    }
+
+    // MARK: SSDP/UPnP harvest (TVs, routers, speakers, printers announce
+    // here — often the only clue for hosts that ignore ping and TCP)
+
+    /// M-SEARCH for everything; responders answer unicast to our port.
+    internal static byte[] SsdpQuery() => Encoding.ASCII.GetBytes(
+        "M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\nMAN: \"ns:01\"\r\nMX: 2\r\nST: ssdp:all\r\n\r\n");
+
+    /// (location, server) from one M-SEARCH response; headers are
+    /// case-insensitive, garbage yields null. Pure — self-tested.
+    internal static (string location, string server)? ParseSsdpResponse(string response)
+    {
+        string? loc = null, srv = null;
+        foreach (var raw in response.Split('\n'))
+        {
+            var line = raw.Trim();
+            int colon = line.IndexOf(':');
+            if (colon <= 0) continue;
+            var name = line[..colon].Trim();
+            var value = line[(colon + 1)..].Trim();
+            if (name.Equals("location", StringComparison.OrdinalIgnoreCase)) loc = value;
+            else if (name.Equals("server", StringComparison.OrdinalIgnoreCase)) srv = value;
+        }
+        if (string.IsNullOrEmpty(loc)) return null;
+        return (loc, srv ?? "");
+    }
+
+    /// `(senderIp, location, server)` from the responses in the window.
+    /// Unprivileged UDP — the replies come back unicast, no multicast
+    /// membership needed. Same harvest shape as mDNS.
+    internal static async Task<List<(string ip, string location, string server)>> SsdpDiscoverAsync(double seconds = 3, CancellationToken ct = default)
+    {
+        var out_ = new List<(string, string, string)>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        try
+        {
+            using var sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            sock.Bind(new IPEndPoint(IPAddress.Any, 0));
+            var dst = new IPEndPoint(IPAddress.Parse("239.255.255.250"), 1900);
+            var q = SsdpQuery();
+            for (int i = 0; i < 2; i++)
+            {
+                try { await sock.SendToAsync(q, dst, ct); } catch { break; }
+                await Task.Delay(200, ct);
+            }
+            sock.ReceiveTimeout = 200;
+            var end = DateTime.UtcNow.AddSeconds(seconds);
+            var buf = new byte[8192];
+            while (DateTime.UtcNow < end && !ct.IsCancellationRequested)
+            {
+                try
+                {
+                    EndPoint ep = new IPEndPoint(IPAddress.Any, 0);
+                    int n = sock.ReceiveFrom(buf, ref ep);
+                    if (n <= 12) continue;
+                    var text = Encoding.ASCII.GetString(buf, 0, n);
+                    if (!text.StartsWith("HTTP/", StringComparison.OrdinalIgnoreCase)) continue;
+                    if (ParseSsdpResponse(text) is { } r && seen.Add(r.location))
+                        out_.Add((((IPEndPoint)ep).Address.ToString(), r.location, r.server));
+                }
+                catch (SocketException) { }
+            }
+        }
+        catch { }
+        return out_;
+    }
+
+    /// First `<tag>…</tag>` text of a UPnP device description. The open-tag
+    /// match rejects `<manufacturerURL>` when looking for `manufacturer`
+    /// (prefix collision); nested markup bails. Pure — self-tested.
+    internal static string? SsdpTag(string xml, string tag)
+    {
+        int s = 0;
+        while (true)
+        {
+            s = xml.IndexOf("<" + tag, s, StringComparison.OrdinalIgnoreCase);
+            if (s < 0) return null;
+            int after = s + 1 + tag.Length;
+            if (after >= xml.Length) return null;
+            char c = xml[after];
+            if (c != '>' && c != '/' && !char.IsWhiteSpace(c)) { s = after; continue; }
+            int gt = xml.IndexOf('>', after);
+            if (gt < 0) return null;
+            int e = xml.IndexOf("</" + tag, gt, StringComparison.OrdinalIgnoreCase);
+            if (e < 0) return null;
+            var v = xml[(gt + 1)..e].Trim();
+            if (v.Length == 0 || v.Length > 80 || v.Contains('<')) return null;
+            return v;
+        }
+    }
+
+    internal static (string manufacturer, string friendlyName, string modelName) ParseSsdpDescription(string xml) =>
+        (SsdpTag(xml, "manufacturer") ?? "", SsdpTag(xml, "friendlyName") ?? "", SsdpTag(xml, "modelName") ?? "");
+
+    /// Display label: the user-given name first, maker in parens.
+    /// Pure — self-tested.
+    internal static string SsdpLabel(string manufacturer, string friendlyName, string modelName)
+    {
+        var parts = new[] { friendlyName, manufacturer, modelName }
+            .Where(s => !string.IsNullOrEmpty(s)).Distinct().Take(2).ToList();
+        if (parts.Count == 0) return "";
+        var label = parts.Count == 1 ? parts[0] : $"{parts[0]} ({parts[1]})";
+        return label.Length > 80 ? label[..80] : label;
+    }
+
+    /// GET the description document → display label (null on anything
+    /// unexpected). Raw socket like HttpServerAsync: ≤8 KB, 2 s caps.
+    internal static async Task<string?> SsdpDeviceAsync(string location, CancellationToken ct)
+    {
+        try
+        {
+            if (!Uri.TryCreate(location, UriKind.Absolute, out var uri)) return null;
+            if (!uri.Scheme.StartsWith("http", StringComparison.OrdinalIgnoreCase)) return null;
+            string host = uri.Host;
+            int port = uri.Port < 0 ? 80 : uri.Port;
+            string path = string.IsNullOrEmpty(uri.PathAndQuery) ? "/" : uri.PathAndQuery;
+            using var client = new TcpClient();
+            var connect = client.ConnectAsync(host, port, ct).AsTask();
+            if (await Task.WhenAny(connect, Task.Delay(2000, ct)) != connect) return null;
+            await connect;
+            using var stream = client.GetStream();
+            var req = Encoding.ASCII.GetBytes($"GET {path} HTTP/1.0\r\nHost: {host}\r\nConnection: close\r\n\r\n");
+            await stream.WriteAsync(req, ct);
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            cts.CancelAfter(2000);
+            var buf = new byte[8192];
+            var sb = new StringBuilder();
+            try
+            {
+                while (sb.Length < 8192)
+                {
+                    int n = await stream.ReadAsync(buf.AsMemory(0, Math.Min(buf.Length, 8192 - sb.Length)), cts.Token);
+                    if (n <= 0) break;
+                    sb.Append(Encoding.UTF8.GetString(buf, 0, n));
+                }
+            }
+            catch { }
+            var text = sb.ToString();
+            int bi = text.IndexOf("\r\n\r\n", StringComparison.Ordinal);
+            if (bi < 0) bi = text.IndexOf("\n\n", StringComparison.Ordinal);
+            var xml = bi >= 0 ? text[(bi + (text[bi] == '\r' ? 4 : 2))..] : text;
+            var (m, f, mo) = ParseSsdpDescription(xml);
+            var label = SsdpLabel(m, f, mo);
+            return label.Length == 0 ? null : label;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     // MARK: NetBIOS name (Windows PCs announce no mDNS — NBSTAT over UDP 137)
@@ -697,6 +861,19 @@ internal static class Scanner
         rp3.AddRange(rd3);
         Check(ParseNbns([.. rp3]) == "DESKTOP-ABC123", "nbns parse");
         Check(ParseNbns([0, 1, 2, 3]) is null, "nbns garbage");
+        var sq = System.Text.Encoding.ASCII.GetString(SsdpQuery());
+        Check(sq.Contains("M-SEARCH * HTTP/1.1") && sq.Contains("ST: ssdp:all"), "ssdp query");
+        var sr = ParseSsdpResponse("HTTP/1.1 200 OK\r\nCACHE-CONTROL: max-age=1800\r\nLOCATION: http://192.168.1.115:7344/desc.xml\r\nServer: Linux/1.0 UPnP/1.0\r\nST: upnp:rootdevice\r\n\r\n");
+        Check(sr is { } r1 && r1.location == "http://192.168.1.115:7344/desc.xml" && r1.server.StartsWith("Linux"), "ssdp response parse");
+        Check(ParseSsdpResponse("NOTIFY * HTTP/1.1\r\nNT: upnp:rootdevice\r\n\r\n") is null, "ssdp response needs location");
+        Check(ParseSsdpResponse("garbage") is null, "ssdp response garbage");
+        var desc = "<root><device><manufacturer>LG Electronics</manufacturer><manufacturerURL>http://lg.com/</manufacturerURL><friendlyName>TV Soggiorno</friendlyName><modelName>OLED55C</modelName></device></root>";
+        var dd = ParseSsdpDescription(desc);
+        Check(dd.manufacturer == "LG Electronics" && dd.friendlyName == "TV Soggiorno" && dd.modelName == "OLED55C", "ssdp description parse");
+        Check(ParseSsdpDescription("<root></root>") == ("", "", ""), "ssdp description empty");
+        Check(SsdpLabel("LG Electronics", "TV Soggiorno", "OLED55C") == "TV Soggiorno (LG Electronics)", "ssdp label");
+        Check(SsdpLabel("Amazon", "", "") == "Amazon", "ssdp label maker only");
+        Check(SsdpLabel("", "", "") == "", "ssdp label empty");
         Check(Classify("Dreame Technology", new HashSet<int>())?.Contains("IoT device") == true, "classify dreame iot");
         Check(Classify("Advanced Digital Broadcast SA", new HashSet<int>())?.Contains("Router/AP") == true, "classify adb router");
         Check(Classify(null, new HashSet<int> { 3389 })?.Contains("Windows host") == true, "classify rdp windows");

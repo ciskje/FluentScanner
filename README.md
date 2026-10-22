@@ -33,8 +33,16 @@ Or build it yourself: see `windows/AGENTS.md` (Build/run) and
 
 ## Changelog
 
-Same version number = same features everywhere. Windows is at `1.2.5`,
+Same version number = same features everywhere. Windows is at `1.2.6`,
 macOS at `1.2.4`.
+
+- **1.2.6** — Windows: every IP gets every clue. Hosts seen only through
+  the harvests (mDNS/UPnP speakers that ignore ping and every discovery
+  port — e.g. voice assistants answering as `none`) now gain their MAC +
+  vendor from a post-harvest ARP re-read, reverse DNS and NetBIOS over the
+  full row set, a short 80/8080 knock, and the UPnP description
+  (maker/friendly name) as a second brand fallback; the mDNS query burst
+  goes out twice so flaky IoT responders are caught.
 
 - **1.2.5** — Windows: results land live. Every ping/TCP discovery hit is on
   the table as soon as it answers (no waiting for the whole sweep), the

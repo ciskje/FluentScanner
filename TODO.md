@@ -16,6 +16,21 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
 
 ## Pending
 
+- `generic` — harvest-ghost evidence: hosts seen only through mDNS/UPnP
+  (no ping, no discovery port — e.g. assistants answering as `none`) get
+  every clue: MAC from a post-harvest ARP re-read, reverse DNS + NetBIOS
+  over the full row set, a short 80/8080 knock, the UPnP description
+  (maker/friendlyName) as second brand fallback, mDNS query burst sent
+  twice, `_privet._tcp.local` probed. `win:[x]` (1.2.6: `SsdpDiscoverAsync`
+  + `SsdpDeviceAsync`/`ParseSsdpDescription`/`SsdpLabel` in `Scanner.cs`
+  with self-tests, `SsdpAllAsync` + `GhostWebAsync` + full-row `snap` +
+  post-harvest ARP/classify pass in `MainWindow.xaml.cs`; verified live:
+  `.106 none-2` gained MAC + Amazon vendor).
+  `mac:[ ]` — mirror: M-SEARCH to 239.255.255.250:1900 (unicast replies need
+  no multicast membership), description GET with 2 s caps, same label rule
+  (only when OUI/vendor silent), rDNS + NetBIOS over all `byIp` keys, ghost
+  80/8080 probe, ARP re-read applied to all rows, re-run classify for
+  still-blank kinds, add `_privet._tcp.local` to `mdnsTypes`.
 - `generic` — live results + never stall on an unreachable resolver: hosts
   appear the moment they answer, the internet-dependent lookups run **after**
   the partial results are already on screen. `win:[x]` (chunk-by-chunk
