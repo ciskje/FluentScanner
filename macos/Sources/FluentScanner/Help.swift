@@ -9,21 +9,23 @@ extension Notification.Name {
 /// Opens the bundled Apple Help Book (chapters + menu search) in Help Viewer.
 /// Registers the embedded .help bundle explicitly first: helpd's
 /// launch-time scan can miss it (fresh installs, moved bundles), and then
-/// Help Viewer silently falls back to the macOS manual. The C function is
-/// resolved at runtime so a missing symbol can never break the build.
+/// Help Viewer silently falls back to the macOS manual. Page-based goto
+/// (not anchor lookup) opens the landing page; the C functions are resolved
+/// at runtime so a missing symbol can never break the build.
 func openHelpBook() {
-    guard let folder = Bundle.main.object(forInfoDictionaryKey: "CFBundleHelpBookFolder") as? String,
-        let book = Bundle.main.object(forInfoDictionaryKey: "CFBundleHelpBookName") as? String
-    else { return }
+    guard let folder = Bundle.main.object(forInfoDictionaryKey: "CFBundleHelpBookFolder") as? String else { return }
     let helpURL = Bundle.main.bundleURL.appendingPathComponent("Contents/Resources/\(folder)")
-    if FileManager.default.fileExists(atPath: helpURL.path) {
-        typealias RegisterFn = @convention(c) (CFURL) -> Int32
-        if let lib = dlopen("/System/Library/Frameworks/Carbon.framework/Versions/A/Frameworks/Help.framework/Help", RTLD_LAZY),
-            let sym = dlsym(lib, "AHRegisterHelpBookWithURL") {
-            _ = unsafeBitCast(sym, to: RegisterFn.self)(helpURL as CFURL)
-        }
-    }
-    NSHelpManager.shared.openHelpAnchor("index", inBook: book)
+    guard FileManager.default.fileExists(atPath: helpURL.path),
+        let lib = dlopen("/System/Library/Frameworks/Carbon.framework/Versions/A/Frameworks/Help.framework/Help", RTLD_LAZY),
+        let regSym = dlsym(lib, "AHRegisterHelpBookWithURL"),
+        let gotoSym = dlsym(lib, "AHGotoPage"),
+        let helpBundle = Bundle(url: helpURL),
+        let title = helpBundle.object(forInfoDictionaryKey: "HPDBookTitle") as? String
+    else { return }
+    typealias RegisterFn = @convention(c) (CFURL) -> Int32
+    typealias GotoFn = @convention(c) (CFString, CFString, CFString?) -> Int32
+    _ = unsafeBitCast(regSym, to: RegisterFn.self)(helpURL as CFURL)
+    _ = unsafeBitCast(gotoSym, to: GotoFn.self)(title as CFString, "index.html" as CFString, nil)
 }
 
 /// Version changelog sheet (the Help menu's second item opens it).

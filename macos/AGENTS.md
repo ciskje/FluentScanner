@@ -100,10 +100,16 @@ at releases.
   `packaging/help-src/<lang>.lproj/*.html`, assembled + `hiutil`-indexed by
   `bundle.sh` into `FluentScanner.help` (registered via
   `CFBundleHelpBookFolder/Name` in `packaging/Info.plist`, opened with
-  `NSHelpManager.openHelpAnchor`). No Xcode help tooling needed;
-  `hiutil -I corespotlight -C -a` with `-s` stopwords per language. The old
-  in-app help sheet is gone (deleted, not kept as fallback); About +
-  Changelog sheets stay.
+  `AHGotoPage` on the `HPDBookTitle` + `index.html`: page-based goto is
+  reliable, anchor lookup via `openHelpAnchor` silently falls back to the
+  macOS manual when helpd's scan missed the book). The `.help` bundle is
+  registered explicitly at open time with `AHRegisterHelpBookWithURL`
+  (resolved at runtime via `dlopen`, so no linking changes). No Xcode help
+  tooling needed; `hiutil -I corespotlight -C -a` with `-s` stopwords per
+  language (plus `-I lsm` for the legacy index). The old in-app help sheet
+  is gone (deleted, not kept as fallback); About + Changelog sheets stay.
+  Debug: `log show --predicate 'process == "helpd"'`, `defaults read
+  com.apple.help`, purge with `hiutil -P` when trying a fixed book.
 - Adding a UI language: copy `en.lproj/Localizable.strings` + `help-src/en.lproj/*.html`
   and translate (keep every key, keep `%ld` placeholders), add the code to
   `supportedLocalizations` in `Strings.swift`, a picker row in `Settings.swift`,
