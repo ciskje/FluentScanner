@@ -36,7 +36,7 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
   chapters + in-dialog search. The dated Novità/What's new sheet + its own
   Help-menu item stay as they are.
   `mac:[x]` — Apple Help Book (`help-src`, hiutil index, `openHelpBook`;
-  `HelpView` sheet deleted). `win:[x]` — Help dialog with 5 chapters + live
+  `HelpView` sheet deleted; shipped in 1.5.0). `win:[x]` — Help dialog with 5 chapters + live
   search box, `helpBody` replaced by chapter keys (code written from the
   macOS machine — Windows rebuild + FSCAN_SELFTEST pending there).
 - `generic` — third-language default: a system language outside EN/IT shows

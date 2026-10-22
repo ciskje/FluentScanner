@@ -32,8 +32,12 @@ Or build it yourself: see `windows/AGENTS.md` (Build/run) and
 ## Changelog
 
 Same version number = same features everywhere. Windows is at `1.2.6`,
-macOS at `1.4.0` (same intents, except the EFIGS UI below —
-Windows still to mirror the open row in TODO.md).
+macOS at `1.5.0` (same intents, except the EFIGS UI and the Help Book below —
+Windows still to mirror the open rows in TODO.md).
+
+- **1.5.0** — macOS: the Help menu opens a structured Apple Help Book
+  (chapters in five languages, searchable from the menu) instead of an
+  in-app sheet; the dated Novità/What's new sheet stays as its own item.
 
 - **1.4.0** — macOS: UI in EFIGS — every string, the Help Book and the
   changelog in English, French, Italian, German and Spanish (system
