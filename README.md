@@ -32,11 +32,15 @@ Or build it yourself: see `windows/AGENTS.md` (Build/run) and
 ## Changelog
 
 Same version number = same features everywhere. Windows is at `1.2.6`,
-macOS at `1.3.0` (same intents, except the Help changelog below —
-Windows still to mirror the row in TODO.md).
+macOS at `1.4.0` (same intents, except the EFIGS UI below —
+Windows still to mirror the open row in TODO.md).
 
-- **1.3.0** — macOS: the Help sheet ends with a "Novità / What's new"
-  version changelog, in Italian and English.
+- **1.4.0** — macOS: UI in EFIGS — every string, the Help Book and the
+  changelog in English, French, Italian, German and Spanish (system
+  language outside EFIGS shows English).
+
+- **1.3.0** — macOS: a separate "Novità / What's new" sheet with its own
+  Help-menu item carries the dated version changelog, in Italian and English.
 
 - **1.2.7** — macOS: a system language outside EN/IT now shows English
   (never raw keys), and `;` joins the discovery/service port lists like

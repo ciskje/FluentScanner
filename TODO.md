@@ -19,7 +19,8 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
 - `generic` — EFIGS UI (EN/FR/IT/DE/ES): every UI string, the Help Book and
   the changelog in five languages (system language outside EFIGS → English).
   `mac:[x]` — fr/de/es `.lproj` + help-src (8 chapters each, hiutil-indexed),
-  `L()` + picker cover EN/FR/IT/DE/ES, `CFBundleLocalizations` set.
+  `L()` + picker cover EN/FR/IT/DE/ES, `CFBundleLocalizations` set
+  (shipped in 1.4.0).
   `win:[ ]` — resw `Strings/fr-FR,de-DE,es-ES` + language menu + Help/changelog
   translations (Windows rebuild + verify there).
 - `generic` — changelog in Help (IT + EN): a separate Novità/What's new
