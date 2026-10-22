@@ -9,9 +9,8 @@ func L(_ key: String, _ args: CVarArg...) -> String {
         forced == "en" || forced == "it" {
         code = forced
     } else if let first = Locale.preferredLanguages.first {
-        // Outside EN/IT the UI shows Italian (same rule as Windows UiLang),
-        // never raw keys.
-        code = String(first.prefix(2)).lowercased() == "en" ? "en" : "it"
+        // Outside EN/IT the UI shows English (never raw keys).
+        code = String(first.prefix(2)).lowercased() == "it" ? "it" : "en"
     }
     let bundle = code.flatMap { Bundle.main.path(forResource: $0, ofType: "lproj") }
         .flatMap { Bundle(path: $0) }
