@@ -32,7 +32,12 @@ Or build it yourself: see `windows/AGENTS.md` (Build/run) and
 ## Changelog
 
 Same version number = same features everywhere. Windows is at `1.2.6`,
-macOS at `1.2.6`.
+macOS at `1.2.7` (same intents, except the third-language default below —
+Windows still falls back to Italian until it mirrors the row in TODO.md).
+
+- **1.2.7** — macOS: a system language outside EN/IT now shows English
+  (never raw keys), and `;` joins the discovery/service port lists like
+  `,`/space.
 
 - **1.2.6** — macOS: same as Windows 1.2.5–1.2.6 (this Mac skipped the
   1.2.5 release). Results land live as each discovery chunk answers, the

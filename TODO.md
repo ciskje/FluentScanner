@@ -20,7 +20,7 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
   English (never raw keys). `win:[ ]` (`UiLang` currently falls back to
   Italian — change to English). `mac:[x]` (`L()` falls back to `en`;
   `;` port separator also shipped on mac: `parsePorts` splits `;` like
-  `,`/space, `win:[x]` already so — both ship with the next release).
+  `,`/space, `win:[x]` already so — mac side shipped in 1.2.7).
 - `windows` — ARP icon in Settings > Installed apps: add
   `UninstallDisplayIcon={app}\FluentScanner.exe` to
   `windows/installer/FluentScanner.iss` (per skill `windows-setup`
