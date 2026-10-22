@@ -125,6 +125,9 @@ One channel per platform, tags always carry the platform prefix:
   Command in `macos/AGENTS.md`.
 - Every version bump is published (tag + release with artifact), otherwise
   Latest lags behind the code. Keep the **last 2 releases per platform**.
+  Every bump also appends its changelog entry to the README Changelog and
+  to `changelogBody` in every `.lproj` (macOS) / resw (Windows) — the
+  in-app Novità/What's new must never lag behind the releases.
 - Release notes **always in English**: standard install line + changelog
   entries since the previous release of that platform (same text as the
   Changelog in `README.md`, which is in English).

@@ -25,7 +25,10 @@
 "thisMacLegend" = "Ce Mac (hôte d'analyse)";
 "helpTitle" = "Aide de FluentScanner";
 "changelogTitle" = "Nouveautés";
-"changelogBody" = "1.2.7 — 22 oct 2026 — Les langues système hors EFIGS affichent l'anglais ; `;` sépare aussi les listes de ports.
+"changelogBody" = "1.5.0 — 22 oct 2026 — Le menu Aide ouvre un livre d'aide Apple structuré, interrogeable depuis le menu ; les nouveautés restent à part.
+1.4.0 — 22 oct 2026 — Interface en EFIGS : chaînes, livre d'aide et nouveautés en EN/FR/IT/DE/ES.
+1.3.0 — 22 oct 2026 — Panneau Nouveautés séparé avec journal daté (EN/IT).
+1.2.7 — 22 oct 2026 — Les langues système hors EFIGS affichent l'anglais ; `;` sépare aussi les listes de ports.
 1.2.6 — 22 oct 2026 — Résultats en direct sur les deux plateformes ; les fantômes des récoltes obtiennent MAC, DNS, NetBIOS et UPnP ; soulignement d'en-tête au thème ; indicateur d'activité.
 1.2.5 — 22 oct 2026 — Résultats en direct (Windows) : fusions de noms par bloc, délais stricts sur le resolver.
 1.2.4 — 18 oct 2026 — Le bouton d'ajustement refonctionne (macOS).

@@ -18,5 +18,15 @@
 	<string>hbwr</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>HPDBookAccessPath</key>
+	<string>index.html</string>
+	<key>HPDBookCSIndexPath</key>
+	<string>FluentScanner.cshelpindex</string>
+	<key>HPDBookIndexPath</key>
+	<string>FluentScanner.helpindex</string>
+	<key>HPDBookTitle</key>
+	<string>FluentScanner Help</string>
+	<key>HPDBookType</key>
+	<string>3</string>
 </dict>
 </plist>

@@ -26,8 +26,11 @@ cp packaging/help-Info.plist "$HELP/Info.plist"
 for lang in en fr it de es; do
   mkdir -p "$HELP/Resources/$lang.lproj"
   cp packaging/help-src/$lang.lproj/*.html "$HELP/Resources/$lang.lproj/"
+  hiutil -I lsm -C \
+    -f "$HELP/Resources/$lang.lproj/FluentScanner.helpindex" \
+    "$HELP/Resources/$lang.lproj/"
   hiutil -I corespotlight -C -a -s $lang -l $lang \
-    -f "$HELP/Resources/$lang.lproj/search.helpindex" \
+    -f "$HELP/Resources/$lang.lproj/FluentScanner.cshelpindex" \
     "$HELP/Resources/$lang.lproj/"
 done
 echo "==> help book"
