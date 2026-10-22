@@ -4,6 +4,7 @@ import SwiftUI
 extension Notification.Name {
     static let showAbout = Notification.Name("FluentScanner.showAbout")
     static let showHelp = Notification.Name("FluentScanner.showHelp")
+    static let showChangelog = Notification.Name("FluentScanner.showChangelog")
 }
 
 /// How-to sheet (toolbar "?" and the Help menu open it).
@@ -17,10 +18,27 @@ struct HelpView: View {
             ScrollView {
                 Text(L("helpBody"))
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Text(L("changelogTitle"))
-                    .font(.headline)
-                    .padding(.top, 8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            HStack {
+                Spacer()
+                Button(L("closeBtn")) { dismiss() }
+                    .keyboardShortcut(.defaultAction)
+            }
+        }
+        .padding(20)
+        .frame(width: 520, height: 420)
+    }
+}
+
+/// Version changelog sheet (the Help menu's second item opens it).
+struct ChangelogView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(L("changelogTitle"))
+                .font(.title2.weight(.semibold))
+            ScrollView {
                 Text(L("changelogBody"))
                     .frame(maxWidth: .infinity, alignment: .leading)
             }

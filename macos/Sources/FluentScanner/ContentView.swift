@@ -9,6 +9,7 @@ struct ContentView: View {
     @State private var end = Scanner.localSubnet()?.end ?? "192.168.1.254"
     @State private var showHelp = false
     @State private var showAbout = false
+    @State private var showChangelog = false
     @State private var fits: [String: CGFloat] = [:]
     // Table ignores width changes on an existing view: bump the identity
     // so it rebuilds with the new ideals (scroll jumps to top, sort stays).
@@ -135,11 +136,15 @@ struct ContentView: View {
         .padding(8)
         .sheet(isPresented: $showHelp) { HelpView() }
         .sheet(isPresented: $showAbout) { AboutView() }
+        .sheet(isPresented: $showChangelog) { ChangelogView() }
         .onReceive(NotificationCenter.default.publisher(for: .showAbout)) { _ in
             showAbout = true
         }
         .onReceive(NotificationCenter.default.publisher(for: .showHelp)) { _ in
             showHelp = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .showChangelog)) { _ in
+            showChangelog = true
         }
     }
 

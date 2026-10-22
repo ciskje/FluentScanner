@@ -31,6 +31,9 @@ struct FluentScannerApp: App {
                 Button(L("helpTitle")) {
                     NotificationCenter.default.post(name: .showHelp, object: nil)
                 }
+                Button(L("changelogTitle")) {
+                    NotificationCenter.default.post(name: .showChangelog, object: nil)
+                }
             }
         }
         Settings {

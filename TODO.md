@@ -16,11 +16,12 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
 
 ## Pending
 
-- `generic` — changelog in Help (IT + EN): the Help sheet ends with a
-  "Novità / What's new" version list (same entries as the README Changelog,
-  both languages). `mac:[x]` — `changelogTitle`/`changelogBody` in both
-  `.lproj` + section in `HelpView` (shipped in 1.3.0). `win:[ ]` — mirror with resw keys +
-  section in the Help dialog.
+- `generic` — changelog in Help (IT + EN): a separate Novità/What's new
+  sheet with its own Help-menu item, every version dated (same entries as
+  the README Changelog, both languages). `mac:[x]` (`ChangelogView` +
+  `showChangelog`, `changelogTitle`/`changelogBody` in both `.lproj`).
+  `win:[ ]` — mirror with resw keys + Help-dialog item opening a changelog
+  dialog.
 - `generic` — third-language default: a system language outside EN/IT shows
   English (never raw keys). `win:[ ]` (`UiLang` currently falls back to
   Italian — change to English). `mac:[x]` (`L()` falls back to `en`;
