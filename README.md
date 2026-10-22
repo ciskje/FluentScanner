@@ -32,8 +32,12 @@ Or build it yourself: see `windows/AGENTS.md` (Build/run) and
 ## Changelog
 
 Same version number = same features everywhere. Windows is at `1.2.6`,
-macOS at `1.5.0` (same intents, except the EFIGS UI and the Help Book below —
+macOS at `1.5.1` (same intents, except the EFIGS UI and the Help Book below —
 Windows still to mirror the open rows in TODO.md).
+
+- **1.5.1** — macOS: Help Book access-path fix — the Help menu now opens
+  the program's book (it fell back to the macOS manual); the in-app
+  changelog is caught up to this version.
 
 - **1.5.0** — macOS: the Help menu opens a structured Apple Help Book
   (chapters in five languages, searchable from the menu) instead of an
