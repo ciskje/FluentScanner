@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- XAML strings (x:Uid → <uid>.<property>) -->
   <data name="InputLabel.Text"><value>Destinazione</value></data>
@@ -42,13 +42,56 @@
   <data name="thisPc"><value>Questo PC (host di scansione)</value></data>
   <data name="thisPcLegend"><value>Questo PC (host di scansione)</value></data>
   <data name="helpTitle"><value>Aiuto di FluentScanner</value></data>
-  <data name="helpBody"><value>Inserisci IP inizio e IP fine e premi Avvia (vale anche Invio). Get IP riempie il range della subnet di questa macchina. Un singolo IP scansiona solo quell'host. Gli indirizzi di rete (.0) e broadcast (.255) non vengono mai sondati.
-
-La discovery fa ping su ogni indirizzo e sonda le porte TCP comuni in parallelo; gli host attivi ricevono poi la scansione completa delle porte. La barra mostra l'avanzamento; Ferma interrompe la scansione. Esporta salva la tabella in CSV.
-
-Il pallino prima di ogni IP è il tipo di dispositivo (vedi legenda sotto la tabella); la marca ha un suo colore stabile. L'icona shuffle indica un MAC randomizzato, senza produttore. La riga gialla con l'icona del computer è questa macchina.
-
-Gli hostname arrivano da Bonjour (mDNS), NetBIOS e reverse DNS. I dispositivi silenziosi senza porte aperte né servizio nomi restano anonimi: porte aperte, MAC reale e mDNS sono ciò che identifica un dispositivo.</value></data>
+  <data name="changelogItem"><value>Novità</value></data>
+  <data name="changelogTitle"><value>Novità</value></data>
+  <data name="changelogBody"><value>1.3.0 — 22 ott 2026 — Help sostituito da un Apple Help Book strutturato con ricerca (macOS).
+1.2.7 — 22 ott 2026 — Le lingue di sistema oltre EN/IT mostrano l'inglese; anche `;` separa le liste porte.
+1.2.6 — Risultati live su entrambe le piattaforme; i ghost delle harvest ottengono MAC, DNS, NetBIOS e UPnP; sottolineatura header a tema; rotellina di attività.
+1.2.5 — Risultati live (Windows): merge hostname per chunk, deadline sui lookup del resolver.
+1.2.4 — Il bottone di adattamento funziona di nuovo (macOS).
+1.2.3 — Bottone di adattamento + Cmd+Maiusc+F (macOS).
+1.2.2 — Ridimensionamento colonne stile Excel (Windows).
+1.2.1 — Doppio clic sull'header adatta la colonna (entrambi).
+1.2.0 — Parità completa: ordinamento, filtro, porte/timeout modificabili, servizi cliccabili, colonne marca/tipo.
+1.1.0 — Porte/timeout modificabili, ordinamento + filtro, evidenziazione leggibile; Windows: Mica, menu, tabella, installer.
+1.0.0 — Prima stabile.
+0.10.0 — Impostazioni: lingua, dimensione font + mono, tema.
+0.9.0 — Pannelli Aiuto e Info; revisione EN/IT.
+0.8.4 — La legenda copre l'icona computer.
+0.8.3 — La legenda copre i MAC randomizzati; colonna IP più larga.
+0.8.2 — Campi IP inizio/fine più larghi.
+0.8.1 — L'evidenziazione sopravvive al refresh ARP.
+0.8.0 — Range modificabile + bottone Get IP.
+0.7.2 — IP della macchina in giallo.
+0.7.1 — HTTP nomina il software: HTTP/Caddy (80).
+0.7.0 — Tutti i lookup in parallelo; tempo ≈ il più lento.
+0.6.3 — MAC randomizzati segnalati, mai attribuiti; riga propria in grassetto.
+0.6.2 — Tabella OUI IEEE completa (40k produttori), offline.
+0.6.1 — Header HTTP Server come marca di riserva su 80/8080.
+0.6.0 — Macchina sempre elencata; più produttori, hint, tipi mDNS.
+0.5.3 — Gruppi MAC non riempiti analizzati.
+0.5.2 — CIDR salta .0/.255; una /24 sonda 254 host.
+0.5.1 — TTL 255 sono stack embedded, non router; solo 128 indica Windows.
+0.5.0 — Icona radar.
+0.4.3 — Colori marca stabili; legenda tipi.
+0.4.2 — Pallino tipo dispositivo; tolto il generico TTL Linux.
+0.4.1 — Hostname sistemati: query `.local`, record A, NetBIOS.
+0.4.0 — Meno MAC mancanti (re-ping + re-lettura ARP); hint TTL.
+0.3.0 — Ping sweep ICMP + fallback TCP; porte/timeout per Wi-Fi.
+0.2.1 — Allineamento header/righe; fix lookup OUI.
+0.2.0 — Colonna Marca/Tipo; discovery 4× più veloce; risultati progressivi.
+0.1.0 — Scheletro: target, discovery TCP, porte, MAC da ARP, reverse DNS, CSV, EN/IT.</value></data>
+  <data name="helpSearchHint"><value>Cerca nell'aiuto…</value></data>
+  <data name="helpChScanTitle"><value>Scansionare la rete</value></data>
+  <data name="helpChScanBody"><value>Inserisci IP inizio e IP fine e premi Avvia (vale anche Invio). Get IP riempie il range della subnet di questa macchina. I range accettano CIDR (192.168.1.0/24) e forme complete o ultimo ottetto; .0 e .255 non vengono mai sondati. Ping di discovery più sonde TCP in parallelo; la barra mostra l'avanzamento, la rotellina la scansione in corso. Stop mantiene le righe trovate.</value></data>
+  <data name="helpChResultsTitle"><value>Leggere i risultati</value></data>
+  <data name="helpChResultsBody"><value>Una riga per host appare appena risponde. Un clic sull'intestazione ordina (un altro inverte); il filtro restringe la lista; trascina un gripper di confine — o doppio clic — per dimensionare una colonna. I servizi HTTP/HTTPS si aprono nel browser. Export salva le righe visibili in CSV, disabilitato durante la scansione.</value></data>
+  <data name="helpChLegendTitle"><value>Colori e icone</value></data>
+  <data name="helpChLegendBody"><value>Il pallino prima di ogni IP è il tipo (legenda sotto la tabella); ogni marca ha un suo colore stabile. L'icona shuffle indica un MAC randomizzato, senza produttore. Questo PC è in grassetto con icona computer e IP in evidenza.</value></data>
+  <data name="helpChNamesTitle"><value>MAC, produttori e hostname</value></data>
+  <data name="helpChNamesBody"><value>I MAC vengono dalla tabella ARP locale, aggiornata dopo la discovery con re-ping mirati. Il produttore è il prefisso OUI; l'header HTTP Server o la descrizione UPnP riempiono la marca quando tace. I nomi arrivano da mDNS, NetBIOS e reverse DNS; anche i ghost delle harvest ricevono tutto.</value></data>
+  <data name="helpChSettingsTitle"><value>Impostazioni e problemi</value></data>
+  <data name="helpChSettingsBody"><value>Le impostazioni regolano lingua, tema, font, porte e timeout. Un access point senza internet non blocca mai la scansione: ogni lookup ha una deadline. I dispositivi silenziosi senza porte aperte restano anonimi.</value></data>
   <data name="aboutTitle"><value>Informazioni su FluentScanner</value></data>
   <data name="aboutDesc"><value>Trova tutti i dispositivi della tua LAN: discovery ping più TCP, scansione porte, identificazione MAC e produttore, hostname.</value></data>
   <data name="aboutOui"><value>Dati produttori: registro IEEE OUI.</value></data>

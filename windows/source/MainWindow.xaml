@@ -55,6 +55,7 @@
             </MenuBarItem>
             <MenuBarItem x:Name="HelpMenu">
                 <MenuFlyoutItem x:Name="HelpMenuItem" Click="Help_Click" />
+                <MenuFlyoutItem x:Name="ChangelogMenuItem" Click="Changelog_Click" />
                 <MenuFlyoutItem x:Name="AboutMenuItem" Click="About_Click" />
             </MenuBarItem>
         </MenuBar>

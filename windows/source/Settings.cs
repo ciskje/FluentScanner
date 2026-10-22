@@ -87,7 +87,7 @@ internal sealed class AppSettings
         if (Language == "en" || Language == "it") return Language;
         var sys = Windows.Globalization.ApplicationLanguages.Languages
             .FirstOrDefault()?.Split('-')[0] ?? "";
-        return sys == "en" ? "en" : "it";
+        return sys == "it" ? "it" : "en";
     }
 
     internal Microsoft.UI.Xaml.ElementTheme ThemeEnum() => Theme switch

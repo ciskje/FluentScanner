@@ -16,16 +16,25 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
 
 ## Pending
 
+- `generic` — changelog in Help (IT + EN): a separate Novità/What's new
+  entry with its own Help-menu item, every version dated. `mac:[x]`
+  (1.3.0: `ChangelogView` + dated `changelogBody` in both `.lproj`).
+  `win:[x]` — resw `changelogItem/Title/Body` + Help-menu item opening a
+  changelog dialog (code written from the macOS machine — Windows rebuild
+  + FSCAN_SELFTEST pending there).
 - `generic` — structured multi-chapter help with working search (IT + EN):
   macOS ships an Apple Help Book (`packaging/help-src`, hiutil-indexed in
   `bundle.sh`, opened from the Help menu + toolbar ?); Windows mirrors with
   chapters + in-dialog search. The dated Novità/What's new sheet + its own
   Help-menu item stay as they are.
-  `mac:[ ]` — write `help-src`, wire `bundle.sh` + `openHelpBook`, drop the
-  `HelpView` sheet. `win:[ ]` — chapters + search in the Help dialog.
+  `mac:[x]` — Apple Help Book (`help-src`, hiutil index, `openHelpBook`;
+  `HelpView` sheet deleted). `win:[x]` — Help dialog with 5 chapters + live
+  search box, `helpBody` replaced by chapter keys (code written from the
+  macOS machine — Windows rebuild + FSCAN_SELFTEST pending there).
 - `generic` — third-language default: a system language outside EN/IT shows
-  English (never raw keys). `win:[ ]` (`UiLang` currently falls back to
-  Italian — change to English). `mac:[x]` (`L()` falls back to `en`;
+  English (never raw keys).
+  `win:[x]` (`UiLang` non-it→`en`; code written from the macOS machine —
+  Windows rebuild + FSCAN_SELFTEST pending there). `mac:[x]` (`L()` falls back to `en`;
   `;` port separator also shipped on mac: `parsePorts` splits `;` like
   `,`/space, `win:[x]` already so — mac side shipped in 1.2.7).
 - `windows` — ARP icon in Settings > Installed apps: add

@@ -246,6 +246,7 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
         FontSizeSubItem.Text = Str("fontSizeLabel");
         HelpMenu.Title = Str("menuHelp");
         HelpMenuItem.Text = Str("helpItem");
+        ChangelogMenuItem.Text = Str("changelogItem");
         AboutMenuItem.Text = Str("aboutItem");
         SettingsMenuItem.Text = Str("settingsTitle");
         FilterBox.PlaceholderText = Str("searchLabel");
@@ -846,14 +847,70 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
         string.IsNullOrEmpty(s) ? "" : s.Contains(',') || s.Contains('"')
             ? $"\"{s.Replace("\"", "\"\"")}\"" : s;
 
+    /// Help chapters (title key, body key): the Help dialog shows one
+    /// section per chapter, filterable through the search box.
+    private static readonly (string title, string body)[] HelpChapters =
+    [
+        ("helpChScanTitle", "helpChScanBody"),
+        ("helpChResultsTitle", "helpChResultsBody"),
+        ("helpChLegendTitle", "helpChLegendBody"),
+        ("helpChNamesTitle", "helpChNamesBody"),
+        ("helpChSettingsTitle", "helpChSettingsBody"),
+    ];
+
     private async void Help_Click(object sender, RoutedEventArgs e)
     {
+        var search = new TextBox { PlaceholderText = Str("helpSearchHint") };
+        var sections = new StackPanel { Spacing = 12 };
+        var blocks = new List<(TextBlock title, TextBlock body)>();
+        foreach (var (t, b) in HelpChapters)
+        {
+            var title = new TextBlock
+            {
+                Text = Str(t), TextWrapping = TextWrapping.Wrap,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+            };
+            var body = new TextBlock { Text = Str(b), TextWrapping = TextWrapping.Wrap };
+            blocks.Add((title, body));
+            var sec = new StackPanel { Spacing = 4 };
+            sec.Children.Add(title);
+            sec.Children.Add(body);
+            sections.Children.Add(sec);
+        }
+        search.TextChanged += (_, _) =>
+        {
+            var f = search.Text.Trim().ToLowerInvariant();
+            foreach (var (title, body) in blocks)
+            {
+                bool show = f.Length == 0
+                    || title.Text.ToLowerInvariant().Contains(f)
+                    || body.Text.ToLowerInvariant().Contains(f);
+                var vis = show ? Visibility.Visible : Visibility.Collapsed;
+                title.Visibility = vis;
+                body.Visibility = vis;
+            }
+        };
+        var stack = new StackPanel { Spacing = 8, Width = 480 };
+        stack.Children.Add(search);
+        stack.Children.Add(new ScrollViewer { Content = sections, Height = 380 });
         var dlg = new ContentDialog
         {
             Title = Str("helpTitle"),
+            Content = stack,
+            PrimaryButtonText = Str("closeBtn"),
+            XamlRoot = Content.XamlRoot,
+        };
+        await dlg.ShowAsync();
+    }
+
+    private async void Changelog_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new ContentDialog
+        {
+            Title = Str("changelogTitle"),
             Content = new ScrollViewer
             {
-                Content = new TextBlock { Text = Str("helpBody"), TextWrapping = TextWrapping.Wrap },
+                Content = new TextBlock { Text = Str("changelogBody"), TextWrapping = TextWrapping.Wrap },
                 Height = 380, Width = 480,
             },
             PrimaryButtonText = Str("closeBtn"),
