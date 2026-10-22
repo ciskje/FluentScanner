@@ -4,7 +4,7 @@ A LAN scanner: give it an IP range and it finds live hosts, their open
 common services, MAC addresses and hostnames — two native builds from
 one repo, same features on both platforms.
 
-![FluentScanner on Windows after a LAN scan (last IP digits and MAC addresses pixelated)](screenshotV2.png)
+![FluentScanner on Windows after a LAN scan (last IP digits and MAC addresses pixelated)](windows/screenshots/screenshotV2.png)
 
 ![FluentScanner on macOS after a LAN scan](macos/screenshot.png)
 
