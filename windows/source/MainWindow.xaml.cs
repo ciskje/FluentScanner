@@ -48,10 +48,10 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
     private bool _prevSortAsc = true;
 
     // Code-behind strings: read from the .resw files shipped next to the exe
-    // (Strings/<language>/). No MRT/ResourceLoader: it needs package identity,
-    // missing in unpackaged apps (FileNotFoundException in the constructor).
-    // x:Uid in XAML uses internal MRT and works for the system language;
-    // the settings override is applied here in code (ApplyLanguage).
+    // (Strings/<language>/, EFIGS). No MRT/ResourceLoader: it needs package
+    // identity, missing in unpackaged apps (FileNotFoundException in the
+    // constructor). x:Uid in XAML uses internal MRT and works for the system
+    // language; the settings override is applied here in code (ApplyLanguage).
     private static Dictionary<string, string>? _res;
     private static string _resLang = "";
     internal string Str(string key)
@@ -61,7 +61,7 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
             var lang = _settings.UiLang();
             if (_res is null || _resLang != lang)
             {
-                _res = LoadResw(lang == "en" ? "en-US" : "it-IT");
+                _res = LoadResw(ResFolder(lang));
                 _resLang = lang;
             }
             if (_res.TryGetValue(key, out var s)) return s;
@@ -75,6 +75,16 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
             .Root!.Elements("data")
             .Where(e => e.Attribute("name")?.Value != null && e.Element("value") != null)
             .ToDictionary(e => e.Attribute("name")!.Value, e => e.Element("value")!.Value);
+
+    /// EFIGS settings subtag → the resw folder shipped next to the exe.
+    private static string ResFolder(string lang) => lang switch
+    {
+        "it" => "it-IT",
+        "fr" => "fr-FR",
+        "de" => "de-DE",
+        "es" => "es-ES",
+        _ => "en-US",
+    };
 
     public MainWindow()
     {
@@ -266,6 +276,9 @@ public sealed partial class MainWindow : Window, System.ComponentModel.INotifyPr
         LangSystemItem.IsChecked = _settings.Language == "system";
         LangEnglishItem.IsChecked = _settings.Language == "en";
         LangItalianItem.IsChecked = _settings.Language == "it";
+        LangFrenchItem.IsChecked = _settings.Language == "fr";
+        LangGermanItem.IsChecked = _settings.Language == "de";
+        LangSpanishItem.IsChecked = _settings.Language == "es";
         MonoMenuItem.IsChecked = _settings.MonoBody;
         foreach (var item in FontSizeSubItem.Items.OfType<RadioMenuFlyoutItem>())
             item.IsChecked = item.Tag is int s && s == (int)_settings.FontSize;

@@ -74,9 +74,10 @@ Both builds implement the same intents; platform-native details may differ:
 - Settings: table font size + monospaced toggle; the discovery/scan port
   lists and the ping/discovery/port timeouts have fixed working defaults,
   editable in the app
-- Help (Apple Help Book with chapters + menu search) + About panel, in all
-  supported languages; a separate Novità/What's new sheet (own Help-menu item, every
-  version dated) carries the changelog in all supported languages
+- Help (chapters + live search: macOS opens an Apple Help Book, Windows an
+  in-app dialog) + About panel, in all supported languages; a separate
+  Novità/What's new item (own Help-menu entry, every version dated) carries
+  the changelog in all supported languages
 - App icon: radar-sweep SVG source, rendered per platform
 
 ## Change workflow
@@ -107,11 +108,12 @@ implemented those intents; if the other lags, its release waits.
 
 - Z = bugfix/tweak, Y = new feature/behavior, X = upheaval.
 - Docs/refactor/build never change the version.
-- Current: Windows `1.2.6`, macOS `1.5.1` (1.2.2 was Windows-only:
-  Excel-style column resize; macOS got the header double-click in 1.2.3;
+- Current: both platforms at `1.5.1` (Windows' first release since 1.2.6
+  carries the 1.2.7–1.5.0 intents; the size-to-fit toolbar button is still
+  Windows-open in TODO.md). History: 1.2.2 was Windows-only
+  (Excel-style column resize; macOS got the header double-click in 1.2.3;
   1.2.4 fixes the size-to-fit button, which 1.2.3 had broken; macOS skipped
-  the 1.2.5 release and caught up at 1.2.6; 1.2.7–1.5.0 ship macOS tweaks
-  whose Windows mirrors are still open — same intents once they land).
+  the 1.2.5 release and caught up at 1.2.6).
 - Single source: `<Version>` in `windows/source/FluentScanner.csproj`
   and `CFBundleShortVersionString` in `macos/packaging/Info.plist`.
 

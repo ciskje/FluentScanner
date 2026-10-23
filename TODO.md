@@ -21,15 +21,15 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
   `mac:[x]` — fr/de/es `.lproj` + help-src (8 chapters each, hiutil-indexed),
   `L()` + picker cover EN/FR/IT/DE/ES, `CFBundleLocalizations` set
   (shipped in 1.4.0).
-  `win:[ ]` — resw `Strings/fr-FR,de-DE,es-ES` + `UiLang` non-it→`en` +
-  language menu + Help/changelog translations (Windows rebuild + verify
-  there).
+  `win:[x]` — resw `Strings/fr-FR,de-DE,es-ES` (same keys as en-US/it-IT,
+  help + changelog translated), `UiLang`/`ResFolder` cover EN/FR/IT/DE/ES
+  (outside EFIGS → en), language menu gains Français/Deutsch/Español
+  (shipped in 1.5.1: rebuilt + FSCAN_SELFTEST OK).
 - `generic` — changelog in Help (EFIGS): a separate Novità/What's new
   entry with its own Help-menu item, every version dated. `mac:[x]`
   (1.3.0: `ChangelogView` + dated `changelogBody` in both `.lproj`).
   `win:[x]` — resw `changelogItem/Title/Body` + Help-menu item opening a
-  changelog dialog (code written from the macOS machine — Windows rebuild
-  + FSCAN_SELFTEST pending there).
+  changelog dialog (shipped in 1.5.1: rebuilt + FSCAN_SELFTEST OK).
 - `generic` — structured multi-chapter help with working search (EFIGS):
   macOS ships an Apple Help Book (`packaging/help-src`, hiutil-indexed in
   `bundle.sh`, opened from the Help menu + toolbar ?); Windows mirrors with
@@ -38,12 +38,12 @@ Legend per row: `win:[ ]` / `mac:[ ]` = shipped on that platform.
   `mac:[x]` — Apple Help Book (`help-src`, hiutil index, `openHelpBook`
   via `AHGotoPage` + explicit registration; `HelpView` sheet deleted;
   shipped working in 1.5.1). `win:[x]` — Help dialog with 5 chapters + live
-  search box, `helpBody` replaced by chapter keys (code written from the
-  macOS machine — Windows rebuild + FSCAN_SELFTEST pending there).
-- `generic` — third-language default: a system language outside EN/IT shows
+  search box, `helpBody` replaced by chapter keys (shipped in 1.5.1:
+  rebuilt + FSCAN_SELFTEST OK).
+- `generic` — third-language default: a system language outside EFIGS shows
   English (never raw keys).
-  `win:[x]` (`UiLang` non-it→`en`; code written from the macOS machine —
-  Windows rebuild + FSCAN_SELFTEST pending there). `mac:[x]` (`L()` falls back to `en`;
+  `win:[x]` (`UiLang` EFIGS-only, else `en`; shipped in 1.5.1: rebuilt +
+  FSCAN_SELFTEST OK). `mac:[x]` (`L()` falls back to `en`;
   `;` port separator also shipped on mac: `parsePorts` splits `;` like
   `,`/space, `win:[x]` already so — mac side shipped in 1.2.7).
 - `windows` — ARP icon in Settings > Installed apps: add

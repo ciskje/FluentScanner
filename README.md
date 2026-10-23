@@ -31,13 +31,20 @@ Or build it yourself: see `windows/AGENTS.md` (Build/run) and
 
 ## Changelog
 
-Same version number = same features everywhere. Windows is at `1.2.6`,
-macOS at `1.5.1` (same intents, except the EFIGS UI and the Help Book below —
-Windows still to mirror the open rows in TODO.md).
+Same version number = same features everywhere. Both platforms are at
+`1.5.1` (Windows' first release since 1.2.6): UI, help and changelog in
+EFIGS (EN/FR/IT/DE/ES; any other language shows English). Still macOS-only:
+the toolbar size-to-fit button (Windows sizes a column by double-clicking
+its header or boundary). See [TODO.md](TODO.md).
 
 - **1.5.1** — macOS: Help Book access-path fix — the Help menu now opens
   the program's book (it fell back to the macOS manual); the in-app
-  changelog is caught up to this version.
+  changelog is caught up to this version. Windows: the same version is its
+  first release since 1.2.6 — it carries the 1.2.7–1.5.0 intents (EFIGS UI
+  with help and changelog in five languages, English for anything else, `;`
+  port separator, dated What's new dialog, help with chapters + live
+  search); only the size-to-fit toolbar button stays macOS-only (Windows
+  sizes columns by double-clicking the header or its boundary).
 
 - **1.5.0** — macOS: the Help menu opens a structured Apple Help Book
   (chapters in five languages, searchable from the menu) instead of an

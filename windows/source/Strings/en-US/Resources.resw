@@ -44,7 +44,10 @@
   <data name="helpTitle"><value>FluentScanner Help</value></data>
   <data name="changelogItem"><value>What's new</value></data>
   <data name="changelogTitle"><value>What's new</value></data>
-  <data name="changelogBody"><value>1.3.0 — Oct 22, 2026 — Help sheet replaced by a structured Apple Help Book with search (macOS).
+  <data name="changelogBody"><value>1.5.1 — Oct 22, 2026 — Help Book access-path fix: the Help menu opens the program's own book (macOS). Windows' first build since 1.2.6 ships this version with the 1.2.7–1.5.0 intents (EFIGS UI incl. help and changelog, English for third languages, `;` port lists, dated What's new, help with chapters + live search); only the size-to-fit toolbar button stays macOS-only.
+1.5.0 — Oct 22, 2026 — Help menu opens a structured Apple Help Book, searchable from the menu (macOS).
+1.4.0 — Oct 22, 2026 — UI in EFIGS: strings, help and changelog in EN/FR/IT/DE/ES (macOS).
+1.3.0 — Oct 22, 2026 — Separate dated What's new item with its own Help-menu entry.
 1.2.7 — Oct 22, 2026 — Third system languages show English; `;` also separates port lists.
 1.2.6 — Live results on both platforms; harvest ghosts gain MAC, DNS, NetBIOS and UPnP clues; theme-aware header underline; running spinner.
 1.2.5 — Results land live (Windows): per-chunk hostname merges, hard deadlines on resolver lookups.

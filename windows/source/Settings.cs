@@ -8,7 +8,7 @@ namespace FluentScanner;
 /// macOS SettingsStore defaults.
 internal sealed class AppSettings
 {
-    public string Language { get; set; } = "system"; // system|en|it
+    public string Language { get; set; } = "system"; // system|en|it|fr|de|es
     public double FontSize { get; set; } = 12;       // 10..16
     public bool MonoBody { get; set; } = false;
     public string Theme { get; set; } = "system";    // system|light|dark
@@ -37,7 +37,7 @@ internal sealed class AppSettings
                 var s = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(Path));
                 if (s is not null)
                 {
-                    if (s.Language is not ("system" or "en" or "it")) s.Language = "system";
+                    if (s.Language is not ("system" or "en" or "it" or "fr" or "de" or "es")) s.Language = "system";
                     if (s.Theme is not ("system" or "light" or "dark")) s.Theme = "system";
                     s.FontSize = Math.Clamp(s.FontSize, 10, 16);
                     s.PingTimeoutMs = Math.Clamp(s.PingTimeoutMs, 500, 2000);
@@ -82,12 +82,13 @@ internal sealed class AppSettings
     }
 
     /// Effective UI language subtag: settings override wins, else system.
+    /// EFIGS only — anything else shows English (same rule as macOS `L()`).
     internal string UiLang()
     {
-        if (Language == "en" || Language == "it") return Language;
+        if (Language is "en" or "it" or "fr" or "de" or "es") return Language;
         var sys = Windows.Globalization.ApplicationLanguages.Languages
             .FirstOrDefault()?.Split('-')[0] ?? "";
-        return sys == "it" ? "it" : "en";
+        return sys is "it" or "fr" or "de" or "es" ? sys : "en";
     }
 
     internal Microsoft.UI.Xaml.ElementTheme ThemeEnum() => Theme switch

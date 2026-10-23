@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- XAML strings (x:Uid → <uid>.<property>) -->
+  <data name="InputLabel.Text"><value>Cible</value></data>
+  <data name="Start.Content"><value>Démarrer</value></data>
+  <data name="Stop.Content"><value>Arrêter</value></data>
+  <data name="ExportCsv.Content"><value>Exporter CSV</value></data>
+  <data name="HdrIp.Text"><value>Adresse IP</value></data>
+  <data name="HdrHostname.Text"><value>Nom d'hôte</value></data>
+  <data name="HdrMac.Text"><value>Adresse MAC</value></data>
+  <data name="HdrServices.Text"><value>Services</value></data>
+  <data name="HdrVendor.Text"><value>Fabricant / Type</value></data>
+  <data name="HdrLatency.Text"><value>Latence</value></data>
+  <!-- Code-behind strings (Str()). NB: names must NOT collide
+       case-insensitively with any x:Uid scope above (PRI175). -->
+  <data name="btnStart"><value>Démarrer</value></data>
+  <data name="btnStop"><value>Arrêter</value></data>
+  <data name="btnExport"><value>Exporter CSV</value></data>
+  <data name="exported"><value>CSV exporté</value></data>
+  <data name="exportedFailed"><value>Échec de l'export</value></data>
+  <data name="scanningFmt"><value>Analyse {0} sur {1}…</value></data>
+  <data name="doneFmt"><value>{0} hôtes trouvés</value></data>
+  <data name="stopped"><value>Arrêté</value></data>
+  <data name="portScanFmt"><value>{0} hôtes actifs — analyse des services…</value></data>
+  <data name="dnsFmt"><value>Résolution des noms d'hôtes…</value></data>
+  <data name="invalidRange"><value>Cible invalide (IP, CIDR ou plage attendus)</value></data>
+  <data name="targetHint"><value>IP / CIDR / plage (ex. 192.168.1.0/24)</value></data>
+  <data name="empty"><value>Saisissez une plage et appuyez sur Démarrer.</value></data>
+  <data name="thIp"><value>Adresse IP</value></data>
+  <data name="thHostname"><value>Nom d'hôte</value></data>
+  <data name="thMac"><value>Adresse MAC</value></data>
+  <data name="thBrand"><value>Fabricant</value></data>
+  <data name="thKind"><value>Type</value></data>
+  <data name="thServices"><value>Services</value></data>
+  <data name="thLatency"><value>Latence</value></data>
+  <data name="startIp"><value>IP de début</value></data>
+  <data name="endIp"><value>IP de fin</value></data>
+  <data name="getIp"><value>Lire IP</value></data>
+  <data name="getIpHelp"><value>Remplir avec la plage du sous-réseau local</value></data>
+  <data name="randomMac"><value>MAC aléatoire (adresse privée, sans fabricant)</value></data>
+  <data name="randomMacLegend"><value>MAC aléatoire</value></data>
+  <data name="thisPc"><value>Ce PC (hôte d'analyse)</value></data>
+  <data name="thisPcLegend"><value>Ce PC (hôte d'analyse)</value></data>
+  <data name="helpTitle"><value>Aide de FluentScanner</value></data>
+  <data name="changelogItem"><value>Nouveautés</value></data>
+  <data name="changelogTitle"><value>Nouveautés</value></data>
+  <data name="changelogBody"><value>1.5.1 — 22 oct 2026 — Correction du chemin du livre d'aide : le menu Aide ouvre le livre du programme (macOS). Première version Windows depuis la 1.2.6 : elle reprend les intentions 1.2.7–1.5.0 (interface EFIGS avec aide et nouveautés, anglais pour les autres langues, `;` dans les listes de ports, nouveautés datées, aide par chapitres + recherche en direct) ; seul le bouton d'ajustement des colonnes reste spécifique à macOS.
+1.5.0 — 22 oct 2026 — Le menu Aide ouvre un livre d'aide Apple structuré, interrogeable depuis le menu (macOS).
+1.4.0 — 22 oct 2026 — Interface en EFIGS : chaînes, aide et nouveautés en EN/FR/IT/DE/ES (macOS).
+1.3.0 — 22 oct 2026 — Panneau Nouveautés daté et séparé, avec sa propre entrée dans le menu Aide.
+1.2.7 — 22 oct 2026 — Les langues système hors EFIGS affichent l'anglais ; `;` sépare aussi les listes de ports.
+1.2.6 — 22 oct 2026 — Résultats en direct sur les deux plateformes ; les fantômes des récoltes obtiennent MAC, DNS, NetBIOS et UPnP ; soulignement d'en-tête au thème ; indicateur d'activité.
+1.2.5 — 22 oct 2026 — Résultats en direct (Windows) : fusions de noms par bloc, délais stricts sur le resolver.
+1.2.4 — Le bouton d'ajustement refonctionne (macOS).
+1.2.3 — Bouton d'ajustement + Cmd+Maj+F (macOS).
+1.2.2 — Redimensionnement des colonnes façon Excel (Windows).
+1.2.1 — Double-clic sur l'en-tête ajuste sa colonne (les deux).
+1.2.0 — Parité complète : tri, filtre, ports/délais modifiables, services cliquables, colonnes fabricant/type.
+1.1.0 — Ports/délais modifiables, tri + filtre, surlignage lisible ; Windows : Mica, menu, tableau, installeur.
+1.0.0 — Première version stable.
+0.10.0 — Réglages : langue, taille de police + mono, thème.
+0.9.0 — Panneaux Aide et À propos ; contrôle EN/IT.
+0.8.4 — La légende couvre l'icône de l'ordinateur.
+0.8.3 — La légende couvre les MAC aléatoires ; colonne IP élargie.
+0.8.2 — Champs IP de début/fin élargis.
+0.8.1 — Le surlignage survit au rafraîchissement ARP.
+0.8.0 — Plage modifiable + bouton Lire IP.
+0.7.2 — IP de l'hôte analysé en jaune.
+0.7.1 — HTTP nomme le logiciel : HTTP/Caddy (80).
+0.7.0 — Toutes les recherches en parallèle ; durée ≈ la plus lente.
+0.6.3 — MAC aléatoires signalés, jamais attribués ; ligne de l'hôte en gras.
+0.6.2 — Table OUI IEEE complète (40k fabricants), hors ligne.
+0.6.1 — En-tête HTTP Server comme fabricant de repli sur 80/8080.
+0.6.0 — Hôte toujours listé ; plus de fabricants, d'indices, de types mDNS.
+0.5.3 — Groupes MAC non remplis analysés.
+0.5.2 — CIDR saute .0/.255 ; un /24 sonde 254 hôtes.
+0.5.1 — TTL 255 = piles embarquées, pas des routeurs ; seul 128 indique Windows.
+0.5.0 — Icône radar.
+0.4.3 — Couleurs de fabricant stables ; légende des types.
+0.4.2 — Pastille de type ; indice TTL Linux générique supprimé.
+0.4.1 — Noms d'hôtes corrigés : requêtes `.local`, enregistrements A, NetBIOS.
+0.4.0 — Moins de MAC manquants (re-ping + relecture ARP) ; indices TTL.
+0.3.0 — Balayage ping ICMP + repli TCP ; ports/délais réglés pour le Wi-Fi.
+0.2.1 — Alignement en-tête/lignes ; correctif recherche OUI.
+0.2.0 — Colonne Fabricant/Type ; découverte 4× plus rapide ; résultats progressifs.
+0.1.0 — Squelette : cibles, découverte TCP, ports, MAC via ARP, DNS inverse, CSV, EN/IT.</value></data>
+  <data name="helpSearchHint"><value>Rechercher dans l'aide…</value></data>
+  <data name="helpChScanTitle"><value>Analyser le réseau</value></data>
+  <data name="helpChScanBody"><value>Saisissez une IP de début et une IP de fin puis appuyez sur Démarrer (Entrée fonctionne aussi). Lire IP remplit la plage du sous-réseau local. Les plages acceptent le CIDR (192.168.1.0/24) et les formes complètes ou dernier octet ; .0 et .255 ne sont jamais sondés. Le ping de découverte et les sondes TCP tournent en parallèle ; la barre suit la progression, l'indicateur marque une analyse en cours. Arrêter conserve les lignes déjà trouvées.</value></data>
+  <data name="helpChResultsTitle"><value>Lire les résultats</value></data>
+  <data name="helpChResultsBody"><value>Une ligne par hôte actif apparaît dès qu'il répond. Cliquez sur un en-tête pour trier (à nouveau pour inverser) ; le filtre restreint la liste ; faites glisser une poignée de limite — ou double-cliquez — pour dimensionner une colonne. Les services HTTP/HTTPS s'ouvrent dans le navigateur. Exporter enregistre les lignes visibles en CSV, désactivé pendant une analyse.</value></data>
+  <data name="helpChLegendTitle"><value>Couleurs et icônes</value></data>
+  <data name="helpChLegendBody"><value>La pastille devant chaque IP indique le type d'appareil (légende sous le tableau) ; chaque fabricant a sa propre couleur stable. Une icône de mélange signale une MAC aléatoire, sans fabricant. Ce PC est en gras, avec une icône d'ordinateur et une IP accentuée.</value></data>
+  <data name="helpChNamesTitle"><value>MAC, fabricants et noms d'hôtes</value></data>
+  <data name="helpChNamesBody"><value>Les MAC viennent de la table ARP locale, rafraîchie après la découverte par des re-pings ciblés pour combler les lacunes. Le fabricant est le préfixe OUI ; l'en-tête HTTP Server ou la description UPnP remplit la marque quand il se tait. Les noms viennent de mDNS, NetBIOS puis DNS inverse ; les fantômes issus des récoltes reçoivent le même traitement.</value></data>
+  <data name="helpChSettingsTitle"><value>Réglages et dépannage</value></data>
+  <data name="helpChSettingsBody"><value>Les réglages ajustent langue, thème, police, ports et délais. Un point d'accès sans Internet ne bloque jamais une analyse : chaque résolution a un délai strict. Les appareils silencieux, sans port ouvert ni service de noms, restent anonymes.</value></data>
+  <data name="aboutTitle"><value>À propos de FluentScanner</value></data>
+  <data name="aboutDesc"><value>Trouve tous les appareils de votre LAN : découverte ping et TCP, balayage des ports, identification MAC et fabricant, noms d'hôtes.</value></data>
+  <data name="aboutOui"><value>Données fabricants : registre IEEE OUI.</value></data>
+  <data name="aboutLicense"><value>Licence MIT — © 2026 Francesco Ferrara.</value></data>
+  <data name="closeBtn"><value>Fermer</value></data>
+  <data name="menuFile"><value>Fichier</value></data>
+  <data name="menuScan"><value>Analyse</value></data>
+  <data name="menuView"><value>Présentation</value></data>
+  <data name="menuHelp"><value>Aide</value></data>
+  <data name="fileExport"><value>Exporter CSV</value></data>
+  <data name="fileExit"><value>Quitter</value></data>
+  <data name="helpItem"><value>Aide</value></data>
+  <data name="aboutItem"><value>À propos de FluentScanner</value></data>
+  <data name="settingsTitle"><value>Réglages</value></data>
+  <data name="languageLabel"><value>Langue</value></data>
+  <data name="languageSystem"><value>Système</value></data>
+  <data name="fontSizeLabel"><value>Taille de police</value></data>
+  <data name="monoLabel"><value>Texte du tableau en chasse fixe</value></data>
+  <data name="themeLabel"><value>Thème</value></data>
+  <data name="themeSystem"><value>Système</value></data>
+  <data name="themeLight"><value>Clair</value></data>
+  <data name="themeDark"><value>Sombre</value></data>
+  <data name="searchLabel"><value>Filtre</value></data>
+  <data name="pingTimeoutLabel"><value>Délai du ping</value></data>
+  <data name="discTimeoutLabel"><value>Délai de découverte</value></data>
+  <data name="portTimeoutLabel"><value>Délai des ports</value></data>
+  <data name="discPortsLabel"><value>Ports de découverte (séparés par des virgules)</value></data>
+  <data name="scanPortsLabel"><value>Ports de service (séparés par des virgules)</value></data>
+  <data name="portsInvalid"><value>Liste de ports invalide — utilisez des nombres 1-65535 séparés par des virgules</value></data>
+  <data name="saveBtn"><value>Enregistrer</value></data>
+</root>

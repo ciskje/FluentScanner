@@ -48,7 +48,10 @@
                 <MenuFlyoutSubItem x:Name="LangSubItem">
                     <RadioMenuFlyoutItem x:Name="LangSystemItem" GroupName="LangGroup" Tag="system" Click="LangMenu_Click" />
                     <RadioMenuFlyoutItem x:Name="LangEnglishItem" GroupName="LangGroup" Tag="en" Text="English" Click="LangMenu_Click" />
+                    <RadioMenuFlyoutItem x:Name="LangFrenchItem" GroupName="LangGroup" Tag="fr" Text="Français" Click="LangMenu_Click" />
                     <RadioMenuFlyoutItem x:Name="LangItalianItem" GroupName="LangGroup" Tag="it" Text="Italiano" Click="LangMenu_Click" />
+                    <RadioMenuFlyoutItem x:Name="LangGermanItem" GroupName="LangGroup" Tag="de" Text="Deutsch" Click="LangMenu_Click" />
+                    <RadioMenuFlyoutItem x:Name="LangSpanishItem" GroupName="LangGroup" Tag="es" Text="Español" Click="LangMenu_Click" />
                 </MenuFlyoutSubItem>
                 <ToggleMenuFlyoutItem x:Name="MonoMenuItem" Click="MonoMenu_Click" />
                 <MenuFlyoutSubItem x:Name="FontSizeSubItem" />

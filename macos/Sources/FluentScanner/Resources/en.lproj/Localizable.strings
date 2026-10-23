@@ -25,7 +25,8 @@
 "thisMacLegend" = "This Mac (scanning host)";
 "helpTitle" = "FluentScanner Help";
 "changelogTitle" = "What's new";
-"changelogBody" = "1.5.0 — Oct 22, 2026 — Help menu opens a structured Apple Help Book, searchable from the menu; changelog stays its own item.
+"changelogBody" = "1.5.1 — Oct 22, 2026 — Help Book access-path fix: the Help menu opens the program's own book again; Windows publishes this version too.
+1.5.0 — Oct 22, 2026 — Help menu opens a structured Apple Help Book, searchable from the menu; changelog stays its own item.
 1.4.0 — Oct 22, 2026 — UI in EFIGS: strings, Help Book and changelog in EN/FR/IT/DE/ES.
 1.3.0 — Oct 22, 2026 — Separate Novità/What's new sheet with dated changelog (EN/IT).
 1.2.7 — Oct 22, 2026 — Third system languages show English; `;` also separates port lists.

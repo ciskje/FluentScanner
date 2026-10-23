@@ -25,7 +25,8 @@
 "thisMacLegend" = "Este Mac (host de análisis)";
 "helpTitle" = "Ayuda de FluentScanner";
 "changelogTitle" = "Novedades";
-"changelogBody" = "1.5.0 — 22 oct 2026 — El menú Ayuda abre un libro de ayuda Apple estructurado, con búsqueda desde el menú; las novedades siguen aparte.
+"changelogBody" = "1.5.1 — 22 oct 2026 — Corrección de la ruta del libro de ayuda: el menú Ayuda vuelve a abrir el libro del programa; Windows también publica esta versión.
+1.5.0 — 22 oct 2026 — El menú Ayuda abre un libro de ayuda Apple estructurado, con búsqueda desde el menú; las novedades siguen aparte.
 1.4.0 — 22 oct 2026 — IU en EFIGS: cadenas, libro de ayuda y novedades en EN/FR/IT/DE/ES.
 1.3.0 — 22 oct 2026 — Panel Novedades separado con historial fechado (EN/IT).
 1.2.7 — 22 oct 2026 — Los idiomas fuera de EFIGS muestran inglés; `;` también separa listas de puertos.

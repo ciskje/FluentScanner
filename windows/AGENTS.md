@@ -62,6 +62,25 @@ Windows-only detail (shared rules in root `AGENTS.md`): single source is
 `installer/FluentScanner.iss` and the setup name in the root `README.md`
 derive from it (never bumped for docs/refactor/build).
 
+## UI languages (EFIGS)
+
+- Strings live in `Strings/<tag>/Resources.resw` (`en-US`, `it-IT`, `fr-FR`,
+  `de-DE`, `es-ES`); every file carries the same key set — copy `en-US` and
+  translate, never drop a key, keep the `{0}`/`{1}` placeholders.
+- `AppSettings.UiLang()` resolves the language (settings override, else the
+  system language); anything outside EFIGS shows English, never a raw key.
+- `MainWindow.Str()` reads the resw of the effective language straight from
+  disk (`ResFolder()` maps the subtag to the folder). The `x:Uid` keys in
+  XAML would follow the *system* language through internal MRT, so every
+  control that can change at runtime is re-set from `ApplyLanguage()`.
+- Adding a language = resw folder + `<Content Include>` in the csproj + a
+  `RadioMenuFlyoutItem` in View > Language + `UiLang()`/`ResFolder()` cases
+  + the `Language` validation in `Settings.Load()` (the macOS checklist is
+  the last paragraph of `macos/AGENTS.md`).
+- Device-type names (`Router/AP`, `NAS`, `Windows host`, …) stay English on
+  both platforms (macOS `KindNames` does the same); only the column title is
+  localized.
+
 ## GitHub releases
 
 Command (the rest — English notes, last 2 per platform — in root `AGENTS.md`):
